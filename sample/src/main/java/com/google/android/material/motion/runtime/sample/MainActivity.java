@@ -16,10 +16,18 @@
 
 package com.google.android.material.motion.runtime.sample;
 
-import com.google.android.material.motion.runtime.Runtime;
+import com.google.android.material.motion.runtime.Performer;
+import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
+import com.google.android.material.motion.runtime.Performer.PlanPerformance;
+import com.google.android.material.motion.runtime.Plan;
+import com.google.android.material.motion.runtime.Scheduler;
+import com.google.android.material.motion.runtime.Transaction;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 
 /**
@@ -33,7 +41,93 @@ public class MainActivity extends AppCompatActivity {
 
     setContentView(R.layout.main_activity);
 
-    TextView text = (TextView) findViewById(R.id.text);
-    text.setText(Runtime.LIBRARY_NAME);
+    TextView text1 = (TextView) findViewById(R.id.text1);
+    TextView text2 = (TextView) findViewById(R.id.text2);
+
+    text1.setText("");
+    text2.setAlpha(0f);
+
+    Scheduler scheduler = new Scheduler();
+    Transaction transaction = new Transaction();
+
+    transaction.addNamedPlan(new DemoPlan1("trash"), "cd", text1);
+    transaction.addPlan(new DemoPlan1("get"), text1);
+    transaction.addNamedPlan(new DemoPlan1("real"), "cd", text1);
+
+    transaction.addPlan(new DemoPlan2(.5f), text2);
+
+    scheduler.commitTransaction(transaction);
+  }
+
+  private static class DemoPlan1 extends Plan {
+
+    private final String text;
+
+    private DemoPlan1(String text) {
+      this.text = text;
+    }
+
+    @Override
+    public Class<? extends Performer> getPerformerClass() {
+      return DemoPerformer1.class;
+    }
+  }
+
+  public static class DemoPerformer1 extends Performer implements PlanPerformance {
+
+    @Override
+    public void addPlan(Plan plan) {
+      DemoPlan1 demoPlan = (DemoPlan1) plan;
+      TextView target = getTarget();
+
+      target.setText(target.getText() + " " + demoPlan.text);
+    }
+  }
+
+  private static class DemoPlan2 extends Plan {
+    private final float alpha;
+
+    private DemoPlan2(float alpha) {
+      this.alpha = alpha;
+    }
+
+    @Override
+    public Class<? extends Performer> getPerformerClass() {
+      return DemoPerformer2.class;
+    }
+  }
+
+  public static class DemoPerformer2 extends Performer
+      implements PlanPerformance, DelegatedPerformance {
+
+    private DelegatedPerformanceCallback callback;
+
+    @Override
+    public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void addPlan(Plan plan) {
+      DemoPlan2 demoPlan = (DemoPlan2) plan;
+      View target = getTarget();
+
+      target
+          .animate()
+          .alpha(demoPlan.alpha)
+          .setDuration(2000)
+          .setListener(
+              new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                  callback.onDelegatedPerformanceStart(DemoPerformer2.this, "alpha");
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                  callback.onDelegatedPerformanceEnd(DemoPerformer2.this, "alpha");
+                }
+              });
+    }
   }
 }

@@ -18,6 +18,7 @@ android {
 
 dependencies {
   // add dependencies here
+  compile 'com.android.support:support-v4:23.4.0'
 }
 
 // build a jar with source files
