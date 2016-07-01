@@ -1,52 +1,31 @@
-# A convention for Android libraries
+# Runtime
 
-The file system structure in this repo defines the conventions for a shared Android library.
+Describe your library here.
 
-    LibraryName/
-      .editorconfig             <- Libraries are expected to follow a standard format.
-      build.gradle              <- Libraries should support the Gradle build system.
+### Depending on the library
 
-      LICENSE                   <- License.
-      README.md                 <- Essential installation and usage guide.
-      CONTRIBUTING.md           <- Details for external contributors.
-
-      library/                  <- The library module.
-        build.gradle            <- Gradle build file for the library.
-        src/
-          main/                 <- The code for the library.
-            AndroidManifest.xml <- The manifest for the library.
-            java/               <- Java source files.
-            res/                <- Android resources.
-          androidTest/          <- Tests.
-
-      sample/                   <- The sample module.
-        build.gradle            <- Gradle build file for the sample.
-        src/
-          main/                 <- The code for the sample.
-            AndroidManifest.xml <- The manifest for the sample.
-            java/               <- Java source files.
-            res/                <- Android resources.
-
-## Bootstrap script
-
-The bootstrap script creates the skeletal directory structure for an
-Android library repo.
-This script must be provided a library name, package name, github group,
-and github repo.
-
-Example usage:
-
-1. Create new Github repository `github-repo` in Github group `github-username`.
-1. Clone this `android-conventions` repo into a local directory `~/github/github-repo`.
+Add it to your build.gradle with:
+```gradle
+allprojects {
+    repositories {
+        maven { url "https://jitpack.io" }
+    }
+}
 ```
-$ git clone git@github.com:material-motion/material-motion-conventions-android.git ~/github/github-repo
-$ cd ~/github/github-repo
+and:
+
+```gradle
+dependencies {
+    compile 'com.github.material-motion:material-motion-runtime-android:master-SNAPSHOT'
+}
 ```
-1. Run bootstrap.sh script.
-```
-$ ./bootstrap.sh MyLibrary com.example.library github-username github-repo
-```
-1. Push to new repo.
-```
-$ git push -u origin master
-```
+
+### Contributing to the library
+
+Open Android Studio,
+choose `File > New > Import`,
+choose the root `build.gradle` file.
+
+### Building the sample
+
+Run `./gradlew installDebug` from the project root.

@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.material.motion.convention;
-
-import android.app.Application;
-import android.test.ApplicationTestCase;
+package com.google.android.material.motion.runtime;
 
 /**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
+ * Runtime library class.
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
+public class Runtime {
 
-  public ApplicationTest() {
-    super(Application.class);
-  }
+  public static final String LIBRARY_NAME = "Runtime";
 }

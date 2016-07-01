@@ -15,5 +15,5 @@
   ~ under the License.
 -->
 <resources>
-  <string name="app_name">Convention Sample</string>
+  <string name="app_name">Runtime Sample</string>
 </resources>

@@ -15,7 +15,7 @@
   ~ under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.google.android.material.motion.convention.sample">
+  package="com.google.android.material.motion.runtime.sample">
 
   <application
     android:allowBackup="true"
