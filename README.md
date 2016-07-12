@@ -17,22 +17,7 @@ Learn more about the APIs defined in the library by reading our
 
 ## Depending on the library
 
-### Manually
-
-1. Run `./gradlew build` from the project root. It will generate `library/build/outputs/aar/library-release.aar`.
-1. Open your project in Android Studio. Select `File > New > New Module... > Import .JAR/.AAR Package`.
-1. Select the AAR file generated from step 1. Name the new module `material-motion-runtime`.
-1. Add the dependency to your module's `build.gradle`:
-
-```gradle
-dependencies {
-  compile project(':material-motion-runtime')
-}
-```
-
 ### Using Jitpack
-
-> This section is under construction.
 
 Add the Jitpack repository to your project's `build.gradle`:
 ```gradle
