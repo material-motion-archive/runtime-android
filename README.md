@@ -19,6 +19,9 @@ Learn more about the APIs defined in the library by reading our
 
 ### Using Jitpack
 
+Jitpack allows you to easily add a dependency on any of the [published releases](https://github.com/material-motion/material-motion-runtime-android/releases)
+for this library.
+
 Add the Jitpack repository to your project's `build.gradle`:
 
 ```gradle
@@ -40,8 +43,8 @@ dependencies {
 ```
 
 Later on in the project you may want to freeze to a specific version of
-the library. This makes builds predictable and reproducible, so **it is
-highly recommended**.
+the library. This is **highly recommended** because it makes your builds
+predictable and reproducible. Take care to occasionally [check for updates](https://github.com/ben-manes/gradle-versions-plugin).
 
 ```gradle
 dependencies {
@@ -50,8 +53,8 @@ dependencies {
 ```
 
 It is also possible to specify a *dynamic version* range. This is useful
-to stay up to date on a major version, without the risks of breaking
-changes in new library releases.
+to stay up to date on a major version, without the risk of new library releases
+introducing breaking changes into your project.
 
 ```gradle
 dependencies {
@@ -76,7 +79,7 @@ dependencies {
 ```
 
 To use this option, you must run `gradle install` from the library's
-project root every time you want local changes to the library to
+project root every time you want local changes in the library to
 propagate to the clients.
 
 ## Contributing

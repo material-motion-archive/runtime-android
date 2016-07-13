@@ -19,6 +19,7 @@ package com.google.android.material.motion.runtime;
 import static com.google.android.material.motion.runtime.Scheduler.DELEGATED_DETAILED_STATE_FLAG;
 import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAILED_STATE_FLAG;
 
+import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceCallback;
 import com.google.android.material.motion.runtime.Performer.ManualPerformance;
@@ -26,9 +27,6 @@ import com.google.android.material.motion.runtime.Performer.PerformerInstantiati
 import com.google.android.material.motion.runtime.Performer.PlanPerformance;
 import com.google.android.material.motion.runtime.Scheduler.State;
 import com.google.android.material.motion.runtime.Transaction.PlanInfo;
-
-import android.support.v4.util.SimpleArrayMap;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;

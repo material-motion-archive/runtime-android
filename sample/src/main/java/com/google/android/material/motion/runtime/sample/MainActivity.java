@@ -16,6 +16,12 @@
 
 package com.google.android.material.motion.runtime.sample;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.TextView;
 import com.google.android.material.motion.runtime.Performer;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
 import com.google.android.material.motion.runtime.Performer.PlanPerformance;
@@ -23,15 +29,8 @@ import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.Scheduler;
 import com.google.android.material.motion.runtime.Transaction;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.TextView;
-
 /**
- * Runtime sample Activity.
+ * Material Motion Android Runtime sample Activity.
  */
 public class MainActivity extends AppCompatActivity {
 

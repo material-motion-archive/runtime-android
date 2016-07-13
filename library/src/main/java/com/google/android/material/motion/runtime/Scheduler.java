@@ -16,13 +16,11 @@
 
 package com.google.android.material.motion.runtime;
 
-import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
-import com.google.android.material.motion.runtime.Transaction.PlanInfo;
-
 import android.support.annotation.IntDef;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
-
+import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
+import com.google.android.material.motion.runtime.Transaction.PlanInfo;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashSet;
