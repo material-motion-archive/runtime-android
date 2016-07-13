@@ -20,6 +20,7 @@ Learn more about the APIs defined in the library by reading our
 ### Using Jitpack
 
 Add the Jitpack repository to your project's `build.gradle`:
+
 ```gradle
 allprojects {
     repositories {
@@ -28,13 +29,55 @@ allprojects {
 }
 ```
 
+When starting out with a project it is likely that you will want to use
+the latest version of the library.
 Add the dependency to your module's `build.gradle`:
+
+```gradle
+dependencies {
+    compile 'com.github.material-motion:material-motion-runtime-android:+'
+}
+```
+
+Later on in the project you may want to freeze to a specific version of
+the library. This makes builds predictable and reproducible, so **it is
+highly recommended**.
 
 ```gradle
 dependencies {
     compile 'com.github.material-motion:material-motion-runtime-android:1.0.0'
 }
 ```
+
+It is also possible to specify a *dynamic version* range. This is useful
+to stay up to date on a major version, without the risks of breaking
+changes in new library releases.
+
+```gradle
+dependencies {
+    compile 'com.github.material-motion:material-motion-runtime-android:1.+'
+}
+```
+
+For more information regarding versioning, see:
+
+- [Gradle Documentation on Dynamic Versions](https://docs.gradle.org/current/userguide/dependency_management.html#sub:dynamic_versions_and_changing_modules)
+- [Material Motion Versioning Policies](https://material-motion.gitbooks.io/material-motion-team/content/essentials/core_team_contributors/release_process.html#versioning)
+
+### Using the files from a folder local to the machine
+
+If you would like to edit this library in tandem with its client project
+you can use `:local`.
+
+```gradle
+dependencies {
+    compile 'com.github.material-motion:material-motion-runtime-android:local'
+}
+```
+
+To use this option, you must run `gradle install` from the library's
+project root every time you want local changes to the library to
+propagate to the clients.
 
 ## Contributing
 
@@ -54,7 +97,7 @@ choose the root `build.gradle` file.
 
 ### Building the sample
 
-Run `./gradlew installDebug` from the project root.
+Run `gradle installDebug` from the project root.
 
 ## License
 
