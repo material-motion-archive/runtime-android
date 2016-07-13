@@ -3,6 +3,13 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.github.material-motion'
 
+install {
+  repositories.mavenInstaller {
+    pom.version = 'local'
+    pom.artifactId = 'material-motion-runtime-android'
+  }
+}
+
 android {
   compileSdkVersion 23
   buildToolsVersion "23.0.2"
