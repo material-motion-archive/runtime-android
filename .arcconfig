@@ -1,12 +1,12 @@
 {
   "load": [
-    "third_party/arc-proselint",
+    ".arc-hooks/post-diff/arc-hook-github-issues",
     "third_party/arc-hook-conphig",
-    ".arc-hooks/post-diff/arc-hook-github-issues"
+    "third_party/arc-proselint"
   ],
-  "arcanist_configuration" : "HookConphig",
-  "phabricator.uri" : "http://codereview.cc/",
-  "arc.land.onto.default" : "develop",
+  "arcanist_configuration": "HookConphig",
+  "phabricator.uri": "http://codereview.cc/",
+  "arc.land.onto.default": "develop",
   "arc.feature.start.default": "origin/develop",
-  "git.default-relative-commit" : "origin/develop"
+  "git.default-relative-commit": "origin/develop"
 }

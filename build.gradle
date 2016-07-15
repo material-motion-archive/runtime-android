@@ -1,3 +1,5 @@
+apply from: 'local-dependency-substitution.gradle'
+
 buildscript {
   repositories {
     jcenter()

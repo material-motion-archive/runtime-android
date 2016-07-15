@@ -1,0 +1,26 @@
+# List local dependencies here to be applied to all projects in this library.
+#
+# ██████╗ ██╗     ███████╗ █████╗ ███████╗███████╗    ██████╗ ███████╗ █████╗ ██████╗
+# ██╔══██╗██║     ██╔════╝██╔══██╗██╔════╝██╔════╝    ██╔══██╗██╔════╝██╔══██╗██╔══██╗
+# ██████╔╝██║     █████╗  ███████║███████╗█████╗      ██████╔╝█████╗  ███████║██║  ██║
+# ██╔═══╝ ██║     ██╔══╝  ██╔══██║╚════██║██╔══╝      ██╔══██╗██╔══╝  ██╔══██║██║  ██║
+# ██║     ███████╗███████╗██║  ██║███████║███████╗    ██║  ██║███████╗██║  ██║██████╔╝
+# ╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝    ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝
+#
+# Format:
+#
+# [group]:[name]
+#
+# Example:
+#
+# com.github.material-motion:material-motion-runtime-android
+#
+# These are dependencies defined in your build.gradle for which you would like to reflect any local
+# changes. This is useful if you would like to develop multiple libraries in tandem.
+#
+# For each dependency listed, you *must* run `gradle install` from its project root every time you
+# make a change to it. That command will publish your latest changes to the local maven repository.
+# If your local dependencies have local dependencies of their own, you must `gradle install` them as
+# well. See https://github.com/material-motion/material-motion-runtime-android/issues/16.
+#
+# You must `gradle clean` this library every time you add or remove a local dependency.
