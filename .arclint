@@ -3,6 +3,15 @@
     "chmod": {
       "type": "chmod"
     },
+    "text": {
+      "type": "text",
+      "include": "(\\.(java|xml)$)",
+      "exclude": [],
+      "severity": {
+        "3": "disabled",
+        "5": "disabled"
+      }
+    },
     "prose": {
       "type": "prose",
       "include": "(\\.(md)$)",
