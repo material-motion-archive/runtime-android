@@ -56,10 +56,10 @@ public abstract class Performer {
    *
    * <p>
    * The only requirement is that the Performer must be able to notify the
-   * {@link DelegatedPerformanceCallback callback} when the delegated work
-   * {@link DelegatedPerformanceCallback#onDelegatedPerformanceStart(DelegatedPerformance, String) starts}
+   * {@link DelegatedPerformanceTokenCallback callback} when the delegated work
+   * {@link DelegatedPerformanceTokenCallback#onDelegatedPerformanceStart(DelegatedPerformance) starts}
    * and
-   * {@link DelegatedPerformanceCallback#onDelegatedPerformanceEnd(DelegatedPerformance, String) ends}.
+   * {@link DelegatedPerformanceTokenCallback#onDelegatedPerformanceEnd(DelegatedPerformance, DelegatedPerformanceToken) ends}.
    */
   public interface DelegatedPerformance {
 
@@ -67,11 +67,19 @@ public abstract class Performer {
      * Called by the {@link Scheduler} to supply the {@link Performer} with a
      * {@link DelegatedPerformanceCallback}.
      */
+    @Deprecated
     void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback);
+
+    /**
+     * Called by the {@link Scheduler} to supply the {@link Performer} with a
+     * {@link DelegatedPerformanceTokenCallback}.
+     */
+    void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback);
 
     /**
      * A callback to be provided to a {@link DelegatedPerformance} Performer.
      */
+    @Deprecated
     interface DelegatedPerformanceCallback {
 
       /**
@@ -89,6 +97,37 @@ public abstract class Performer {
        * @param name The identifier of the delegated performance. Must have a matching start and end.
        */
       void onDelegatedPerformanceEnd(DelegatedPerformance performer, String name);
+    }
+
+    /**
+     * A token representing a single unit of delegated performance.
+     */
+    final class DelegatedPerformanceToken {}
+
+    /**
+     * A callback to be provided to a {@link DelegatedPerformance} Performer.
+     */
+    interface DelegatedPerformanceTokenCallback {
+
+      /**
+       * Notifies that the delegated performance has started.
+       *
+       * @param performer The Performer whose delegated performance has started.
+       *
+       * @return The token of the delegated performance. Must be provided to
+       *     {@link #onDelegatedPerformanceEnd(DelegatedPerformance, DelegatedPerformanceToken)}.
+       */
+      DelegatedPerformanceToken onDelegatedPerformanceStart(DelegatedPerformance performer);
+
+      /**
+       * Notifies that the delegated performance has ended.
+       *
+       * @param performer The Performer whose delegated performance has ended.
+       * @param token The token of the delegated performance returned by
+       *     {@link #onDelegatedPerformanceStart(DelegatedPerformance)}.
+       */
+      void onDelegatedPerformanceEnd(
+          DelegatedPerformance performer, DelegatedPerformanceToken token);
     }
   }
 

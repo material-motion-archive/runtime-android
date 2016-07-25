@@ -99,10 +99,15 @@ public class MainActivity extends AppCompatActivity {
   public static class DemoPerformer2 extends Performer
       implements PlanPerformance, DelegatedPerformance {
 
-    private DelegatedPerformanceCallback callback;
+    private DelegatedPerformanceTokenCallback callback;
 
     @Override
     public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
+      // Deprecated.
+    }
+
+    @Override
+    public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
       this.callback = callback;
     }
 
@@ -117,14 +122,16 @@ public class MainActivity extends AppCompatActivity {
           .setDuration(2000)
           .setListener(
               new AnimatorListenerAdapter() {
+                private DelegatedPerformanceToken token;
+
                 @Override
                 public void onAnimationStart(Animator animation) {
-                  callback.onDelegatedPerformanceStart(DemoPerformer2.this, "alpha");
+                  token = callback.onDelegatedPerformanceStart(DemoPerformer2.this);
                 }
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                  callback.onDelegatedPerformanceEnd(DemoPerformer2.this, "alpha");
+                  callback.onDelegatedPerformanceEnd(DemoPerformer2.this, token);
                 }
               });
     }

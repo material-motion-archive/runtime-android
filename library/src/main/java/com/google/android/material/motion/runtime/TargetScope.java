@@ -22,6 +22,8 @@ import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAIL
 import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceCallback;
+import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceToken;
+import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceTokenCallback;
 import com.google.android.material.motion.runtime.Performer.ManualPerformance;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
 import com.google.android.material.motion.runtime.Performer.PlanPerformance;
@@ -44,8 +46,13 @@ class TargetScope {
       new SimpleArrayMap<>();
 
   private final Set<ManualPerformance> activeManualPerformances = new HashSet<>();
+
+  @Deprecated
   private final SimpleArrayMap<DelegatedPerformance, Set<String>> activeDelegatedPerformances =
       new SimpleArrayMap<>();
+
+  private final SimpleArrayMap<DelegatedPerformance, Set<DelegatedPerformanceToken>>
+      activeTokenDelegatedPerformances = new SimpleArrayMap<>();
 
   private final Scheduler scheduler;
 
@@ -63,7 +70,9 @@ class TargetScope {
 
     if (performer instanceof DelegatedPerformance) {
       ((DelegatedPerformance) performer)
-          .setDelegatedPerformanceCallback(delegatedPerformanceCallback);
+        .setDelegatedPerformanceCallback(delegatedPerformanceCallback);
+      ((DelegatedPerformance) performer)
+        .setDelegatedPerformanceCallback(delegatedPerformanceTokenCallback);
     }
 
     if (performer instanceof PlanPerformance) {
@@ -98,7 +107,7 @@ class TargetScope {
     if (!activeManualPerformances.isEmpty()) {
       state |= MANUAL_DETAILED_STATE_FLAG;
     }
-    if (!activeDelegatedPerformances.isEmpty()) {
+    if (!activeDelegatedPerformances.isEmpty() || !activeTokenDelegatedPerformances.isEmpty()) {
       state |= DELEGATED_DETAILED_STATE_FLAG;
     }
     return state;
@@ -140,8 +149,10 @@ class TargetScope {
    * The {@link DelegatedPerformanceCallback} assigned to every {@link DelegatedPerformance} in
    * this TargetScope.
    */
+  @Deprecated
   private final DelegatedPerformanceCallback delegatedPerformanceCallback =
       new DelegatedPerformanceCallback() {
+
         @Override
         public void onDelegatedPerformanceStart(DelegatedPerformance performer, String name) {
           Set<String> delegatedNames = activeDelegatedPerformances.get(performer);
@@ -172,6 +183,51 @@ class TargetScope {
 
           if (delegatedNames.isEmpty()) {
             activeDelegatedPerformances.remove(performer);
+          }
+
+          notifyTargetStateChanged();
+        }
+      };
+
+  /**
+   * The {@link DelegatedPerformanceTokenCallback} assigned to every {@link DelegatedPerformance} in
+   * this TargetScope.
+   */
+  private final DelegatedPerformanceTokenCallback delegatedPerformanceTokenCallback =
+      new DelegatedPerformanceTokenCallback() {
+        @Override
+        public DelegatedPerformanceToken onDelegatedPerformanceStart(
+            DelegatedPerformance performer) {
+          Set<DelegatedPerformanceToken> delegatedTokens =
+              activeTokenDelegatedPerformances.get(performer);
+
+          if (delegatedTokens == null) {
+            delegatedTokens = new HashSet<>();
+            activeTokenDelegatedPerformances.put(performer, delegatedTokens);
+          }
+
+          DelegatedPerformanceToken token = new DelegatedPerformanceToken();
+          delegatedTokens.add(token);
+
+          notifyTargetStateChanged();
+
+          return token;
+        }
+
+        @Override
+        public void onDelegatedPerformanceEnd(
+            DelegatedPerformance performer, DelegatedPerformanceToken token) {
+          Set<DelegatedPerformanceToken> delegatedTokens =
+              activeTokenDelegatedPerformances.get(performer);
+
+          boolean modified = delegatedTokens.remove(token);
+          if (!modified) {
+            throw new IllegalArgumentException(
+                "Expected delegated performance to be active: " + token);
+          }
+
+          if (delegatedTokens.isEmpty()) {
+            activeTokenDelegatedPerformances.remove(performer);
           }
 
           notifyTargetStateChanged();
