@@ -1,20 +1,30 @@
+sudo: false
 language: android
 jdk: oraclejdk8
 env:
   matrix:
     - ANDROID_TARGET=android-23  ANDROID_ABI=armeabi-v7a
+    - ADB_INSTALL_TIMEOUT=8
 
 android:
   components:
+    - platform-tools
+    - tools
     - android-23
     - build-tools-23.0.2
     - sys-img-armeabi-v7a-android-23
 
+licenses:
+  - 'android-sdk-license-.+'
+
 before_script:
-  - android list targets
-  - echo no | android create avd --force -n test -t android-23 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
+  - echo no | android create avd --force --name test --target android-23 --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-audio -no-window -gpu off -no-boot-anim &
   - android-wait-for-emulator
+  - adb devices
   - adb shell input keyevent 82 &
 
-script: ./gradlew connectedAndroidTest -PdisablePreDex
+script:
+  - echo $ADB_INSTALL_TIMEOUT
+  - android list target
+  - ./gradlew connectedAndroidTest
