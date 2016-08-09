@@ -16,3 +16,5 @@ test:
     - circle-android wait-for-boot
     # run tests  against the emulator.
     - ./gradlew connectedAndroidTest
+  post:
+    - bash <(curl -s https://codecov.io/bash)
