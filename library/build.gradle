@@ -21,6 +21,12 @@ android {
     versionName "1.0"
     consumerProguardFiles 'proguard-rules.pro'
   }
+
+  buildTypes {
+    debug {
+      testCoverageEnabled true
+    }
+  }
 }
 
 dependencies {
