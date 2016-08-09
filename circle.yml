@@ -12,9 +12,9 @@ test:
     - emulator -avd circleci-android22 -no-audio -no-window:
         background: true
         parallel: true
-    # wait for it to have booted
+    # wait for it to boot
     - circle-android wait-for-boot
-    # run tests  against the emulator.
-    - ./gradlew connectedAndroidTest
+    # run tests against the emulator.
+    - ./gradlew library:connectedAndroidTest
   post:
     - bash <(curl -s https://codecov.io/bash)
