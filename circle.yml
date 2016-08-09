@@ -15,4 +15,4 @@ test:
     # wait for it to have booted
     - circle-android wait-for-boot
     # run tests  against the emulator.
-    - ./gradlew :app:connectedAndroidTest
+    - ./gradlew connectedAndroidTest
