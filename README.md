@@ -1,4 +1,5 @@
 # Material Motion Android Runtime
+[![Build Status](https://circleci.com/gh/material-motion/material-motion-runtime-android.svg?style=shield)](https://circleci.com/gh/material-motion/material-motion-runtime-android)
 
 The Material Motion Runtime is a tool for describing motion declaratively.
 
