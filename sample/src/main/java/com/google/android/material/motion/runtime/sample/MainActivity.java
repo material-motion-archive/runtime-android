@@ -16,6 +16,12 @@
 
 package com.google.android.material.motion.runtime.sample;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.TextView;
 import com.google.android.material.motion.runtime.Performer;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
 import com.google.android.material.motion.runtime.Performer.PlanPerformance;
@@ -23,15 +29,8 @@ import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.Scheduler;
 import com.google.android.material.motion.runtime.Transaction;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.TextView;
-
 /**
- * Runtime sample Activity.
+ * Material Motion Android Runtime sample Activity.
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -100,10 +99,15 @@ public class MainActivity extends AppCompatActivity {
   public static class DemoPerformer2 extends Performer
       implements PlanPerformance, DelegatedPerformance {
 
-    private DelegatedPerformanceCallback callback;
+    private DelegatedPerformanceTokenCallback callback;
 
     @Override
     public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
+      // Deprecated.
+    }
+
+    @Override
+    public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
       this.callback = callback;
     }
 
@@ -118,14 +122,16 @@ public class MainActivity extends AppCompatActivity {
           .setDuration(2000)
           .setListener(
               new AnimatorListenerAdapter() {
+                private DelegatedPerformanceToken token;
+
                 @Override
                 public void onAnimationStart(Animator animation) {
-                  callback.onDelegatedPerformanceStart(DemoPerformer2.this, "alpha");
+                  token = callback.onDelegatedPerformanceStart(DemoPerformer2.this);
                 }
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                  callback.onDelegatedPerformanceEnd(DemoPerformer2.this, "alpha");
+                  callback.onDelegatedPerformanceEnd(DemoPerformer2.this, token);
                 }
               });
     }

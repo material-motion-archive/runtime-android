@@ -1,3 +1,5 @@
+apply from: 'local-dependency-substitution.gradle'
+
 buildscript {
   repositories {
     jcenter()
@@ -11,5 +13,6 @@ buildscript {
 allprojects {
   repositories {
     jcenter()
+    maven { url "https://jitpack.io" }
   }
 }
