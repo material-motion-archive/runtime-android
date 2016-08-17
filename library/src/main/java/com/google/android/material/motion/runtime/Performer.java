@@ -173,7 +173,13 @@ public abstract class Performer {
    */
   public final void initialize(Object target) {
     this.target = target;
+    onInitialize(target);
   }
+
+  /**
+   * Invoked immediately after this Performer has been initialized with a target.
+   */
+  protected void onInitialize(Object target) {}
 
   /**
    * Returns the target that this Performer is associated with.
