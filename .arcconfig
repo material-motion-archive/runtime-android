@@ -1,7 +1,7 @@
 {
   "load": [
-    "material-arc-tools/third_party/arc-hook-conphig",
     "material-arc-tools/third_party/arc-hook-github-issues",
+    "material-arc-tools/third_party/arc-hook-conphig",
     "material-arc-tools/third_party/arc-proselint"
   ],
   "arcanist_configuration": "HookConphig",
