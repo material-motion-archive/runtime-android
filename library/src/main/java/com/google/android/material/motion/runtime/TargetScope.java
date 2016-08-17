@@ -20,6 +20,9 @@ import static com.google.android.material.motion.runtime.Scheduler.DELEGATED_DET
 import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAILED_STATE_FLAG;
 
 import android.support.v4.util.SimpleArrayMap;
+import com.google.android.material.motion.runtime.Performer.ComposablePerformance;
+import com.google.android.material.motion.runtime.Performer.ComposablePerformance.ComposablePerformanceCallback;
+import com.google.android.material.motion.runtime.Performer.ComposablePerformance.Work;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceCallback;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceToken;
@@ -73,6 +76,11 @@ class TargetScope {
         .setDelegatedPerformanceCallback(delegatedPerformanceCallback);
       ((DelegatedPerformance) performer)
         .setDelegatedPerformanceCallback(delegatedPerformanceTokenCallback);
+    }
+
+    if (performer instanceof ComposablePerformance) {
+      ((ComposablePerformance) performer)
+        .setComposablePerformanceCallback(composablePerformanceCallback);
     }
 
     if (performer instanceof PlanPerformance) {
@@ -233,4 +241,14 @@ class TargetScope {
           notifyTargetStateChanged();
         }
       };
+
+  private final ComposablePerformanceCallback composablePerformanceCallback =
+    new ComposablePerformanceCallback() {
+      @Override
+      public void transact(Work work) {
+        Transaction transaction = new Transaction();
+        work.work(transaction);
+        scheduler.commitTransaction(transaction);
+      }
+    };
 }

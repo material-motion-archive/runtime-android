@@ -152,6 +152,48 @@ public abstract class Performer {
   }
 
   /**
+   * A Performer implements this interface in order to commit new {@link Plan Plans}.
+   *
+   * <p>
+   * The Performer should call {@link ComposablePerformanceCallback#transact(Work)} to receive a
+   * {@link Transaction} to add plans to.
+   */
+  public interface ComposablePerformance {
+
+    /**
+     * Called by the {@link Scheduler} to supply the {@link Performer} with a
+     * {@link ComposablePerformanceCallback}.
+     */
+    void setComposablePerformanceCallback(ComposablePerformanceCallback callback);
+
+    /**
+     * A callback to be provided to a {@link ComposablePerformance} Performer.
+     */
+    interface ComposablePerformanceCallback {
+
+      /**
+       * The {@link Performer} calls this when it wants to commit new {@link Plan Plans} to the
+       * {@link Scheduler}.
+       *
+       * @param work A {@link Work} that adds new Plans to a {@link Transaction} provided by the
+       *     Scheduler.
+       */
+      void transact(Work work);
+    }
+
+    /**
+     * A function object that adds {@link Plan Plans} to a {@link Transaction}.
+     */
+    abstract class Work {
+
+      /**
+       * Adds {@link Plan Plans} to a {@link Transaction}.
+       */
+      abstract void work(Transaction transaction);
+    }
+  }
+
+  /**
    * Thrown when there is an instantiation failure. Make sure that your
    * {@link Performer}'s class name exists, is public, and has an empty constructor that is public.
    */
