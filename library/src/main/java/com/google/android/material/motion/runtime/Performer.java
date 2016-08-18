@@ -189,7 +189,7 @@ public abstract class Performer {
       /**
        * Adds {@link Plan Plans} to a {@link Transaction}.
        */
-      abstract void work(Transaction transaction);
+      public abstract void work(Transaction transaction);
     }
   }
 
