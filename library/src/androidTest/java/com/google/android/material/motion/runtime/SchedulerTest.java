@@ -16,7 +16,10 @@
 
 package com.google.android.material.motion.runtime;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.test.AndroidTestCase;
+import android.view.View;
 import android.widget.TextView;
 
 public class SchedulerTest extends AndroidTestCase {
@@ -52,7 +55,7 @@ public class SchedulerTest extends AndroidTestCase {
   }
 
   public void testDelegatePlanPerformanceSchedulerState() {
-    transaction.addNamedPlan(new DelegatedPlan("delegated"), "plan", textView);
+    transaction.addNamedPlan(new DelegatedPlan(500, 500), "plan", textView);
     scheduler.commitTransaction(transaction);
 
     assertTrue(scheduler.getState() == Scheduler.IDLE);
@@ -69,6 +72,22 @@ public class SchedulerTest extends AndroidTestCase {
 
     assertTrue(firstListener.getState() == Scheduler.ACTIVE);
     assertTrue(secondListener.getState() == Scheduler.ACTIVE);
+  }
+
+  public void testRemovingSchedulerListeners() {
+    TestSchedulerListener firstListener = new TestSchedulerListener();
+    TestSchedulerListener secondListener = new TestSchedulerListener();
+    scheduler.addStateListener(firstListener);
+    scheduler.addStateListener(secondListener);
+
+    transaction.addNamedPlan(new ManualPlan("manual"), "plan", textView);
+
+    scheduler.removeStateListener(secondListener);
+
+    scheduler.commitTransaction(transaction);
+
+    assertTrue(firstListener.getState() == Scheduler.ACTIVE);
+    assertTrue(secondListener.getState() == Scheduler.IDLE);
   }
 
   private static class StandardPlan extends Plan {
@@ -101,10 +120,12 @@ public class SchedulerTest extends AndroidTestCase {
 
   private static class DelegatedPlan extends Plan {
 
-    private final String text;
+    private final int x;
+    private final int y;
 
-    private DelegatedPlan(String text) {
-      this.text = text;
+    private DelegatedPlan(int x, int y) {
+      this.x = x;
+      this.y = y;
     }
 
     @Override
@@ -131,10 +152,29 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  public static class DelegatedPerformer extends Performer implements Performer.DelegatedPerformance {
+  public static class DelegatedPerformer extends Performer implements Performer.DelegatedPerformance, Performer.PlanPerformance {
 
-    private DelegatedPerformanceCallback callback;
     private DelegatedPerformanceTokenCallback tokenCallback;
+
+    @Override
+    public void addPlan(Plan plan) {
+      DelegatedPlan delegatedPlan = (DelegatedPlan) plan;
+      View target = getTarget();
+      target.animate().x(delegatedPlan.x).y(delegatedPlan.y).setDuration(5000).setListener(
+          new AnimatorListenerAdapter() {
+            private DelegatedPerformanceToken token;
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+              token = tokenCallback.onDelegatedPerformanceStart(DelegatedPerformer.this);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+              tokenCallback.onDelegatedPerformanceEnd(DelegatedPerformer.this, token);
+            }
+          });
+    }
 
     @Override
     public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
@@ -143,7 +183,7 @@ public class SchedulerTest extends AndroidTestCase {
 
     @Override
     public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
-      this.callback = callback;
+
     }
   }
 
