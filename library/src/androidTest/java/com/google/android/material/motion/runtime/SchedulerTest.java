@@ -55,10 +55,10 @@ public class SchedulerTest extends AndroidTestCase {
   }
 
   public void testDelegatePlanPerformanceSchedulerState() {
-    transaction.addNamedPlan(new DelegatedPlan(500, 500), "plan", textView);
+    transaction.addPlan(new DelegatedPlan(500, 500), textView);
     scheduler.commitTransaction(transaction);
 
-    assertTrue(scheduler.getState() == Scheduler.IDLE);
+    assertTrue(scheduler.getState() == Scheduler.ACTIVE);
   }
 
   public void testAddingMultipleSchedulerListeners() {
