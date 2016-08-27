@@ -61,13 +61,30 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(scheduler.getState() == Scheduler.IDLE);
   }
 
-  public void testAddingSchedulerListeners() {
+  public void testAddingMultipleSchedulerListeners() {
     TestSchedulerListener firstListener = new TestSchedulerListener();
     TestSchedulerListener secondListener = new TestSchedulerListener();
     scheduler.addStateListener(firstListener);
     scheduler.addStateListener(secondListener);
 
-    transaction.addNamedPlan(new ManualPlan("manual"), "plan", textView);
+    transaction.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
+    transaction.addPlan(new StandardPlan("standard one"), textView);
+
+    scheduler.commitTransaction(transaction);
+
+    assertTrue(firstListener.getState() == Scheduler.ACTIVE);
+    assertTrue(secondListener.getState() == Scheduler.ACTIVE);
+  }
+
+  public void testAddOrderedMultipleSchedulerListeners() {
+    TestSchedulerListener firstListener = new TestSchedulerListener();
+    TestSchedulerListener secondListener = new TestSchedulerListener();
+    scheduler.addStateListener(firstListener);
+    scheduler.addStateListener(secondListener);
+
+    transaction.addPlan(new StandardPlan("standard one"), textView);
+    transaction.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
+
     scheduler.commitTransaction(transaction);
 
     assertTrue(firstListener.getState() == Scheduler.ACTIVE);
