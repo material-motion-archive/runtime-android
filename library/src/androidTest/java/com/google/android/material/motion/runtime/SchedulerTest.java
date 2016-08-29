@@ -16,10 +16,7 @@
 
 package com.google.android.material.motion.runtime;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.test.AndroidTestCase;
-import android.view.View;
 import android.widget.TextView;
 
 public class SchedulerTest extends AndroidTestCase {
@@ -49,13 +46,6 @@ public class SchedulerTest extends AndroidTestCase {
 
   public void testManualPlanPerformanceSchedulerState() {
     transaction.addNamedPlan(new ManualPlan("manual"), "plan", textView);
-    scheduler.commitTransaction(transaction);
-
-    assertTrue(scheduler.getState() == Scheduler.ACTIVE);
-  }
-
-  public void testDelegatePlanPerformanceSchedulerState() {
-    transaction.addPlan(new DelegatedPlan(500, 500), textView);
     scheduler.commitTransaction(transaction);
 
     assertTrue(scheduler.getState() == Scheduler.ACTIVE);
@@ -135,22 +125,6 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  private static class DelegatedPlan extends Plan {
-
-    private final int x;
-    private final int y;
-
-    private DelegatedPlan(int x, int y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    @Override
-    public Class<? extends Performer> getPerformerClass() {
-      return DelegatedPerformer.class;
-    }
-  }
-
   public static class StandardPlanPerformer extends Performer implements Performer.PlanPerformance {
 
     @Override
@@ -166,41 +140,6 @@ public class SchedulerTest extends AndroidTestCase {
     @Override
     public int update(float deltaTimeMs) {
       return Scheduler.ACTIVE;
-    }
-  }
-
-  public static class DelegatedPerformer extends Performer implements Performer.DelegatedPerformance, Performer.PlanPerformance {
-
-    private DelegatedPerformanceTokenCallback tokenCallback;
-
-    @Override
-    public void addPlan(Plan plan) {
-      DelegatedPlan delegatedPlan = (DelegatedPlan) plan;
-      View target = getTarget();
-      target.animate().x(delegatedPlan.x).y(delegatedPlan.y).setDuration(5000).setListener(
-          new AnimatorListenerAdapter() {
-            private DelegatedPerformanceToken token;
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-              token = tokenCallback.onDelegatedPerformanceStart(DelegatedPerformer.this);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-              tokenCallback.onDelegatedPerformanceEnd(DelegatedPerformer.this, token);
-            }
-          });
-    }
-
-    @Override
-    public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
-      this.tokenCallback = callback;
-    }
-
-    @Override
-    public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
-
     }
   }
 
