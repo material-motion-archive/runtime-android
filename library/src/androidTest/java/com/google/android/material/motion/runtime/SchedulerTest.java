@@ -17,6 +17,7 @@
 package com.google.android.material.motion.runtime;
 
 import android.test.AndroidTestCase;
+import android.view.View;
 import android.widget.TextView;
 
 public class SchedulerTest extends AndroidTestCase {
@@ -97,6 +98,13 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(secondListener.getState() == Scheduler.IDLE);
   }
 
+  public void testDelegatePlanPerformanceSchedulerState() {
+    transaction.addNamedPlan(new DelegatedPlan("delegated"), "plan", textView);
+    scheduler.commitTransaction(transaction);
+
+    assertTrue(scheduler.getState() == Scheduler.IDLE);
+  }
+
   private static class StandardPlan extends Plan {
 
     private final String text;
@@ -125,6 +133,20 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
+  private static class DelegatedPlan extends Plan {
+
+    private final String text;
+
+    private DelegatedPlan(String text) {
+      this.text = text;
+    }
+
+    @Override
+    public Class<? extends Performer> getPerformerClass() {
+      return DelegatedPerformer.class;
+    }
+  }
+
   public static class StandardPlanPerformer extends Performer implements Performer.PlanPerformance {
 
     @Override
@@ -140,6 +162,29 @@ public class SchedulerTest extends AndroidTestCase {
     @Override
     public int update(float deltaTimeMs) {
       return Scheduler.ACTIVE;
+    }
+  }
+
+  public static class DelegatedPerformer extends Performer implements Performer.DelegatedPerformance, Performer.PlanPerformance {
+
+    private DelegatedPerformanceTokenCallback tokenCallback;
+
+    @Override
+    public void addPlan(Plan plan) {
+//      DelegatedPlan delegatedPlan = (DelegatedPlan) plan;
+//      View target = getTarget();
+      DelegatedPerformanceToken token = tokenCallback.onDelegatedPerformanceStart(this);
+//      tokenCallback.onDelegatedPerformanceEnd(this, token);
+    }
+
+    @Override
+    public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
+
+    }
+
+    @Override
+    public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
+      this.tokenCallback = callback;
     }
   }
 
