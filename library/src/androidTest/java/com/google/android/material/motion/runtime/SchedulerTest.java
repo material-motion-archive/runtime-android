@@ -98,8 +98,15 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(secondListener.getState() == Scheduler.IDLE);
   }
 
-  public void testDelegatePlanPerformanceSchedulerState() {
-    transaction.addNamedPlan(new DelegatedPlan("delegated"), "plan", textView);
+  public void testNeverEndingDelegatePlanPerformanceSchedulerState() {
+    transaction.addNamedPlan(new NeverEndingDelegatedPlan("delegated"), "plan", textView);
+    scheduler.commitTransaction(transaction);
+
+    assertTrue(scheduler.getState() == Scheduler.ACTIVE);
+  }
+
+  public void testEndingDelegatedPlanPerformanceSchedulerState() {
+    transaction.addNamedPlan(new EndingDelegatedPlan("delegated"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
     assertTrue(scheduler.getState() == Scheduler.IDLE);
@@ -133,17 +140,31 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  private static class DelegatedPlan extends Plan {
+  private static class NeverEndingDelegatedPlan extends Plan {
 
     private final String text;
 
-    private DelegatedPlan(String text) {
+    private NeverEndingDelegatedPlan(String text) {
       this.text = text;
     }
 
     @Override
     public Class<? extends Performer> getPerformerClass() {
-      return DelegatedPerformer.class;
+      return NeverEndingDelegatedPerformer.class;
+    }
+  }
+
+  private static class EndingDelegatedPlan extends Plan {
+
+    private final String text;
+
+    private EndingDelegatedPlan(String text) {
+      this.text = text;
+    }
+
+    @Override
+    public Class<? extends Performer> getPerformerClass() {
+      return EndingDelegatedPerformer.class;
     }
   }
 
@@ -165,16 +186,36 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  public static class DelegatedPerformer extends Performer implements Performer.DelegatedPerformance, Performer.PlanPerformance {
+  public static class NeverEndingDelegatedPerformer extends Performer implements Performer.DelegatedPerformance, Performer.PlanPerformance {
 
     private DelegatedPerformanceTokenCallback tokenCallback;
 
     @Override
     public void addPlan(Plan plan) {
-//      DelegatedPlan delegatedPlan = (DelegatedPlan) plan;
-//      View target = getTarget();
+      // start the plan, but never finish it
       DelegatedPerformanceToken token = tokenCallback.onDelegatedPerformanceStart(this);
-//      tokenCallback.onDelegatedPerformanceEnd(this, token);
+    }
+
+    @Override
+    public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
+
+    }
+
+    @Override
+    public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
+      this.tokenCallback = callback;
+    }
+  }
+
+  public static class EndingDelegatedPerformer extends Performer implements Performer.DelegatedPerformance, Performer.PlanPerformance {
+
+    private DelegatedPerformanceTokenCallback tokenCallback;
+
+    @Override
+    public void addPlan(Plan plan) {
+      // start and end it immediately
+      DelegatedPerformanceToken token = tokenCallback.onDelegatedPerformanceStart(this);
+      tokenCallback.onDelegatedPerformanceEnd(this, token);
     }
 
     @Override
