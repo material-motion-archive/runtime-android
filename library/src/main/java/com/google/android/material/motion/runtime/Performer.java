@@ -65,39 +65,9 @@ public abstract class Performer {
 
     /**
      * Called by the {@link Scheduler} to supply the {@link Performer} with a
-     * {@link DelegatedPerformanceCallback}.
-     */
-    @Deprecated
-    void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback);
-
-    /**
-     * Called by the {@link Scheduler} to supply the {@link Performer} with a
      * {@link DelegatedPerformanceTokenCallback}.
      */
     void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback);
-
-    /**
-     * A callback to be provided to a {@link DelegatedPerformance} Performer.
-     */
-    @Deprecated
-    interface DelegatedPerformanceCallback {
-
-      /**
-       * Notifies that the delegated performance has started.
-       *
-       * @param performer The Performer whose delegated performance has started.
-       * @param name The identifier of the delegated performance. Must have a matching start and end.
-       */
-      void onDelegatedPerformanceStart(DelegatedPerformance performer, String name);
-
-      /**
-       * Notifies that the delegated performance has ended.
-       *
-       * @param performer The Performer whose delegated performance has ended.
-       * @param name The identifier of the delegated performance. Must have a matching start and end.
-       */
-      void onDelegatedPerformanceEnd(DelegatedPerformance performer, String name);
-    }
 
     /**
      * A token representing a single unit of delegated performance.
@@ -155,20 +125,38 @@ public abstract class Performer {
    * A Performer implements this interface in order to commit new {@link Plan Plans}.
    *
    * <p>
-   * The Performer should call {@link ComposablePerformanceCallback#transact(Work)} to receive a
-   * {@link Transaction} to add plans to.
+   * The Performer should call {@link TransactionEmitter#emit(Transaction)} to add new plans.
    */
   public interface ComposablePerformance {
 
     /**
      * Called by the {@link Scheduler} to supply the {@link Performer} with a
+     * {@link TransactionEmitter}.
+     */
+    void setTransactionEmitter(TransactionEmitter transactionEmitter);
+
+    /**
+     * A callback to be provided to a {@link ComposablePerformance} Performer.
+     */
+    interface TransactionEmitter {
+
+      /**
+       * Adds the plans in the transaction to the {@link Scheduler}.
+       */
+      void emit(Transaction transaction);
+    }
+
+    /**
+     * Called by the {@link Scheduler} to supply the {@link Performer} with a
      * {@link ComposablePerformanceCallback}.
      */
+    @Deprecated
     void setComposablePerformanceCallback(ComposablePerformanceCallback callback);
 
     /**
      * A callback to be provided to a {@link ComposablePerformance} Performer.
      */
+    @Deprecated
     interface ComposablePerformanceCallback {
 
       /**
@@ -178,17 +166,20 @@ public abstract class Performer {
        * @param work A {@link Work} that adds new Plans to a {@link Transaction} provided by the
        *     Scheduler.
        */
+      @Deprecated
       void transact(Work work);
     }
 
     /**
      * A function object that adds {@link Plan Plans} to a {@link Transaction}.
      */
+    @Deprecated
     abstract class Work {
 
       /**
        * Adds {@link Plan Plans} to a {@link Transaction}.
        */
+      @Deprecated
       public abstract void work(Transaction transaction);
     }
   }

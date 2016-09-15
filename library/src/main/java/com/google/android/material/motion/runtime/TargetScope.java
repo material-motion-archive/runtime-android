@@ -22,9 +22,9 @@ import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAIL
 import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.ComposablePerformance;
 import com.google.android.material.motion.runtime.Performer.ComposablePerformance.ComposablePerformanceCallback;
+import com.google.android.material.motion.runtime.Performer.ComposablePerformance.TransactionEmitter;
 import com.google.android.material.motion.runtime.Performer.ComposablePerformance.Work;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
-import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceCallback;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceToken;
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceTokenCallback;
 import com.google.android.material.motion.runtime.Performer.ManualPerformance;
@@ -73,12 +73,12 @@ class TargetScope {
 
     if (performer instanceof DelegatedPerformance) {
       ((DelegatedPerformance) performer)
-        .setDelegatedPerformanceCallback(delegatedPerformanceCallback);
-      ((DelegatedPerformance) performer)
         .setDelegatedPerformanceCallback(delegatedPerformanceTokenCallback);
     }
 
     if (performer instanceof ComposablePerformance) {
+      ((ComposablePerformance) performer)
+        .setTransactionEmitter(transactionEmitter);
       ((ComposablePerformance) performer)
         .setComposablePerformanceCallback(composablePerformanceCallback);
     }
@@ -154,50 +154,6 @@ class TargetScope {
   }
 
   /**
-   * The {@link DelegatedPerformanceCallback} assigned to every {@link DelegatedPerformance} in
-   * this TargetScope.
-   */
-  @Deprecated
-  private final DelegatedPerformanceCallback delegatedPerformanceCallback =
-      new DelegatedPerformanceCallback() {
-
-        @Override
-        public void onDelegatedPerformanceStart(DelegatedPerformance performer, String name) {
-          Set<String> delegatedNames = activeDelegatedPerformances.get(performer);
-
-          if (delegatedNames == null) {
-            delegatedNames = new HashSet<>();
-            activeDelegatedPerformances.put(performer, delegatedNames);
-          }
-
-          boolean modified = delegatedNames.add(name);
-          if (!modified) {
-            throw new IllegalArgumentException(
-                "Existing delegated performance already active: " + name);
-          }
-
-          notifyTargetStateChanged();
-        }
-
-        @Override
-        public void onDelegatedPerformanceEnd(DelegatedPerformance performer, String name) {
-          Set<String> delegatedNames = activeDelegatedPerformances.get(performer);
-
-          boolean modified = delegatedNames.remove(name);
-          if (!modified) {
-            throw new IllegalArgumentException(
-                "Expected delegated performance to be active: " + name);
-          }
-
-          if (delegatedNames.isEmpty()) {
-            activeDelegatedPerformances.remove(performer);
-          }
-
-          notifyTargetStateChanged();
-        }
-      };
-
-  /**
    * The {@link DelegatedPerformanceTokenCallback} assigned to every {@link DelegatedPerformance} in
    * this TargetScope.
    */
@@ -242,6 +198,14 @@ class TargetScope {
         }
       };
 
+  private final TransactionEmitter transactionEmitter = new TransactionEmitter() {
+    @Override
+    public void emit(Transaction transaction) {
+      scheduler.commitTransaction(transaction);
+    }
+  };
+
+  @Deprecated
   private final ComposablePerformanceCallback composablePerformanceCallback =
     new ComposablePerformanceCallback() {
       @Override
