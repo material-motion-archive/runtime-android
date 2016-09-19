@@ -136,7 +136,7 @@ public abstract class Performer {
     void setTransactionEmitter(TransactionEmitter transactionEmitter);
 
     /**
-     * A callback to be provided to a {@link ComposablePerformance} Performer.
+     * A transaction emitter to be provided to a {@link ComposablePerformance} Performer.
      */
     interface TransactionEmitter {
 
