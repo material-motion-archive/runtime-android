@@ -17,7 +17,6 @@
 package com.google.android.material.motion.runtime;
 
 import android.test.AndroidTestCase;
-import android.view.View;
 import android.widget.TextView;
 
 public class SchedulerTest extends AndroidTestCase {
@@ -150,7 +149,7 @@ public class SchedulerTest extends AndroidTestCase {
 
     @Override
     public Class<? extends Performer> getPerformerClass() {
-      return NeverEndingDelegatedPerformer.class;
+      return NeverEndingContinuousPerformer.class;
     }
   }
 
@@ -186,46 +185,38 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  public static class NeverEndingDelegatedPerformer extends Performer implements Performer.DelegatedPerformance, Performer.PlanPerformance {
+  public static class NeverEndingContinuousPerformer extends Performer implements
+    Performer.ContinuousPerformance, Performer.PlanPerformance {
 
-    private DelegatedPerformanceTokenCallback tokenCallback;
+    private IsActiveTokenGenerator isActiveTokenGenerator;
 
     @Override
     public void addPlan(Plan plan) {
       // start the plan, but never finish it
-      DelegatedPerformanceToken token = tokenCallback.onDelegatedPerformanceStart(this);
+      IsActiveToken token = isActiveTokenGenerator.generate();
     }
 
     @Override
-    public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
-
-    }
-
-    @Override
-    public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
-      this.tokenCallback = callback;
+    public void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator) {
+      this.isActiveTokenGenerator = isActiveTokenGenerator;
     }
   }
 
-  public static class EndingDelegatedPerformer extends Performer implements Performer.DelegatedPerformance, Performer.PlanPerformance {
+  public static class EndingDelegatedPerformer extends Performer implements
+    Performer.ContinuousPerformance, Performer.PlanPerformance {
 
-    private DelegatedPerformanceTokenCallback tokenCallback;
+    private IsActiveTokenGenerator isActiveTokenGenerator;
 
     @Override
     public void addPlan(Plan plan) {
       // start and end it immediately
-      DelegatedPerformanceToken token = tokenCallback.onDelegatedPerformanceStart(this);
-      tokenCallback.onDelegatedPerformanceEnd(this, token);
+      IsActiveToken token = isActiveTokenGenerator.generate();
+      token.terminate();
     }
 
     @Override
-    public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
-
-    }
-
-    @Override
-    public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
-      this.tokenCallback = callback;
+    public void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator) {
+      this.isActiveTokenGenerator = isActiveTokenGenerator;
     }
   }
 

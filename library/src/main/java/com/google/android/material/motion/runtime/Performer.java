@@ -50,6 +50,53 @@ public abstract class Performer {
   }
 
   /**
+   * A Performer implements this interface in order to request and release is-active tokens.
+   * The scheduler uses these tokens to inform its active state. If any performer owns an is-active
+   * token then the scheduler is active. Otherwise, the scheduler is idle.
+   *
+   * <p>
+   * The only requirement is that the Performer must request a token from the
+   * {@link IsActiveTokenGenerator token generator} when the continuous performance
+   * {@link IsActiveTokenGenerator#generate() starts}
+   * and release the token when the continuous performance {@link IsActiveToken#terminate() ends}.
+   */
+  public interface ContinuousPerformance {
+
+    /**
+     * Called by the {@link Scheduler} to supply the {@link Performer} with a
+     * {@link IsActiveTokenGenerator}.
+     */
+    void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator);
+
+    /**
+     * A generator for {@link IsActiveToken}s.
+     */
+    interface IsActiveTokenGenerator {
+
+      /**
+       * Generate and return a new is-active token. The receiver of this token is expected to
+       * eventually {@link IsActiveToken#terminate()} the token.
+       *
+       * Usually called by a {@link ContinuousPerformance} when it starts.
+       *
+       */
+      IsActiveToken generate();
+    }
+
+    /**
+     * A token representing a single unit of continuous performance.
+     */
+    interface IsActiveToken {
+
+      /**
+       * Notifies that the continuous performance has ended. Subsequent invocations of this method
+       * will result in an exception.
+       */
+      void terminate();
+    }
+  }
+
+  /**
    * A Performer implements this interface in order to delegate its work to another API.
    * {@link android.animation.Animator} and {@link android.view.ViewPropertyAnimator} are examples
    * of APIs that can be delegated to.
@@ -61,22 +108,26 @@ public abstract class Performer {
    * and
    * {@link DelegatedPerformanceTokenCallback#onDelegatedPerformanceEnd(DelegatedPerformance, DelegatedPerformanceToken) ends}.
    */
+  @Deprecated
   public interface DelegatedPerformance {
 
     /**
      * Called by the {@link Scheduler} to supply the {@link Performer} with a
      * {@link DelegatedPerformanceTokenCallback}.
      */
+    @Deprecated
     void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback);
 
     /**
      * A token representing a single unit of delegated performance.
      */
+    @Deprecated
     final class DelegatedPerformanceToken {}
 
     /**
      * A callback to be provided to a {@link DelegatedPerformance} Performer.
      */
+    @Deprecated
     interface DelegatedPerformanceTokenCallback {
 
       /**
@@ -87,6 +138,7 @@ public abstract class Performer {
        * @return The token of the delegated performance. Must be provided to
        *     {@link #onDelegatedPerformanceEnd(DelegatedPerformance, DelegatedPerformanceToken)}.
        */
+      @Deprecated
       DelegatedPerformanceToken onDelegatedPerformanceStart(DelegatedPerformance performer);
 
       /**
@@ -96,8 +148,9 @@ public abstract class Performer {
        * @param token The token of the delegated performance returned by
        *     {@link #onDelegatedPerformanceStart(DelegatedPerformance)}.
        */
+      @Deprecated
       void onDelegatedPerformanceEnd(
-          DelegatedPerformance performer, DelegatedPerformanceToken token);
+        DelegatedPerformance performer, DelegatedPerformanceToken token);
     }
   }
 

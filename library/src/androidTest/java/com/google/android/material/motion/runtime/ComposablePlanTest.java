@@ -82,24 +82,25 @@ public class ComposablePlanTest extends AndroidTestCase {
 
   public static class ComposablePerformer extends Performer implements Performer.ComposablePerformance, Performer.PlanPerformance {
 
-    private ComposablePerformanceCallback callback;
+    private TransactionEmitter transactionEmitter;
+
+    @Override
+    public void setTransactionEmitter(TransactionEmitter transactionEmitter) {
+      this.transactionEmitter = transactionEmitter;
+    }
 
     @Override
     public void setComposablePerformanceCallback(ComposablePerformanceCallback callback) {
-      this.callback = callback;
     }
 
     @Override
     public void addPlan(Plan plan) {
       // immediately delegate the actual work of changing the text view to the leaf plan
-      this.callback.transact(new Work() {
-        @Override
-        public void work(Transaction transaction) {
-          LeafPlan leafPlan = new LeafPlan("leafPlan");
-          transaction.addNamedPlan(leafPlan, "leafPlan", textView);
-          scheduler.commitTransaction(transaction);
-        }
-      });
+      Transaction transaction = new Transaction();
+      LeafPlan leafPlan = new LeafPlan("leafPlan");
+      transaction.addNamedPlan(leafPlan, "leafPlan", textView);
+
+      transactionEmitter.emit(transaction);
     }
   }
 }
