@@ -198,43 +198,6 @@ public abstract class Performer {
        */
       void emit(Transaction transaction);
     }
-
-    /**
-     * Called by the {@link Scheduler} to supply the {@link Performer} with a
-     * {@link ComposablePerformanceCallback}.
-     */
-    @Deprecated
-    void setComposablePerformanceCallback(ComposablePerformanceCallback callback);
-
-    /**
-     * A callback to be provided to a {@link ComposablePerformance} Performer.
-     */
-    @Deprecated
-    interface ComposablePerformanceCallback {
-
-      /**
-       * The {@link Performer} calls this when it wants to commit new {@link Plan Plans} to the
-       * {@link Scheduler}.
-       *
-       * @param work A {@link Work} that adds new Plans to a {@link Transaction} provided by the
-       *     Scheduler.
-       */
-      @Deprecated
-      void transact(Work work);
-    }
-
-    /**
-     * A function object that adds {@link Plan Plans} to a {@link Transaction}.
-     */
-    @Deprecated
-    abstract class Work {
-
-      /**
-       * Adds {@link Plan Plans} to a {@link Transaction}.
-       */
-      @Deprecated
-      public abstract void work(Transaction transaction);
-    }
   }
 
   /**

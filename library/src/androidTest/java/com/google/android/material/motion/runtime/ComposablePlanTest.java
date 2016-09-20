@@ -90,10 +90,6 @@ public class ComposablePlanTest extends AndroidTestCase {
     }
 
     @Override
-    public void setComposablePerformanceCallback(ComposablePerformanceCallback callback) {
-    }
-
-    @Override
     public void addPlan(Plan plan) {
       // immediately delegate the actual work of changing the text view to the leaf plan
       Transaction transaction = new Transaction();

@@ -21,9 +21,7 @@ import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAIL
 
 import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.ComposablePerformance;
-import com.google.android.material.motion.runtime.Performer.ComposablePerformance.ComposablePerformanceCallback;
 import com.google.android.material.motion.runtime.Performer.ComposablePerformance.TransactionEmitter;
-import com.google.android.material.motion.runtime.Performer.ComposablePerformance.Work;
 import com.google.android.material.motion.runtime.Performer.ContinuousPerformance;
 import com.google.android.material.motion.runtime.Performer.ContinuousPerformance.IsActiveToken;
 import com.google.android.material.motion.runtime.Performer.ContinuousPerformance.IsActiveTokenGenerator;
@@ -79,10 +77,7 @@ class TargetScope {
     }
 
     if (performer instanceof ComposablePerformance) {
-      ((ComposablePerformance) performer)
-        .setTransactionEmitter(transactionEmitter);
-      ((ComposablePerformance) performer)
-        .setComposablePerformanceCallback(composablePerformanceCallback);
+      ((ComposablePerformance) performer).setTransactionEmitter(transactionEmitter);
     }
 
     if (performer instanceof PlanPerformance) {
@@ -252,15 +247,4 @@ class TargetScope {
       scheduler.commitTransaction(transaction);
     }
   };
-
-  @Deprecated
-  private final ComposablePerformanceCallback composablePerformanceCallback =
-    new ComposablePerformanceCallback() {
-      @Override
-      public void transact(Work work) {
-        Transaction transaction = new Transaction();
-        work.work(transaction);
-        scheduler.commitTransaction(transaction);
-      }
-    };
 }
