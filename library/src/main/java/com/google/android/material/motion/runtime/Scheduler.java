@@ -47,7 +47,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * <p>
  * This Scheduler correctly handles
  * {@link com.google.android.material.motion.runtime.Performer.PlanPerformance},
- * {@link com.google.android.material.motion.runtime.Performer.DelegatedPerformance}, and
+ * {@link com.google.android.material.motion.runtime.Performer.ContinuousPerformance}, and
  * {@link com.google.android.material.motion.runtime.Performer.ManualPerformance}.
  *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/scheduler.html">The Scheduler specification</a>
@@ -89,9 +89,9 @@ public final class Scheduler {
   static final int MANUAL_DETAILED_STATE_FLAG = 1 << 0;
   /**
    * Flag for detailed state bitmask specifying that the activity originates from a
-   * {@link com.google.android.material.motion.runtime.Performer.DelegatedPerformance}.
+   * {@link com.google.android.material.motion.runtime.Performer.ContinuousPerformance}.
    */
-  static final int DELEGATED_DETAILED_STATE_FLAG = 1 << 1;
+  static final int CONTINUOUS_DETAILED_STATE_FLAG = 1 << 1;
 
   private final CopyOnWriteArraySet<StateListener> listeners = new CopyOnWriteArraySet<>();
   private final ChoreographerCompat choreographer = ChoreographerCompat.getInstance();
@@ -100,7 +100,7 @@ public final class Scheduler {
 
   private final SimpleArrayMap<Object, TargetScope> targets = new SimpleArrayMap<>();
   private final Set<TargetScope> activeManualPerformanceTargets = new HashSet<>();
-  private final Set<TargetScope> activeDelegatedPerformanceTargets = new HashSet<>();
+  private final Set<TargetScope> activeContinuousPerformanceTargets = new HashSet<>();
 
   /**
    * @return The current {@link State} of this Scheduler.
@@ -121,8 +121,8 @@ public final class Scheduler {
     if (!activeManualPerformanceTargets.isEmpty()) {
       state |= MANUAL_DETAILED_STATE_FLAG;
     }
-    if (!activeDelegatedPerformanceTargets.isEmpty()) {
-      state |= DELEGATED_DETAILED_STATE_FLAG;
+    if (!activeContinuousPerformanceTargets.isEmpty()) {
+      state |= CONTINUOUS_DETAILED_STATE_FLAG;
     }
     return state;
   }
@@ -179,10 +179,10 @@ public final class Scheduler {
       activeManualPerformanceTargets.remove(target);
     }
 
-    if (isSet(targetDetailedState, DELEGATED_DETAILED_STATE_FLAG)) {
-      activeDelegatedPerformanceTargets.add(target);
+    if (isSet(targetDetailedState, CONTINUOUS_DETAILED_STATE_FLAG)) {
+      activeContinuousPerformanceTargets.add(target);
     } else {
-      activeDelegatedPerformanceTargets.remove(target);
+      activeContinuousPerformanceTargets.remove(target);
     }
 
     int newDetailedState = getDetailedState();
@@ -201,11 +201,11 @@ public final class Scheduler {
         manualPerformanceFrameCallback.stop();
       }
     }
-    if (changed(oldDetailedState, newDetailedState, DELEGATED_DETAILED_STATE_FLAG)) {
-      if (isSet(newDetailedState, DELEGATED_DETAILED_STATE_FLAG)) {
-        Log.d(TAG, "Delegated performance TargetScopes now active.");
+    if (changed(oldDetailedState, newDetailedState, CONTINUOUS_DETAILED_STATE_FLAG)) {
+      if (isSet(newDetailedState, CONTINUOUS_DETAILED_STATE_FLAG)) {
+        Log.d(TAG, "Continuous performance TargetScopes now active.");
       } else {
-        Log.d(TAG, "Delegated performance TargetScopes now idle.");
+        Log.d(TAG, "Continuous performance TargetScopes now idle.");
       }
     }
 

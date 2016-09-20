@@ -23,7 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
+import com.google.android.material.motion.runtime.Performer.ContinuousPerformance;
 import com.google.android.material.motion.runtime.Performer.PlanPerformance;
 import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.Scheduler;
@@ -97,18 +97,13 @@ public class MainActivity extends AppCompatActivity {
   }
 
   public static class DemoPerformer2 extends Performer
-      implements PlanPerformance, DelegatedPerformance {
+      implements PlanPerformance, ContinuousPerformance {
 
-    private DelegatedPerformanceTokenCallback callback;
-
-    @Override
-    public void setDelegatedPerformanceCallback(DelegatedPerformanceCallback callback) {
-      // Deprecated.
-    }
+    private IsActiveTokenGenerator isActiveTokenGenerator;
 
     @Override
-    public void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback) {
-      this.callback = callback;
+    public void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator) {
+      this.isActiveTokenGenerator = isActiveTokenGenerator;
     }
 
     @Override
@@ -122,16 +117,16 @@ public class MainActivity extends AppCompatActivity {
           .setDuration(2000)
           .setListener(
               new AnimatorListenerAdapter() {
-                private DelegatedPerformanceToken token;
+                private IsActiveToken token;
 
                 @Override
                 public void onAnimationStart(Animator animation) {
-                  token = callback.onDelegatedPerformanceStart(DemoPerformer2.this);
+                  token = isActiveTokenGenerator.generate();
                 }
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                  callback.onDelegatedPerformanceEnd(DemoPerformer2.this, token);
+                  token.terminate();
                 }
               });
     }
