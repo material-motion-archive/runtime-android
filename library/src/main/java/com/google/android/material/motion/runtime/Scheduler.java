@@ -147,13 +147,22 @@ public final class Scheduler {
    * Commits the given {@link Transaction}. Each {@link PlanInfo} is committed in the context of
    * its target, called a {@link TargetScope}. Each TargetScope ensures that only one instance of a
    * specific type of Performer is created.
+   * @deprecated
    */
+  @Deprecated
   public void commitTransaction(Transaction transaction) {
     List<PlanInfo> plans = transaction.getPlans();
     for (int i = 0, count = plans.size(); i < count; i++) {
       PlanInfo plan = plans.get(i);
       getTargetScope(plan.target).commitPlan(plan);
     }
+  }
+
+  public void addPlan(Plan plan, Object target) {
+    PlanInfo planInfo = new PlanInfo();
+    planInfo.target = target;
+    planInfo.plan = plan;
+    getTargetScope(target).commitPlan(planInfo);
   }
 
   private TargetScope getTargetScope(Object target) {

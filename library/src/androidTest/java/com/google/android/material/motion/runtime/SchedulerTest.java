@@ -111,6 +111,12 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(scheduler.getState() == Scheduler.IDLE);
   }
 
+  public void testAddingPlansDirectlyToScheduler() {
+    scheduler.addPlan(new NeverEndingDelegatedPlan("delegated"), textView);
+
+    assertTrue(scheduler.getState() == Scheduler.ACTIVE);
+  }
+
   private static class StandardPlan extends Plan {
 
     private final String text;
