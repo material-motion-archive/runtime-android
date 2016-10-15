@@ -147,7 +147,9 @@ public final class Scheduler {
    * Commits the given {@link Transaction}. Each {@link PlanInfo} is committed in the context of
    * its target, called a {@link TargetScope}. Each TargetScope ensures that only one instance of a
    * specific type of Performer is created.
-   * @deprecated
+   * @deprecated  Post version 1.0, plans should be added directly to the Scheduler instead of using Transactions. </br>
+   *              This will be removed in the next version </br>
+   *              use {@link #addPlan()} on the Scheduler instead
    */
   @Deprecated
   public void commitTransaction(Transaction transaction) {
@@ -158,6 +160,11 @@ public final class Scheduler {
     }
   }
 
+  /**
+   * Adds a plan to this scheduler. Uses {@link PlanInfo} to join the plan and the target together.
+   * @param plan the {@link Plan} to add to the scheduler.
+   * @param target the target on which the plan will operate.
+     */
   public void addPlan(Plan plan, Object target) {
     PlanInfo planInfo = new PlanInfo();
     planInfo.target = target;
