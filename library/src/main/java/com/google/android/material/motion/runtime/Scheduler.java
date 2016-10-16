@@ -163,7 +163,7 @@ public final class Scheduler {
   }
 
   /**
-   * Adds a plan to this scheduler. Uses {@link PlanInfo} to join the plan and the target together.
+   * Adds a plan to this scheduler.
    * @param plan the {@link Plan} to add to the scheduler.
    * @param target the target on which the plan will operate.
      */
