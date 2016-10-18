@@ -44,7 +44,11 @@ public final class Transaction {
 
   /**
    * Adds a {@link Plan} to this Transaction, targeting the given object.
+   * @deprecated  Plans should be added directly to the Scheduler instead of using Transactions. <br />
+   *              This will be removed in the next version of the runtime <br />
+   *              use {@link com.google.android.material.motion.runtime.Scheduler#addPlan(Plan, Object)} on the Scheduler instead
    */
+  @Deprecated
   public void addPlan(Plan plan, Object target) {
     PlanInfo info = new PlanInfo();
     info.target = target;

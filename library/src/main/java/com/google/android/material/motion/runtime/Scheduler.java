@@ -147,13 +147,29 @@ public final class Scheduler {
    * Commits the given {@link Transaction}. Each {@link PlanInfo} is committed in the context of
    * its target, called a {@link TargetScope}. Each TargetScope ensures that only one instance of a
    * specific type of Performer is created.
+   * @deprecated  Plans should be added directly to the Scheduler instead of using Transactions. <br />
+   *              This will be removed in the next version <br />
+   *              use {@link com.google.android.material.motion.runtime.Scheduler#addPlan(Plan, Object)} on the Scheduler instead
    */
+  @Deprecated
   public void commitTransaction(Transaction transaction) {
     List<PlanInfo> plans = transaction.getPlans();
     for (int i = 0, count = plans.size(); i < count; i++) {
       PlanInfo plan = plans.get(i);
       getTargetScope(plan.target).commitPlan(plan);
     }
+  }
+
+  /**
+   * Adds a plan to this scheduler.
+   * @param plan the {@link Plan} to add to the scheduler.
+   * @param target the target on which the plan will operate.
+   */
+  public void addPlan(Plan plan, Object target) {
+    PlanInfo planInfo = new PlanInfo();
+    planInfo.target = target;
+    planInfo.plan = plan.clone();
+    getTargetScope(target).commitPlan(planInfo);
   }
 
   private TargetScope getTargetScope(Object target) {
