@@ -178,7 +178,7 @@ public final class Scheduler {
    * @param name
    * @param target
    */
-  public void addNamedPlan(Plan plan, String name, Object target) {
+  public void addNamedPlan(NamedPlan plan, String name, Object target) {
     PlanInfo planInfo = new PlanInfo();
     planInfo.name = name;
     planInfo.target = target;
