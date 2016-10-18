@@ -50,6 +50,26 @@ public abstract class Performer {
   }
 
   /**
+   *
+   */
+  public interface NamedPlanPerformance {
+
+    /**
+     *
+     * @param plan
+     * @param name
+     */
+    void addPlan(NamedPlan plan, String name);
+
+    /**
+     *
+     * @param plan
+     * @param name
+     */
+    void removePlan(NamedPlan plan, String name);
+  }
+
+  /**
    * A Performer implements this interface in order to request and release is-active tokens.
    * The scheduler uses these tokens to inform its active state. If any performer owns an is-active
    * token then the scheduler is active. Otherwise, the scheduler is idle.

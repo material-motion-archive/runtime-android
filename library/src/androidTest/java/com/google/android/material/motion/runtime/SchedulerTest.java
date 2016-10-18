@@ -123,6 +123,89 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(textView.getText().equals(" standard"));
   }
 
+  public void testAddingNamedPlan() {
+    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
+
+    assertTrue(textView.getText().equals("removePlanInvokedaddPlanInvoked"));
+  }
+
+  public void testAddAndRemoveTheSameNamedPlan() {
+    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "name_one", textView);
+    scheduler.removePlanNamed("name_one", textView);
+
+    assertTrue(textView.getText().equals("removePlanInvokedaddPlanInvokedremovePlanInvoked"));
+  }
+
+  public void testRemoveNamedPlanThatWasNeverAdded() {
+    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
+    scheduler.removePlanNamed("this_was_never_added", textView);
+
+    assertTrue(textView.getText().equals("removePlanInvokedaddPlanInvoked"));
+  }
+
+  public void testNamedPlansMakeMultipleAddAndRemoveCalls() {
+    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "one", textView);
+    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "two", textView);
+
+    assertTrue(textView.getText().equals("removePlanInvokedaddPlanInvokedremovePlanInvokedaddPlanInvoked"));
+  }
+
+  public void testNamedPlansOverwriteOneAnother() {
+    IncrementerTarget incrementerTarget = new IncrementerTarget();
+    NamedCounterAlteringPlan planA = new NamedCounterAlteringPlan();
+    NamedCounterAlteringPlan planB = new NamedCounterAlteringPlan();
+
+    scheduler.addNamedPlan(planA, "one", incrementerTarget);
+    scheduler.addNamedPlan(planB, "one", incrementerTarget);
+
+    assertTrue(incrementerTarget.addCounter == 2);
+    assertTrue(incrementerTarget.removeCounter == 2);
+  }
+
+  public void testAddingTheSameNamedPlanToTheSameTarget() {
+    IncrementerTarget incrementerTarget = new IncrementerTarget();
+    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
+    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
+
+    assertTrue(incrementerTarget.addCounter == 2);
+    assertTrue(incrementerTarget.removeCounter == 2);
+  }
+
+  public void testAddingSimilarNamesToTheSameTarget() {
+    IncrementerTarget incrementerTarget = new IncrementerTarget();
+    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
+    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "One", incrementerTarget);
+    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "1", incrementerTarget);
+    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "ONE", incrementerTarget);
+
+    assertTrue(incrementerTarget.addCounter == 4);
+    assertTrue(incrementerTarget.removeCounter == 4);
+  }
+
+  public void testAddingNamedPlansToDifferentTargets() {
+    IncrementerTarget firstIncrementerTarget = new IncrementerTarget();
+    IncrementerTarget secondIncrementerTarget = new IncrementerTarget();
+    NamedCounterAlteringPlan plan = new NamedCounterAlteringPlan();
+
+    scheduler.addNamedPlan(plan, "one", firstIncrementerTarget);
+    scheduler.addNamedPlan(plan, "one", secondIncrementerTarget);
+
+    assertTrue(firstIncrementerTarget.addCounter == 1);
+    assertTrue(firstIncrementerTarget.removeCounter == 1);
+    assertTrue(secondIncrementerTarget.addCounter == 1);
+    assertTrue(secondIncrementerTarget.removeCounter == 1);
+  }
+
+  private static class NamedCounterAlteringPlan extends NamedPlan {
+    @Override
+    public Class<? extends Performer> getPerformerClass() { return NamedCounterPlanPerformer.class; }
+  }
+
+  private static class NamedTargetAlteringPlan extends NamedPlan {
+    @Override
+    public Class<? extends Performer> getPerformerClass() { return NamedPlanPerformer.class; }
+  }
+
   private static class StandardPlan extends Plan {
 
     private final String text;
@@ -176,6 +259,40 @@ public class SchedulerTest extends AndroidTestCase {
     @Override
     public Class<? extends Performer> getPerformerClass() {
       return EndingDelegatedPerformer.class;
+    }
+  }
+
+  public class IncrementerTarget {
+    int addCounter = 0;
+    int removeCounter = 0;
+  }
+
+  public static class NamedCounterPlanPerformer extends Performer implements Performer.NamedPlanPerformance {
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      IncrementerTarget target = getTarget();
+      target.addCounter += 1;
+    }
+
+    @Override
+    public void removePlan(NamedPlan plan, String name) {
+      IncrementerTarget target = getTarget();
+      target.removeCounter += 1;
+    }
+  }
+
+  public static class NamedPlanPerformer extends Performer implements Performer.NamedPlanPerformance {
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      TextView target = getTarget();
+      target.setText(target.getText() + "addPlanInvoked");
+    }
+
+    @Override
+    public void removePlan(NamedPlan plan, String name) {
+      TextView target = getTarget();
+      target.setText(target.getText() + "removePlanInvoked");
     }
   }
 

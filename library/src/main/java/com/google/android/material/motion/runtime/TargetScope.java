@@ -47,6 +47,7 @@ class TargetScope {
 
   private final SimpleArrayMap<Class<? extends Performer>, Performer> cache =
     new SimpleArrayMap<>();
+  private final SimpleArrayMap<String, Performer> namedCache = new SimpleArrayMap<>();
 
   private final Set<ManualPerformance> activeManualPerformances = new HashSet<>();
 
@@ -85,6 +86,21 @@ class TargetScope {
     }
   }
 
+  void commitAddNamedPlan(PlanInfo planInfo) {
+    // remove first
+    Performer performer = getNamedPerformer(planInfo);
+    removeNamedPlan(planInfo, performer);
+    // then add
+    if (performer instanceof Performer.NamedPlanPerformance) {
+      namedCache.put(planInfo.name, performer);
+      ((Performer.NamedPlanPerformance) performer).addPlan((NamedPlan) planInfo.plan, planInfo.name);
+    }
+  }
+
+  void commitRemoveNamedPlan(PlanInfo planInfo) {
+    removeNamedPlan(planInfo, namedCache.get(planInfo.name));
+  }
+
   void update(float deltaTimeMs) {
     Iterator<ManualPerformance> iterator = activeManualPerformances.iterator();
 
@@ -116,6 +132,23 @@ class TargetScope {
       state |= CONTINUOUS_DETAILED_STATE_FLAG;
     }
     return state;
+  }
+
+  private void removeNamedPlan(PlanInfo planInfo, Performer performer) {
+    if (performer != null) {
+      if (performer instanceof Performer.NamedPlanPerformance) {
+        ((Performer.NamedPlanPerformance) performer).removePlan((NamedPlan) planInfo.plan, planInfo.name);
+      }
+      namedCache.remove(planInfo.name);
+    }
+  }
+
+  private Performer getNamedPerformer(PlanInfo planInfo) {
+    Performer namedPerformer = namedCache.get(planInfo.name);
+    if (namedPerformer == null) {
+      namedPerformer = getPerformer(planInfo);
+    }
+    return namedPerformer;
   }
 
   private Performer getPerformer(PlanInfo plan) {

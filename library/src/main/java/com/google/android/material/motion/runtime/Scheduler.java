@@ -172,6 +172,32 @@ public final class Scheduler {
     getTargetScope(target).commitPlan(planInfo);
   }
 
+  /**
+   * TODO
+   * @param plan
+   * @param name
+   * @param target
+   */
+  public void addNamedPlan(Plan plan, String name, Object target) {
+    PlanInfo planInfo = new PlanInfo();
+    planInfo.name = name;
+    planInfo.target = target;
+    planInfo.plan = plan.clone();
+    getTargetScope(target).commitAddNamedPlan(planInfo);
+  }
+
+  /**
+   * TODO
+   * @param name
+   * @param target
+   */
+  public void removePlanNamed(String name, Object target) {
+    PlanInfo planInfo = new PlanInfo();
+    planInfo.name = name;
+    planInfo.target = target;
+    getTargetScope(target).commitRemoveNamedPlan(planInfo);
+  }
+
   private TargetScope getTargetScope(Object target) {
     TargetScope targetScope = targets.get(target);
 
