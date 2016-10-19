@@ -47,7 +47,7 @@ class TargetScope {
 
   private final SimpleArrayMap<Class<? extends Performer>, Performer> cache =
     new SimpleArrayMap<>();
-  private final SimpleArrayMap<String, Performer> namedCache = new SimpleArrayMap<>();
+  private final SimpleArrayMap<String, Performer.NamedPlanPerformance> namedCache = new SimpleArrayMap<>();
 
   private final Set<ManualPerformance> activeManualPerformances = new HashSet<>();
 
@@ -86,19 +86,18 @@ class TargetScope {
     }
   }
 
-  void commitAddNamedPlan(PlanInfo planInfo) {
+  void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
     // remove first
-    Performer performer = getNamedPerformer(planInfo);
-    removeNamedPlan(planInfo, performer);
+    Performer.NamedPlanPerformance performer = getNamedPerformer(plan, name, target);
+    removeNamedPlan(plan, name, performer);
     // then add
-    if (performer instanceof Performer.NamedPlanPerformance) {
-      namedCache.put(planInfo.name, performer);
-      ((Performer.NamedPlanPerformance) performer).addPlan((NamedPlan) planInfo.plan, planInfo.name);
-    }
+    namedCache.put(name, performer);
+    performer.addPlan(plan, name);
   }
 
-  void commitRemoveNamedPlan(PlanInfo planInfo) {
-    removeNamedPlan(planInfo, namedCache.get(planInfo.name));
+  void commitRemoveNamedPlan(String name) {
+    // passing null here feels wrong.
+    removeNamedPlan(null, name, namedCache.get(name));
   }
 
   void update(float deltaTimeMs) {
@@ -134,19 +133,20 @@ class TargetScope {
     return state;
   }
 
-  private void removeNamedPlan(PlanInfo planInfo, Performer performer) {
+  private void removeNamedPlan(NamedPlan plan, String name, Performer.NamedPlanPerformance performer) {
     if (performer != null) {
-      if (performer instanceof Performer.NamedPlanPerformance) {
-        ((Performer.NamedPlanPerformance) performer).removePlan((NamedPlan) planInfo.plan, planInfo.name);
-      }
-      namedCache.remove(planInfo.name);
+      performer.removePlan(plan, name);
+      namedCache.remove(name);
     }
   }
 
-  private Performer getNamedPerformer(PlanInfo planInfo) {
-    Performer namedPerformer = namedCache.get(planInfo.name);
+  private Performer.NamedPlanPerformance getNamedPerformer(NamedPlan plan, String name, Object target) {
+    Performer.NamedPlanPerformance namedPerformer = namedCache.get(name);
     if (namedPerformer == null) {
-      namedPerformer = getPerformer(planInfo);
+      // create it
+      namedPerformer = (Performer.NamedPlanPerformance)createPerformer(plan, target);
+      // stash it for later use
+      namedCache.put(name, namedPerformer);
     }
     return namedPerformer;
   }
@@ -156,19 +156,19 @@ class TargetScope {
     Performer performer = cache.get(performerClass);
 
     if (performer == null) {
-      performer = createPerformer(plan);
+      performer = createPerformer(plan.plan, plan.target);
       cache.put(performerClass, performer);
     }
 
     return performer;
   }
 
-  private Performer createPerformer(PlanInfo plan) {
-    Class<? extends Performer> performerClass = plan.plan.getPerformerClass();
+  private Performer createPerformer(Plan plan, Object target) {
+    Class<? extends Performer> performerClass = plan.getPerformerClass();
 
     try {
       Performer performer = performerClass.newInstance();
-      performer.initialize(plan.target);
+      performer.initialize(target);
 
       if (performer instanceof ContinuousPerformance) {
         ContinuousPerformance continuousPerformance = (ContinuousPerformance) performer;

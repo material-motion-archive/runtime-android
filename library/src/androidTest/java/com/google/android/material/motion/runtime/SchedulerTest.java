@@ -129,28 +129,28 @@ public class SchedulerTest extends AndroidTestCase {
   public void testAddingNamedPlan() {
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
 
-    assertTrue(textView.getText().equals("removePlanInvokedaddPlanInvoked"));
+    assertTrue(textView.getText().equals(" removePlanInvoked addPlanInvoked"));
   }
 
   public void testAddAndRemoveTheSameNamedPlan() {
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "name_one", textView);
-    scheduler.removePlanNamed("name_one", textView);
+    scheduler.removeNamedPlan("name_one", textView);
 
-    assertTrue(textView.getText().equals("removePlanInvokedaddPlanInvokedremovePlanInvoked"));
+    assertTrue(textView.getText().equals(" removePlanInvoked addPlanInvoked removePlanInvoked"));
   }
 
   public void testRemoveNamedPlanThatWasNeverAdded() {
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
-    scheduler.removePlanNamed("this_was_never_added", textView);
+    scheduler.removeNamedPlan("this_was_never_added", textView);
 
-    assertTrue(textView.getText().equals("removePlanInvokedaddPlanInvoked"));
+    assertTrue(textView.getText().equals(" removePlanInvoked addPlanInvoked"));
   }
 
   public void testNamedPlansMakeMultipleAddAndRemoveCalls() {
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "one", textView);
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "two", textView);
 
-    assertTrue(textView.getText().equals("removePlanInvokedaddPlanInvokedremovePlanInvokedaddPlanInvoked"));
+    assertTrue(textView.getText().equals(" removePlanInvoked addPlanInvoked removePlanInvoked addPlanInvoked"));
   }
 
   public void testNamedPlansOverwriteOneAnother() {
@@ -229,7 +229,7 @@ public class SchedulerTest extends AndroidTestCase {
     boolean errorThrown = false;
     try {
       scheduler.addNamedPlan(new NamedTargetAlteringPlan(), null, textView);
-    } catch (AssertionError e) {
+    } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
     assertTrue(errorThrown);
@@ -239,7 +239,7 @@ public class SchedulerTest extends AndroidTestCase {
     boolean errorThrown = false;
     try {
       scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "", textView);
-    } catch (AssertionError e) {
+    } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
     assertTrue(errorThrown);
@@ -248,8 +248,8 @@ public class SchedulerTest extends AndroidTestCase {
   public void testExceptionThrownWhenRemovingANamedPlanWithoutAName() {
     boolean errorThrown = false;
     try {
-      scheduler.removePlanNamed(null, textView);
-    } catch (AssertionError e) {
+      scheduler.removeNamedPlan(null, textView);
+    } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
     assertTrue(errorThrown);
@@ -258,8 +258,8 @@ public class SchedulerTest extends AndroidTestCase {
   public void testExceptionThrownWhenRemovingANamedPlanWithAnEmptyName() {
     boolean errorThrown = false;
     try {
-      scheduler.removePlanNamed("", textView);
-    } catch (AssertionError e) {
+      scheduler.removeNamedPlan("", textView);
+    } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
     assertTrue(errorThrown);
@@ -381,19 +381,19 @@ public class SchedulerTest extends AndroidTestCase {
     @Override
     public void addPlan(Plan plan) {
       TextView target = getTarget();
-      target.setText(target.getText() + "regularAddPlanInvoked");
+      target.setText(target.getText() + " regularAddPlanInvoked");
     }
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
       TextView target = getTarget();
-      target.setText(target.getText() + "addPlanInvoked");
+      target.setText(target.getText() + " addPlanInvoked");
     }
 
     @Override
     public void removePlan(NamedPlan plan, String name) {
       TextView target = getTarget();
-      target.setText(target.getText() + "removePlanInvoked");
+      target.setText(target.getText() + " removePlanInvoked");
     }
   }
 

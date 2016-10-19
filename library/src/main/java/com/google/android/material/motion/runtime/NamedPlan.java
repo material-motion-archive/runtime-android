@@ -17,10 +17,11 @@
 package com.google.android.material.motion.runtime;
 
 /**
- * Similar to {@link Plan} in that a named plan is an object representing what you want something to do.
- * {@link NamedPlan} is a simple marker interface which extends from {@link Plan}. It does not include any specifics for how named plans are represented in the system.
- * Like {@link Plan}s, named plans use {@link Performer}s to fulfill themselves.
- * See {@link Performer.NamedPlanPerformance} for the named plan specific callbacks.
+ * A named plan is a {@link Plan} whose performer supports adding and remove the plan by name.
+ * Register a named plan by calling {@link Scheduler#addNamedPlan}, and remove it by calling {@link Scheduler#removeNamedPlan}.
+ *
+ * A named plan or family of named plans enables fine configuration of a performer's behavior.
+ *
  *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/named-plans.html">The Named Plan specificiation</a> for more details.
  */

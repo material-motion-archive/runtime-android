@@ -179,14 +179,10 @@ public final class Scheduler {
    * @param target the target on which the plan will operate.
    */
   public void addNamedPlan(NamedPlan plan, String name, Object target) {
-    if (name == null || name.length() == 0) {
-      throw new AssertionError("A NamedPlan must have a name with more than zero characters");
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("A NamedPlan must have a name with more than zero characters");
     }
-    PlanInfo planInfo = new PlanInfo();
-    planInfo.name = name;
-    planInfo.target = target;
-    planInfo.plan = plan.clone();
-    getTargetScope(target).commitAddNamedPlan(planInfo);
+    getTargetScope(target).commitAddNamedPlan(plan.clone(), name, target);
   }
 
   /**
@@ -194,14 +190,11 @@ public final class Scheduler {
    * @param name the name by which the named plan can be identified.
    * @param target the target on which the named plan was added.
    */
-  public void removePlanNamed(String name, Object target) {
-    if (name == null || name.length() == 0) {
-      throw new AssertionError("A NamedPlan must have a name with more than zero characters");
+  public void removeNamedPlan(String name, Object target) {
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("A NamedPlan must have a name with more than zero characters");
     }
-    PlanInfo planInfo = new PlanInfo();
-    planInfo.name = name;
-    planInfo.target = target;
-    getTargetScope(target).commitRemoveNamedPlan(planInfo);
+    getTargetScope(target).commitRemoveNamedPlan(name);
   }
 
   private TargetScope getTargetScope(Object target) {

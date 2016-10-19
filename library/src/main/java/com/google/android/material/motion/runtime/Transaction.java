@@ -61,7 +61,7 @@ public final class Transaction {
    * Adds a named {@link Plan} to this Transaction, targeting the given object. The Plan overwrites any
    * previously added Plans with the same name.
    * @deprecated  Named Plans should be added directly to the Scheduler instead of using Transactions. <br />
-   *              use {@link com.google.android.material.motion.runtime.Scheduler#addNamedPlan(Plan, String, Object)} on the Scheduler instead
+   *              use {@link com.google.android.material.motion.runtime.Scheduler#addNamedPlan(NamedPlan, String, Object)} on the Scheduler instead
    */
   @Deprecated
   public void addNamedPlan(Plan plan, String name, Object target) {
@@ -75,7 +75,7 @@ public final class Transaction {
   /**
    * Removes a named {@link Plan} with the given name from this Transaction.
    * @deprecated  Named Plans should be removed directly from the Scheduler instead of using Transactions. <br />
-   *              use {@link com.google.android.material.motion.runtime.Scheduler#removePlanNamed(String, Object)} on the Scheduler instead
+   *              use {@link com.google.android.material.motion.runtime.Scheduler#removeNamedPlan(String, Object)} on the Scheduler instead
    */
   @Deprecated
   public void removeNamedPlan(String name, Object target) {
