@@ -196,6 +196,25 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(secondIncrementerTarget.removeCounter == 1);
   }
 
+  public void testNamedPlanOnlyInvokesNamedPlanCallbacks() {
+    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "one", textView);
+
+    assertFalse(textView.getText().toString().contains("regularAddPlanInvoked"));
+  }
+
+  public void testPlanOnlyInvokedPlanCallbacks() {
+    scheduler.addPlan(new RegularPlanTargetAlteringPlan(), textView);
+
+    assertFalse(textView.getText().toString().contains("removePlanInvoked"));
+    assertFalse(textView.getText().toString().contains("addPlanInvoked"));
+    assertTrue(textView.getText().toString().contains("regularAddPlanInvoked"));
+  }
+
+  private static class RegularPlanTargetAlteringPlan extends Plan {
+    @Override
+    public Class<? extends Performer> getPerformerClass() { return GenericPlanPerformer.class; }
+  }
+
   private static class NamedCounterAlteringPlan extends NamedPlan {
     @Override
     public Class<? extends Performer> getPerformerClass() { return NamedCounterPlanPerformer.class; }
@@ -203,7 +222,7 @@ public class SchedulerTest extends AndroidTestCase {
 
   private static class NamedTargetAlteringPlan extends NamedPlan {
     @Override
-    public Class<? extends Performer> getPerformerClass() { return NamedPlanPerformer.class; }
+    public Class<? extends Performer> getPerformerClass() { return GenericPlanPerformer.class; }
   }
 
   private static class StandardPlan extends Plan {
@@ -281,7 +300,13 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  public static class NamedPlanPerformer extends Performer implements Performer.NamedPlanPerformance {
+  public static class GenericPlanPerformer extends Performer implements Performer.NamedPlanPerformance, Performer.PlanPerformance {
+
+    @Override
+    public void addPlan(Plan plan) {
+      TextView target = getTarget();
+      target.setText(target.getText() + "regularAddPlanInvoked");
+    }
 
     @Override
     public void addPlan(NamedPlan plan, String name) {

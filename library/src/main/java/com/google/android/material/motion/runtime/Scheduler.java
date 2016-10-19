@@ -173,12 +173,15 @@ public final class Scheduler {
   }
 
   /**
-   * TODO
-   * @param plan
-   * @param name
-   * @param target
+   * Adds a {@link NamedPlan} to this scheduler.
+   * @param plan the {@link NamedPlan} to add to the scheduler.
+   * @param name the name by which this plan can be identified.
+   * @param target the target on which the plan will operate.
    */
   public void addNamedPlan(NamedPlan plan, String name, Object target) {
+    if (name == null || name.length() == 0) {
+      throw new AssertionError("A NamedPlan must have a name with more than zero characters");
+    }
     PlanInfo planInfo = new PlanInfo();
     planInfo.name = name;
     planInfo.target = target;
@@ -187,11 +190,14 @@ public final class Scheduler {
   }
 
   /**
-   * TODO
-   * @param name
-   * @param target
+   * Removes a {@link NamedPlan} from this scheduler.
+   * @param name the name by which the named plan can be identified.
+   * @param target the target on which the named plan was added.
    */
   public void removePlanNamed(String name, Object target) {
+    if (name == null || name.length() == 0) {
+      throw new AssertionError("A NamedPlan must have a name with more than zero characters");
+    }
     PlanInfo planInfo = new PlanInfo();
     planInfo.name = name;
     planInfo.target = target;

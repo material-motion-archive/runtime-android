@@ -17,8 +17,13 @@
 package com.google.android.material.motion.runtime;
 
 /**
- * TODO
+ * Similar to {@link Plan} in that a named plan is an object representing what you want something to do.
+ * {@link NamedPlan} is a simple marker interface which extends from {@link Plan}. It does not include any specifics for how named plans are represented in the system.
+ * Like {@link Plan}s, named plans use {@link Performer}s to fulfill themselves.
+ * See {@link Performer.NamedPlanPerformance} for the named plan specific callbacks.
+ *
+ * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/named-plans.html">The Named Plan specificiation</a> for more details.
  */
 public abstract class NamedPlan extends Plan {
-
+  
 }
