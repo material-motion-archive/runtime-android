@@ -19,6 +19,9 @@ package com.google.android.material.motion.runtime;
 import android.test.AndroidTestCase;
 import android.widget.TextView;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class SchedulerTest extends AndroidTestCase {
 
   private Scheduler scheduler;
@@ -210,6 +213,23 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(textView.getText().toString().contains("regularAddPlanInvoked"));
   }
 
+  public void testPlanStorageExample() {
+    StorageNamedPlan plan = new StorageNamedPlan();
+    List<NamedPlan> list = new ArrayList<NamedPlan>();
+    scheduler.addNamedPlan(plan, "one", list);
+
+    assertTrue(list.size() == 2);
+    assertTrue(list.get(0) instanceof NamedPlan);
+    assertTrue(list.get(1) instanceof NamedPlan);
+    // plans are always copied
+    assertFalse(list.contains(plan));
+  }
+
+  private static class StorageNamedPlan extends NamedPlan {
+    @Override
+    public Class<? extends Performer> getPerformerClass() { return StoragePlanPerformer.class; }
+  }
+
   private static class RegularPlanTargetAlteringPlan extends Plan {
     @Override
     public Class<? extends Performer> getPerformerClass() { return GenericPlanPerformer.class; }
@@ -287,6 +307,7 @@ public class SchedulerTest extends AndroidTestCase {
   }
 
   public static class NamedCounterPlanPerformer extends Performer implements Performer.NamedPlanPerformance {
+
     @Override
     public void addPlan(NamedPlan plan, String name) {
       IncrementerTarget target = getTarget();
@@ -297,6 +318,21 @@ public class SchedulerTest extends AndroidTestCase {
     public void removePlan(NamedPlan plan, String name) {
       IncrementerTarget target = getTarget();
       target.removeCounter += 1;
+    }
+  }
+
+  public static class StoragePlanPerformer extends Performer implements Performer.NamedPlanPerformance {
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      List<NamedPlan> target = getTarget();
+      target.add(plan);
+    }
+
+    @Override
+    public void removePlan(NamedPlan plan, String name) {
+      List<NamedPlan> target = getTarget();
+      target.add(plan);
     }
   }
 
