@@ -225,6 +225,46 @@ public class SchedulerTest extends AndroidTestCase {
     assertFalse(list.contains(plan));
   }
 
+  public void testExceptionThrownWhenAddingANamedPlanWithoutAName() {
+    boolean errorThrown = false;
+    try {
+      scheduler.addNamedPlan(new NamedTargetAlteringPlan(), null, textView);
+    } catch (AssertionError e) {
+      errorThrown = true;
+    }
+    assertTrue(errorThrown);
+  }
+
+  public void testExceptionThrownWhenAddingANamedPlanWithAnEmptyName() {
+    boolean errorThrown = false;
+    try {
+      scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "", textView);
+    } catch (AssertionError e) {
+      errorThrown = true;
+    }
+    assertTrue(errorThrown);
+  }
+
+  public void testExceptionThrownWhenRemovingANamedPlanWithoutAName() {
+    boolean errorThrown = false;
+    try {
+      scheduler.removePlanNamed(null, textView);
+    } catch (AssertionError e) {
+      errorThrown = true;
+    }
+    assertTrue(errorThrown);
+  }
+
+  public void testExceptionThrownWhenRemovingANamedPlanWithAnEmptyName() {
+    boolean errorThrown = false;
+    try {
+      scheduler.removePlanNamed("", textView);
+    } catch (AssertionError e) {
+      errorThrown = true;
+    }
+    assertTrue(errorThrown);
+  }
+
   private static class StorageNamedPlan extends NamedPlan {
     @Override
     public Class<? extends Performer> getPerformerClass() { return StoragePlanPerformer.class; }
