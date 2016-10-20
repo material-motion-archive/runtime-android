@@ -22,7 +22,6 @@ package com.google.android.material.motion.runtime;
  *
  * A named plan or family of named plans enables fine configuration of a performer's behavior.
  *
- *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/named-plans.html">The Named Plan specificiation</a> for more details.
  */
 public abstract class NamedPlan extends Plan implements Cloneable {

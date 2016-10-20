@@ -174,6 +174,8 @@ public final class Scheduler {
 
   /**
    * Adds a {@link NamedPlan} to this scheduler.
+   * When this method is invoked, a {@link NamedPlan} with the same name and target
+   * is removed from the scheduler before the plan is eventually added.
    * @param plan the {@link NamedPlan} to add to the scheduler.
    * @param name the name by which this plan can be identified.
    * @param target the target on which the plan will operate.

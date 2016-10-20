@@ -142,7 +142,7 @@ class TargetScope {
 
   private Performer.NamedPlanPerformance getNamedPerformer(NamedPlan plan, String name, Object target) {
     Performer.NamedPlanPerformance namedPerformer = namedCache.get(name);
-    if (namedPerformer == null) {
+    if (namedPerformer == null && plan != null) {
       // create it
       namedPerformer = (Performer.NamedPlanPerformance)createPerformer(plan, target);
       // stash it for later use

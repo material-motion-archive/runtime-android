@@ -50,20 +50,21 @@ public abstract class Performer {
   }
 
   /**
-   * {@link Performer}s can implement this interface to understand when named plans are added to
-   * or removed from this performer.
+   * A Performer can implement this interface in order to support the add and remove for {@link NamedPlan}s APIs.
    */
   public interface NamedPlanPerformance {
 
     /**
-     * Executed when a {@link NamedPlan} is added to this Performer.
+     * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any plan
+     * added in this manner.
      * @param plan the plan which was added to this performer.
      * @param name the name by which this plan can be identified.
      */
     void addPlan(NamedPlan plan, String name);
 
     /**
-     * Executed when a {@link NamedPlan} is removed from this Performer.
+     * Provides a {@link NamedPlan} to this Performer. The Performer is expected remove any plan
+     * presented in this manner.
      * @param plan the plan which was removed from this performer.
      * @param name the name by which this plan was identified.
      */

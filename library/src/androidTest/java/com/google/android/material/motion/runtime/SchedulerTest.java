@@ -225,6 +225,13 @@ public class SchedulerTest extends AndroidTestCase {
     assertFalse(list.contains(plan));
   }
 
+  public void testPlanStorageRemoveNamedPlanExample() {
+    List<NamedPlan> list = new ArrayList<NamedPlan>();
+    scheduler.removeNamedPlan("never_added", list);
+
+    assertTrue(list.size() == 0);
+  }
+
   public void testExceptionThrownWhenAddingANamedPlanWithoutAName() {
     boolean errorThrown = false;
     try {
