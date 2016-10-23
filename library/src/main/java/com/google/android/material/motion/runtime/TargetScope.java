@@ -96,7 +96,6 @@ class TargetScope {
   }
 
   void commitRemoveNamedPlan(String name) {
-    // passing null here feels wrong.
     removeNamedPlan(null, name, namedCache.get(name));
   }
 
