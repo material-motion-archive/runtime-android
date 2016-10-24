@@ -32,6 +32,7 @@ import com.google.android.material.motion.runtime.Performer.ManualPerformance;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
 import com.google.android.material.motion.runtime.Performer.PlanPerformance;
 import com.google.android.material.motion.runtime.Scheduler.State;
+import com.google.android.material.motion.runtime.Performer.NamedPlanPerformance;
 import com.google.android.material.motion.runtime.Transaction.PlanInfo;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,7 +48,7 @@ class TargetScope {
 
   private final SimpleArrayMap<Class<? extends Performer>, Performer> cache =
     new SimpleArrayMap<>();
-  private final SimpleArrayMap<String, Performer.NamedPlanPerformance> namedCache = new SimpleArrayMap<>();
+  private final SimpleArrayMap<String, NamedPlanPerformance> namedCache = new SimpleArrayMap<>();
 
   private final Set<ManualPerformance> activeManualPerformances = new HashSet<>();
 
@@ -88,15 +89,15 @@ class TargetScope {
 
   void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
     // remove first
-    Performer.NamedPlanPerformance performer = getNamedPerformer(plan, name, target);
-    removeNamedPlan(plan, name, performer);
+    NamedPlanPerformance performer = getNamedPerformer(plan, name, target);
+    removeNamedPlan(name, performer);
     // then add
     namedCache.put(name, performer);
     performer.addPlan(plan, name);
   }
 
   void commitRemoveNamedPlan(String name) {
-    removeNamedPlan(null, name, namedCache.get(name));
+    removeNamedPlan(name, namedCache.get(name));
   }
 
   void update(float deltaTimeMs) {
@@ -132,18 +133,18 @@ class TargetScope {
     return state;
   }
 
-  private void removeNamedPlan(NamedPlan plan, String name, Performer.NamedPlanPerformance performer) {
+  private void removeNamedPlan(String name, NamedPlanPerformance performer) {
     if (performer != null) {
-      performer.removePlan(plan, name);
+      performer.removePlan(name);
       namedCache.remove(name);
     }
   }
 
-  private Performer.NamedPlanPerformance getNamedPerformer(NamedPlan plan, String name, Object target) {
-    Performer.NamedPlanPerformance namedPerformer = namedCache.get(name);
-    if (namedPerformer == null && plan != null) {
+  private NamedPlanPerformance getNamedPerformer(NamedPlan plan, String name, Object target) {
+    NamedPlanPerformance namedPerformer = namedCache.get(name);
+    if (namedPerformer == null) {
       // create it
-      namedPerformer = (Performer.NamedPlanPerformance)createPerformer(plan, target);
+      namedPerformer = (NamedPlanPerformance)createPerformer(plan, target);
       // stash it for later use
       namedCache.put(name, namedPerformer);
     }

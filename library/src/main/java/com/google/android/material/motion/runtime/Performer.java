@@ -65,10 +65,9 @@ public abstract class Performer {
     /**
      * Provides a {@link NamedPlan} to this Performer. The Performer is expected remove any plan
      * presented in this manner.
-     * @param plan the plan which was removed from this performer.
      * @param name the name by which this plan was identified.
      */
-    void removePlan(NamedPlan plan, String name);
+    void removePlan(String name);
   }
 
   /**

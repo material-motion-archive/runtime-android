@@ -215,14 +215,12 @@ public class SchedulerTest extends AndroidTestCase {
 
   public void testPlanStorageExample() {
     StorageNamedPlan plan = new StorageNamedPlan();
-    List<NamedPlan> list = new ArrayList<NamedPlan>();
+    List<String> list = new ArrayList<>();
     scheduler.addNamedPlan(plan, "one", list);
 
     assertTrue(list.size() == 2);
-    assertTrue(list.get(0) instanceof NamedPlan);
-    assertTrue(list.get(1) instanceof NamedPlan);
-    // plans are always copied
-    assertFalse(list.contains(plan));
+    assertTrue(list.get(0).equals("one"));
+    assertTrue(list.get(1).equals("one"));
   }
 
   public void testPlanStorageRemoveNamedPlanExample() {
@@ -362,7 +360,7 @@ public class SchedulerTest extends AndroidTestCase {
     }
 
     @Override
-    public void removePlan(NamedPlan plan, String name) {
+    public void removePlan(String name) {
       IncrementerTarget target = getTarget();
       target.removeCounter += 1;
     }
@@ -372,14 +370,14 @@ public class SchedulerTest extends AndroidTestCase {
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
-      List<NamedPlan> target = getTarget();
-      target.add(plan);
+      List<String> target = getTarget();
+      target.add(name);
     }
 
     @Override
-    public void removePlan(NamedPlan plan, String name) {
-      List<NamedPlan> target = getTarget();
-      target.add(plan);
+    public void removePlan(String name) {
+      List<String> target = getTarget();
+      target.add(name);
     }
   }
 
@@ -398,7 +396,7 @@ public class SchedulerTest extends AndroidTestCase {
     }
 
     @Override
-    public void removePlan(NamedPlan plan, String name) {
+    public void removePlan(String name) {
       TextView target = getTarget();
       target.setText(target.getText() + " removePlanInvoked");
     }
