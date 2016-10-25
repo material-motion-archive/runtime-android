@@ -144,7 +144,7 @@ public final class Scheduler {
    * Commits the given {@link Transaction}. Each {@link PlanInfo} is committed in the context of
    * its target, called a {@link TargetScope}. Each TargetScope ensures that only one instance of a
    * specific type of Performer is created.
-   * @deprecated  Plans should be added directly to the Scheduler instead of using Transactions. <br />
+   * @deprecated 2.0.0. Plans should be added directly to the Scheduler instead of using Transactions. <br />
    *              This will be removed in the next version <br />
    *              use {@link com.google.android.material.motion.runtime.Scheduler#addPlan(Plan, Object)} on the Scheduler instead
    */
