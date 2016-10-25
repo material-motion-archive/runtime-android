@@ -1,4 +1,5 @@
 apply from: 'local-dependency-substitution.gradle'
+apply plugin: "checkstyle"
 
 buildscript {
   repositories {
@@ -14,5 +15,15 @@ allprojects {
   repositories {
     jcenter()
     maven { url "https://jitpack.io" }
+  }
+}
+
+subprojects {
+  apply plugin: 'checkstyle'
+  apply plugin: 'pmd'
+
+  checkstyle {
+    configFile = rootProject.file('checkstyle.xml')
+    toolVersion = '7.1'
   }
 }
