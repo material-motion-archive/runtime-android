@@ -39,13 +39,19 @@ public abstract class Performer {
    *
    * <p>
    * A Performer can have logic that is configured by the {@link Plan Plans} provided to it.
+   *
+   * @deprecated Override {@link Performer#addPlan(Plan)} instead.
    */
+  @Deprecated
   public interface PlanPerformance {
 
     /**
      * Provides a {@link Plan} to this Performer. The Performer is expected to execute any plan
      * added in this manner.
+     *
+     * @deprecated Override {@link Performer#addPlan(Plan)} instead.
      */
+    @Deprecated
     void addPlan(Plan plan);
   }
 
@@ -224,6 +230,13 @@ public abstract class Performer {
     this.target = target;
     onInitialize(target);
   }
+
+  /**
+   * Provides a {@link Plan} to this Performer. The Performer is expected to execute this plan.
+   *
+   * Note: Once {@link PlanPerformance} is removed, this will become an abstract method.
+   */
+  protected void addPlan(Plan plan) {}
 
   /**
    * Invoked immediately after this Performer has been initialized with a target.

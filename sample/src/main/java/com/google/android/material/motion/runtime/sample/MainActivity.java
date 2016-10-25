@@ -24,7 +24,6 @@ import android.view.View;
 import android.widget.TextView;
 import com.google.android.material.motion.runtime.Performer;
 import com.google.android.material.motion.runtime.Performer.ContinuousPerformance;
-import com.google.android.material.motion.runtime.Performer.PlanPerformance;
 import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.Scheduler;
 import com.google.android.material.motion.runtime.Transaction;
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  public static class DemoPerformer1 extends Performer implements PlanPerformance {
+  public static class DemoPerformer1 extends Performer {
 
     @Override
     public void addPlan(Plan plan) {
@@ -96,8 +95,7 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  public static class DemoPerformer2 extends Performer
-      implements PlanPerformance, ContinuousPerformance {
+  public static class DemoPerformer2 extends Performer implements  ContinuousPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 

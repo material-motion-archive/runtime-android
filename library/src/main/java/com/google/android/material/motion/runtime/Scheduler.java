@@ -45,10 +45,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * listeners via {@link #addStateListener(StateListener)}.
  *
  * <p>
- * This Scheduler correctly handles
- * {@link com.google.android.material.motion.runtime.Performer.PlanPerformance},
- * {@link com.google.android.material.motion.runtime.Performer.ContinuousPerformance}, and
- * {@link com.google.android.material.motion.runtime.Performer.ManualPerformance}.
+ * This Scheduler correctly handles all the interfaces defined in {@link Performer}.
  *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/scheduler.html">The Scheduler specification</a>
  */

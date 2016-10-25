@@ -30,7 +30,6 @@ import com.google.android.material.motion.runtime.Performer.DelegatedPerformance
 import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceTokenCallback;
 import com.google.android.material.motion.runtime.Performer.ManualPerformance;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
-import com.google.android.material.motion.runtime.Performer.PlanPerformance;
 import com.google.android.material.motion.runtime.Scheduler.State;
 import com.google.android.material.motion.runtime.Transaction.PlanInfo;
 import java.util.HashSet;
@@ -80,9 +79,7 @@ class TargetScope {
       ((ComposablePerformance) performer).setTransactionEmitter(transactionEmitter);
     }
 
-    if (performer instanceof PlanPerformance) {
-      ((PlanPerformance) performer).addPlan(plan.plan);
-    }
+    performer.addPlan(plan.plan);
   }
 
   void update(float deltaTimeMs) {
