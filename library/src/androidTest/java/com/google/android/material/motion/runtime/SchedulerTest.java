@@ -129,28 +129,38 @@ public class SchedulerTest extends AndroidTestCase {
   public void testAddingNamedPlan() {
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
 
-    assertTrue(textView.getText().equals(" removePlanInvoked addPlanInvoked"));
+    assertTrue(textView.getText().equals(" addPlanInvoked"));
   }
 
   public void testAddAndRemoveTheSameNamedPlan() {
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "name_one", textView);
     scheduler.removeNamedPlan("name_one", textView);
 
-    assertTrue(textView.getText().equals(" removePlanInvoked addPlanInvoked removePlanInvoked"));
+    assertTrue(textView.getText().equals(" addPlanInvoked removePlanInvoked"));
   }
 
   public void testRemoveNamedPlanThatWasNeverAdded() {
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
     scheduler.removeNamedPlan("this_was_never_added", textView);
 
-    assertTrue(textView.getText().equals(" removePlanInvoked addPlanInvoked"));
+    assertTrue(textView.getText().equals(" addPlanInvoked"));
   }
 
-  public void testNamedPlansMakeMultipleAddAndRemoveCalls() {
+  public void testNamedPlansMakeMultipleAddCalls() {
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "one", textView);
     scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "two", textView);
 
-    assertTrue(textView.getText().equals(" removePlanInvoked addPlanInvoked removePlanInvoked addPlanInvoked"));
+    assertTrue(textView.getText().equals(" addPlanInvoked addPlanInvoked"));
+  }
+
+  public void testAddAndRemoveCallbacksAreInvoked() {
+    NamedTargetAlteringPlan plan1 = new NamedTargetAlteringPlan();
+    NamedTargetAlteringPlan plan2 = new NamedTargetAlteringPlan();
+    Scheduler scheduler = new Scheduler();
+    scheduler.addNamedPlan(plan1, "common_name", textView);
+    scheduler.addNamedPlan(plan2, "common_name", textView);
+
+    assertTrue(textView.getText().equals(" addPlanInvoked removePlanInvoked addPlanInvoked"));
   }
 
   public void testNamedPlansOverwriteOneAnother() {
@@ -162,7 +172,7 @@ public class SchedulerTest extends AndroidTestCase {
     scheduler.addNamedPlan(planB, "one", incrementerTarget);
 
     assertTrue(incrementerTarget.addCounter == 2);
-    assertTrue(incrementerTarget.removeCounter == 2);
+    assertTrue(incrementerTarget.removeCounter == 1);
   }
 
   public void testAddingTheSameNamedPlanToTheSameTarget() {
@@ -171,7 +181,7 @@ public class SchedulerTest extends AndroidTestCase {
     scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
 
     assertTrue(incrementerTarget.addCounter == 2);
-    assertTrue(incrementerTarget.removeCounter == 2);
+    assertTrue(incrementerTarget.removeCounter == 1);
   }
 
   public void testAddingSimilarNamesToTheSameTarget() {
@@ -182,7 +192,7 @@ public class SchedulerTest extends AndroidTestCase {
     scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "ONE", incrementerTarget);
 
     assertTrue(incrementerTarget.addCounter == 4);
-    assertTrue(incrementerTarget.removeCounter == 4);
+    assertTrue(incrementerTarget.removeCounter == 0);
   }
 
   public void testAddingNamedPlansToDifferentTargets() {
@@ -194,9 +204,9 @@ public class SchedulerTest extends AndroidTestCase {
     scheduler.addNamedPlan(plan, "one", secondIncrementerTarget);
 
     assertTrue(firstIncrementerTarget.addCounter == 1);
-    assertTrue(firstIncrementerTarget.removeCounter == 1);
+    assertTrue(firstIncrementerTarget.removeCounter == 0);
     assertTrue(secondIncrementerTarget.addCounter == 1);
-    assertTrue(secondIncrementerTarget.removeCounter == 1);
+    assertTrue(secondIncrementerTarget.removeCounter == 0);
   }
 
   public void testNamedPlanOnlyInvokesNamedPlanCallbacks() {
@@ -208,7 +218,6 @@ public class SchedulerTest extends AndroidTestCase {
   public void testPlanOnlyInvokedPlanCallbacks() {
     scheduler.addPlan(new RegularPlanTargetAlteringPlan(), textView);
 
-    assertFalse(textView.getText().toString().contains("removePlanInvoked"));
     assertFalse(textView.getText().toString().contains("addPlanInvoked"));
     assertTrue(textView.getText().toString().contains("regularAddPlanInvoked"));
   }
@@ -218,9 +227,8 @@ public class SchedulerTest extends AndroidTestCase {
     List<String> list = new ArrayList<>();
     scheduler.addNamedPlan(plan, "one", list);
 
-    assertTrue(list.size() == 2);
+    assertTrue(list.size() == 1);
     assertTrue(list.get(0).equals("one"));
-    assertTrue(list.get(1).equals("one"));
   }
 
   public void testPlanStorageRemoveNamedPlanExample() {

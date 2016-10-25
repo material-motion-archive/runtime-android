@@ -89,11 +89,14 @@ class TargetScope {
 
   void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
     // remove first
-    NamedPlanPerformance performer = getNamedPerformer(plan, name, target);
-    removeNamedPlan(name, performer);
+    commitRemoveNamedPlan(name);
     // then add
-    namedCache.put(name, performer);
-    performer.addPlan(plan, name);
+    NamedPlanPerformance namedPerformer = namedCache.get(name);
+    if (namedPerformer == null) {
+      namedPerformer = (NamedPlanPerformance)createPerformer(plan, target);
+    }
+    namedCache.put(name, namedPerformer);
+    namedPerformer.addPlan(plan, name);
   }
 
   void commitRemoveNamedPlan(String name) {
@@ -136,19 +139,8 @@ class TargetScope {
   private void removeNamedPlan(String name, NamedPlanPerformance performer) {
     if (performer != null) {
       performer.removePlan(name);
-      namedCache.remove(name);
     }
-  }
-
-  private NamedPlanPerformance getNamedPerformer(NamedPlan plan, String name, Object target) {
-    NamedPlanPerformance namedPerformer = namedCache.get(name);
-    if (namedPerformer == null) {
-      // create it
-      namedPerformer = (NamedPlanPerformance)createPerformer(plan, target);
-      // stash it for later use
-      namedCache.put(name, namedPerformer);
-    }
-    return namedPerformer;
+    namedCache.remove(name);
   }
 
   private Performer getPerformer(PlanInfo plan) {
