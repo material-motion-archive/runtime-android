@@ -40,14 +40,14 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(scheduler.getState() == Scheduler.IDLE);
   }
 
-  public void testStandardPlanPerformanceSchedulerState() {
+  public void testStandardPerformerSchedulerState() {
     transaction.addNamedPlan(new StandardPlan("standard"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
     assertTrue(scheduler.getState() == Scheduler.IDLE);
   }
 
-  public void testManualPlanPerformanceSchedulerState() {
+  public void testManualPerformerSchedulerState() {
     transaction.addNamedPlan(new ManualPlan("manual"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
@@ -100,22 +100,22 @@ public class SchedulerTest extends AndroidTestCase {
     assertTrue(secondListener.getState() == Scheduler.IDLE);
   }
 
-  public void testNeverEndingDelegatePlanPerformanceSchedulerState() {
-    transaction.addNamedPlan(new NeverEndingDelegatedPlan("delegated"), "plan", textView);
+  public void testNeverEndingDelegatePerformanceSchedulerState() {
+    transaction.addNamedPlan(new NeverEndingContinuousPlan("continuous"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
     assertTrue(scheduler.getState() == Scheduler.ACTIVE);
   }
 
-  public void testEndingDelegatedPlanPerformanceSchedulerState() {
-    transaction.addNamedPlan(new EndingDelegatedPlan("delegated"), "plan", textView);
+  public void testEndingContinuousPerformanceSchedulerState() {
+    transaction.addNamedPlan(new EndingContinuousPlan("continuous"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
     assertTrue(scheduler.getState() == Scheduler.IDLE);
   }
 
   public void testAddingPlanDirectlyToScheduler() {
-    scheduler.addPlan(new NeverEndingDelegatedPlan("delegated"), textView);
+    scheduler.addPlan(new NeverEndingContinuousPlan("continuous"), textView);
 
     assertTrue(scheduler.getState() == Scheduler.ACTIVE);
   }
@@ -308,7 +308,7 @@ public class SchedulerTest extends AndroidTestCase {
 
     @Override
     public Class<? extends Performer> getPerformerClass() {
-      return StandardPlanPerformer.class;
+      return StandardPerformer.class;
     }
   }
 
@@ -326,11 +326,11 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  private static class NeverEndingDelegatedPlan extends Plan {
+  private static class NeverEndingContinuousPlan extends Plan {
 
     private final String text;
 
-    private NeverEndingDelegatedPlan(String text) {
+    private NeverEndingContinuousPlan(String text) {
       this.text = text;
     }
 
@@ -340,17 +340,17 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  private static class EndingDelegatedPlan extends Plan {
+  private static class EndingContinuousPlan extends Plan {
 
     private final String text;
 
-    private EndingDelegatedPlan(String text) {
+    private EndingContinuousPlan(String text) {
       this.text = text;
     }
 
     @Override
     public Class<? extends Performer> getPerformerClass() {
-      return EndingDelegatedPerformer.class;
+      return EndingContinuousPerformer.class;
     }
   }
 
@@ -389,7 +389,7 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  public static class GenericPlanPerformer extends Performer implements Performer.NamedPlanPerformance, Performer.PlanPerformance {
+  public static class GenericPlanPerformer extends Performer implements Performer.NamedPlanPerformance {
 
     @Override
     public void addPlan(Plan plan) {
@@ -410,7 +410,7 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  public static class StandardPlanPerformer extends Performer implements Performer.PlanPerformance {
+  public static class StandardPerformer extends Performer {
 
     @Override
     public void addPlan(Plan plan) {
@@ -429,7 +429,7 @@ public class SchedulerTest extends AndroidTestCase {
   }
 
   public static class NeverEndingContinuousPerformer extends Performer implements
-    Performer.ContinuousPerformance, Performer.PlanPerformance {
+    Performer.ContinuousPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
@@ -445,8 +445,8 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  public static class EndingDelegatedPerformer extends Performer implements
-    Performer.ContinuousPerformance, Performer.PlanPerformance {
+  public static class EndingContinuousPerformer extends Performer implements
+    Performer.ContinuousPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 

@@ -25,12 +25,8 @@ import com.google.android.material.motion.runtime.Performer.ComposablePerformanc
 import com.google.android.material.motion.runtime.Performer.ContinuousPerformance;
 import com.google.android.material.motion.runtime.Performer.ContinuousPerformance.IsActiveToken;
 import com.google.android.material.motion.runtime.Performer.ContinuousPerformance.IsActiveTokenGenerator;
-import com.google.android.material.motion.runtime.Performer.DelegatedPerformance;
-import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceToken;
-import com.google.android.material.motion.runtime.Performer.DelegatedPerformance.DelegatedPerformanceTokenCallback;
 import com.google.android.material.motion.runtime.Performer.ManualPerformance;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
-import com.google.android.material.motion.runtime.Performer.PlanPerformance;
 import com.google.android.material.motion.runtime.Scheduler.State;
 import com.google.android.material.motion.runtime.Performer.NamedPlanPerformance;
 import com.google.android.material.motion.runtime.Transaction.PlanInfo;
@@ -55,10 +51,6 @@ class TargetScope {
   private final SimpleArrayMap<ContinuousPerformance, Set<IsActiveToken>>
     activeContinuousPerformances = new SimpleArrayMap<>();
 
-  @Deprecated
-  private final SimpleArrayMap<DelegatedPerformance, Set<DelegatedPerformanceToken>>
-    activeTokenDelegatedPerformances = new SimpleArrayMap<>();
-
   private final Scheduler scheduler;
 
   TargetScope(Scheduler scheduler) {
@@ -73,18 +65,11 @@ class TargetScope {
       notifyTargetStateChanged();
     }
 
-    if (performer instanceof DelegatedPerformance) {
-      ((DelegatedPerformance) performer)
-        .setDelegatedPerformanceCallback(delegatedPerformanceTokenCallback);
-    }
-
     if (performer instanceof ComposablePerformance) {
       ((ComposablePerformance) performer).setTransactionEmitter(transactionEmitter);
     }
 
-    if (performer instanceof PlanPerformance) {
-      ((PlanPerformance) performer).addPlan(plan.plan);
-    }
+    performer.addPlan(plan.plan);
   }
 
   void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
@@ -130,7 +115,7 @@ class TargetScope {
     if (!activeManualPerformances.isEmpty()) {
       state |= MANUAL_DETAILED_STATE_FLAG;
     }
-    if (!activeContinuousPerformances.isEmpty() || !activeTokenDelegatedPerformances.isEmpty()) {
+    if (!activeContinuousPerformances.isEmpty()) {
       state |= CONTINUOUS_DETAILED_STATE_FLAG;
     }
     return state;
@@ -219,52 +204,6 @@ class TargetScope {
       }
     };
   }
-
-  /**
-   * The {@link DelegatedPerformanceTokenCallback} assigned to every {@link DelegatedPerformance} in
-   * this TargetScope.
-   */
-  @Deprecated
-  private final DelegatedPerformanceTokenCallback delegatedPerformanceTokenCallback =
-    new DelegatedPerformanceTokenCallback() {
-      @Override
-      public DelegatedPerformanceToken onDelegatedPerformanceStart(
-        DelegatedPerformance performer) {
-        Set<DelegatedPerformanceToken> delegatedTokens =
-          activeTokenDelegatedPerformances.get(performer);
-
-        if (delegatedTokens == null) {
-          delegatedTokens = new HashSet<>();
-          activeTokenDelegatedPerformances.put(performer, delegatedTokens);
-        }
-
-        DelegatedPerformanceToken token = new DelegatedPerformanceToken();
-        delegatedTokens.add(token);
-
-        notifyTargetStateChanged();
-
-        return token;
-      }
-
-      @Override
-      public void onDelegatedPerformanceEnd(
-        DelegatedPerformance performer, DelegatedPerformanceToken token) {
-        Set<DelegatedPerformanceToken> delegatedTokens =
-          activeTokenDelegatedPerformances.get(performer);
-
-        boolean modified = delegatedTokens.remove(token);
-        if (!modified) {
-          throw new IllegalArgumentException(
-            "Expected delegated performance to be active: " + token);
-        }
-
-        if (delegatedTokens.isEmpty()) {
-          activeTokenDelegatedPerformances.remove(performer);
-        }
-
-        notifyTargetStateChanged();
-      }
-    };
 
   private final TransactionEmitter transactionEmitter = new TransactionEmitter() {
     @Override

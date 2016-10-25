@@ -39,13 +39,19 @@ public abstract class Performer {
    *
    * <p>
    * A Performer can have logic that is configured by the {@link Plan Plans} provided to it.
+   *
+   * @deprecated 2.0.0. Override {@link Performer#addPlan(Plan)} instead.
    */
+  @Deprecated
   public interface PlanPerformance {
 
     /**
      * Provides a {@link Plan} to this Performer. The Performer is expected to execute any plan
      * added in this manner.
+     *
+     * @deprecated 2.0.0. Override {@link Performer#addPlan(Plan)} instead.
      */
+    @Deprecated
     void addPlan(Plan plan);
   }
 
@@ -114,64 +120,6 @@ public abstract class Performer {
        * will result in an exception.
        */
       void terminate();
-    }
-  }
-
-  /**
-   * A Performer implements this interface in order to delegate its work to another API.
-   * {@link android.animation.Animator} and {@link android.view.ViewPropertyAnimator} are examples
-   * of APIs that can be delegated to.
-   *
-   * <p>
-   * The only requirement is that the Performer must be able to notify the
-   * {@link DelegatedPerformanceTokenCallback callback} when the delegated work
-   * {@link DelegatedPerformanceTokenCallback#onDelegatedPerformanceStart(DelegatedPerformance) starts}
-   * and
-   * {@link DelegatedPerformanceTokenCallback#onDelegatedPerformanceEnd(DelegatedPerformance, DelegatedPerformanceToken) ends}.
-   */
-  @Deprecated
-  public interface DelegatedPerformance {
-
-    /**
-     * Called by the {@link Scheduler} to supply the {@link Performer} with a
-     * {@link DelegatedPerformanceTokenCallback}.
-     */
-    @Deprecated
-    void setDelegatedPerformanceCallback(DelegatedPerformanceTokenCallback callback);
-
-    /**
-     * A token representing a single unit of delegated performance.
-     */
-    @Deprecated
-    final class DelegatedPerformanceToken {}
-
-    /**
-     * A callback to be provided to a {@link DelegatedPerformance} Performer.
-     */
-    @Deprecated
-    interface DelegatedPerformanceTokenCallback {
-
-      /**
-       * Notifies that the delegated performance has started.
-       *
-       * @param performer The Performer whose delegated performance has started.
-       *
-       * @return The token of the delegated performance. Must be provided to
-       *     {@link #onDelegatedPerformanceEnd(DelegatedPerformance, DelegatedPerformanceToken)}.
-       */
-      @Deprecated
-      DelegatedPerformanceToken onDelegatedPerformanceStart(DelegatedPerformance performer);
-
-      /**
-       * Notifies that the delegated performance has ended.
-       *
-       * @param performer The Performer whose delegated performance has ended.
-       * @param token The token of the delegated performance returned by
-       *     {@link #onDelegatedPerformanceStart(DelegatedPerformance)}.
-       */
-      @Deprecated
-      void onDelegatedPerformanceEnd(
-        DelegatedPerformance performer, DelegatedPerformanceToken token);
     }
   }
 
@@ -245,6 +193,13 @@ public abstract class Performer {
     this.target = target;
     onInitialize(target);
   }
+
+  /**
+   * Provides a {@link Plan} to this Performer. The Performer is expected to execute this plan.
+   *
+   * Note: Once {@link PlanPerformance} is removed, this will become an abstract method.
+   */
+  protected void addPlan(Plan plan) {}
 
   /**
    * Invoked immediately after this Performer has been initialized with a target.

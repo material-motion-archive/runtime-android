@@ -66,11 +66,11 @@ public class ComposablePlanTest extends AndroidTestCase {
 
     @Override
     public Class<? extends Performer> getPerformerClass() {
-      return LeafPlanPerformer.class;
+      return LeafPerformer.class;
     }
   }
 
-  public static class LeafPlanPerformer extends Performer implements Performer.PlanPerformance {
+  public static class LeafPerformer extends Performer {
 
     @Override
     public void addPlan(Plan plan) {
@@ -80,7 +80,7 @@ public class ComposablePlanTest extends AndroidTestCase {
     }
   }
 
-  public static class ComposablePerformer extends Performer implements Performer.ComposablePerformance, Performer.PlanPerformance {
+  public static class ComposablePerformer extends Performer implements Performer.ComposablePerformance {
 
     private TransactionEmitter transactionEmitter;
 

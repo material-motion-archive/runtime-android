@@ -45,10 +45,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * listeners via {@link #addStateListener(StateListener)}.
  *
  * <p>
- * This Scheduler correctly handles
- * {@link com.google.android.material.motion.runtime.Performer.PlanPerformance},
- * {@link com.google.android.material.motion.runtime.Performer.ContinuousPerformance}, and
- * {@link com.google.android.material.motion.runtime.Performer.ManualPerformance}.
+ * This Scheduler correctly handles all the interfaces defined in {@link Performer}.
  *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/scheduler.html">The Scheduler specification</a>
  */
@@ -147,7 +144,7 @@ public final class Scheduler {
    * Commits the given {@link Transaction}. Each {@link PlanInfo} is committed in the context of
    * its target, called a {@link TargetScope}. Each TargetScope ensures that only one instance of a
    * specific type of Performer is created.
-   * @deprecated  Plans should be added directly to the Scheduler instead of using Transactions. <br />
+   * @deprecated 2.0.0. Plans should be added directly to the Scheduler instead of using Transactions. <br />
    *              This will be removed in the next version <br />
    *              use {@link com.google.android.material.motion.runtime.Scheduler#addPlan(Plan, Object)} on the Scheduler instead
    */
