@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Material Motion Authors. All Rights Reserved.
+ * Copyright 2016-present The Material Motion Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.android.material.motion.runtime.sample;
 
 import android.animation.Animator;
@@ -110,23 +109,23 @@ public class MainActivity extends AppCompatActivity {
       View target = getTarget();
 
       target
-          .animate()
-          .alpha(demoPlan.alpha)
-          .setDuration(2000)
-          .setListener(
-              new AnimatorListenerAdapter() {
-                private IsActiveToken token;
+        .animate()
+        .alpha(demoPlan.alpha)
+        .setDuration(2000)
+        .setListener(
+          new AnimatorListenerAdapter() {
+            private IsActiveToken token;
 
-                @Override
-                public void onAnimationStart(Animator animation) {
-                  token = isActiveTokenGenerator.generate();
-                }
+            @Override
+            public void onAnimationStart(Animator animation) {
+              token = isActiveTokenGenerator.generate();
+            }
 
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                  token.terminate();
-                }
-              });
+            @Override
+            public void onAnimationEnd(Animator animation) {
+              token.terminate();
+            }
+          });
     }
   }
 }
