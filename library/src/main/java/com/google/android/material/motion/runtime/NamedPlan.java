@@ -19,6 +19,8 @@ package com.google.android.material.motion.runtime;
 /**
  * A named plan is a {@link Plan} whose performer supports adding and remove the plan by name.
  * Register a named plan by calling {@link Scheduler#addNamedPlan}, and remove it by calling {@link Scheduler#removeNamedPlan}.
+ * NamedPlans should ensure that they override the {@link Plan#getPerformerClass()} method and
+ * return a class which implements {@link com.google.android.material.motion.runtime.Performer.NamedPlanPerformance}
  *
  * A named plan or family of named plans enables fine configuration of a performer's behavior.
  *
