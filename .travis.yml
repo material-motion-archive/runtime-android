@@ -21,7 +21,7 @@ before_install:
   - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force > /dev/null
 
 script:
-  - ./gradlew :library:check
+  - ./gradlew jacocoTestReportDebug
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

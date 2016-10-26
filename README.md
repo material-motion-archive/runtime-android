@@ -118,12 +118,6 @@ To run all unit tests, run the following commands:
     cd material-motion-runtime-android
     gradle test
 
-To run all integration tests, run the following commands:
-
-    git clone https://github.com/material-motion/material-motion-runtime-android.git
-    cd material-motion-runtime-android
-    gradle connectedAndroidTest
-
 ## Guides
 
 1. [Architecture](#architecture)
