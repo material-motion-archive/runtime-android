@@ -7,11 +7,9 @@ env:
 
 android:
   components:
-    - platform-tools
-    - tools
+    - extra-android-m2repository
     - android-23
     - build-tools-23.0.2
-    - sys-img-armeabi-v7a-android-23
 
 licenses:
   - 'android-sdk-license-.+'
