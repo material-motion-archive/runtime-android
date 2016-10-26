@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Material Motion Authors. All Rights Reserved.
+ * Copyright 2016-present The Material Motion Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,33 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.android.material.motion.runtime;
 
-import android.test.AndroidTestCase;
+import static com.google.common.truth.Truth.assertThat;
+
+import android.app.Activity;
+import android.content.Context;
 import android.widget.TextView;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
-public class ComposablePlanTest extends AndroidTestCase {
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
+public class ComposablePlanTests {
 
-  private static Scheduler scheduler;
-  private static TextView textView;
+  private Scheduler scheduler;
+  private TextView textView;
   private Transaction transaction;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() {
+    Context context = Robolectric.setupActivity(Activity.class);
     scheduler = new Scheduler();
-    textView = new TextView(getContext());
+    textView = new TextView(context);
     transaction = new Transaction();
   }
 
+  @Test
   public void testComposablePlan() {
     // add the root plan and have it delegate to the leaf plan
     RootPlan rootPlan = new RootPlan("rootPlan");
     transaction.addNamedPlan(rootPlan, "rootPlan", textView);
     scheduler.commitTransaction(transaction);
 
-    assertTrue(textView.getText().equals("leafPlan"));
+    assertThat(textView.getText()).isEqualTo("leafPlan");
   }
 
   private class RootPlan extends Plan {
@@ -66,11 +77,11 @@ public class ComposablePlanTest extends AndroidTestCase {
 
     @Override
     public Class<? extends Performer> getPerformerClass() {
-      return LeafPlanPerformer.class;
+      return LeafPerformer.class;
     }
   }
 
-  public static class LeafPlanPerformer extends Performer implements Performer.PlanPerformance {
+  public static class LeafPerformer extends Performer {
 
     @Override
     public void addPlan(Plan plan) {
@@ -80,7 +91,8 @@ public class ComposablePlanTest extends AndroidTestCase {
     }
   }
 
-  public static class ComposablePerformer extends Performer implements Performer.ComposablePerformance, Performer.PlanPerformance {
+  public static class ComposablePerformer extends Performer implements
+    Performer.ComposablePerformance {
 
     private TransactionEmitter transactionEmitter;
 
@@ -94,7 +106,7 @@ public class ComposablePlanTest extends AndroidTestCase {
       // immediately delegate the actual work of changing the text view to the leaf plan
       Transaction transaction = new Transaction();
       LeafPlan leafPlan = new LeafPlan("leafPlan");
-      transaction.addNamedPlan(leafPlan, "leafPlan", textView);
+      transaction.addNamedPlan(leafPlan, "leafPlan", getTarget());
 
       transactionEmitter.emit(transaction);
     }

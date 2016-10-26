@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Material Motion Authors. All Rights Reserved.
+ * Copyright 2016-present The Material Motion Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,44 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.android.material.motion.runtime;
 
-import android.test.AndroidTestCase;
-import android.widget.TextView;
+import static com.google.common.truth.Truth.assertThat;
 
-public class SchedulerTest extends AndroidTestCase {
+import android.app.Activity;
+import android.content.Context;
+import android.widget.TextView;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
+public class SchedulerTests {
 
   private Scheduler scheduler;
   private TextView textView;
   private Transaction transaction;
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() {
+    Context context = Robolectric.setupActivity(Activity.class);
     scheduler = new Scheduler();
-    textView = new TextView(getContext());
+    textView = new TextView(context);
     transaction = new Transaction();
   }
 
+  @Test
   public void testInitialSchedulerState() {
-    assertTrue(scheduler.getState() == Scheduler.IDLE);
+    assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
   }
 
-  public void testStandardPlanPerformanceSchedulerState() {
+  @Test
+  public void testStandardPerformerSchedulerState() {
     transaction.addNamedPlan(new StandardPlan("standard"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
-    assertTrue(scheduler.getState() == Scheduler.IDLE);
+    assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
   }
 
-  public void testManualPlanPerformanceSchedulerState() {
+  @Test
+  public void testManualPerformerSchedulerState() {
     transaction.addNamedPlan(new ManualPlan("manual"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
-    assertTrue(scheduler.getState() == Scheduler.ACTIVE);
+    assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
   }
 
+  @Test
   public void testAddingMultipleSchedulerListeners() {
     TestSchedulerListener firstListener = new TestSchedulerListener();
     TestSchedulerListener secondListener = new TestSchedulerListener();
@@ -62,10 +76,11 @@ public class SchedulerTest extends AndroidTestCase {
 
     scheduler.commitTransaction(transaction);
 
-    assertTrue(firstListener.getState() == Scheduler.ACTIVE);
-    assertTrue(secondListener.getState() == Scheduler.ACTIVE);
+    assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(Scheduler.ACTIVE);
   }
 
+  @Test
   public void testAddOrderedMultipleSchedulerListeners() {
     TestSchedulerListener firstListener = new TestSchedulerListener();
     TestSchedulerListener secondListener = new TestSchedulerListener();
@@ -77,10 +92,11 @@ public class SchedulerTest extends AndroidTestCase {
 
     scheduler.commitTransaction(transaction);
 
-    assertTrue(firstListener.getState() == Scheduler.ACTIVE);
-    assertTrue(secondListener.getState() == Scheduler.ACTIVE);
+    assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(Scheduler.ACTIVE);
   }
 
+  @Test
   public void testRemovingSchedulerListeners() {
     TestSchedulerListener firstListener = new TestSchedulerListener();
     TestSchedulerListener secondListener = new TestSchedulerListener();
@@ -93,22 +109,38 @@ public class SchedulerTest extends AndroidTestCase {
 
     scheduler.commitTransaction(transaction);
 
-    assertTrue(firstListener.getState() == Scheduler.ACTIVE);
-    assertTrue(secondListener.getState() == Scheduler.IDLE);
+    assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(Scheduler.IDLE);
   }
 
-  public void testNeverEndingDelegatePlanPerformanceSchedulerState() {
-    transaction.addNamedPlan(new NeverEndingDelegatedPlan("delegated"), "plan", textView);
+  @Test
+  public void testNeverEndingDelegatePerformanceSchedulerState() {
+    transaction.addNamedPlan(new NeverEndingContinuousPlan("continuous"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
-    assertTrue(scheduler.getState() == Scheduler.ACTIVE);
+    assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
   }
 
-  public void testEndingDelegatedPlanPerformanceSchedulerState() {
-    transaction.addNamedPlan(new EndingDelegatedPlan("delegated"), "plan", textView);
+  @Test
+  public void testEndingContinuousPerformanceSchedulerState() {
+    transaction.addNamedPlan(new EndingContinuousPlan("continuous"), "plan", textView);
     scheduler.commitTransaction(transaction);
 
-    assertTrue(scheduler.getState() == Scheduler.IDLE);
+    assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
+  }
+
+  @Test
+  public void testAddingPlanDirectlyToScheduler() {
+    scheduler.addPlan(new NeverEndingContinuousPlan("continuous"), textView);
+
+    assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
+  }
+
+  @Test
+  public void testAddingStandardPlanDirectlyToScheduler() {
+    scheduler.addPlan(new StandardPlan("standard"), textView);
+
+    assertThat(textView.getText()).isEqualTo(" standard");
   }
 
   private static class StandardPlan extends Plan {
@@ -121,7 +153,7 @@ public class SchedulerTest extends AndroidTestCase {
 
     @Override
     public Class<? extends Performer> getPerformerClass() {
-      return StandardPlanPerformer.class;
+      return StandardPerformer.class;
     }
   }
 
@@ -139,11 +171,11 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  private static class NeverEndingDelegatedPlan extends Plan {
+  private static class NeverEndingContinuousPlan extends Plan {
 
     private final String text;
 
-    private NeverEndingDelegatedPlan(String text) {
+    private NeverEndingContinuousPlan(String text) {
       this.text = text;
     }
 
@@ -153,21 +185,21 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  private static class EndingDelegatedPlan extends Plan {
+  private static class EndingContinuousPlan extends Plan {
 
     private final String text;
 
-    private EndingDelegatedPlan(String text) {
+    private EndingContinuousPlan(String text) {
       this.text = text;
     }
 
     @Override
     public Class<? extends Performer> getPerformerClass() {
-      return EndingDelegatedPerformer.class;
+      return EndingContinuousPerformer.class;
     }
   }
 
-  public static class StandardPlanPerformer extends Performer implements Performer.PlanPerformance {
+  public static class StandardPerformer extends Performer {
 
     @Override
     public void addPlan(Plan plan) {
@@ -186,7 +218,7 @@ public class SchedulerTest extends AndroidTestCase {
   }
 
   public static class NeverEndingContinuousPerformer extends Performer implements
-    Performer.ContinuousPerformance, Performer.PlanPerformance {
+    Performer.ContinuousPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
@@ -202,8 +234,8 @@ public class SchedulerTest extends AndroidTestCase {
     }
   }
 
-  public static class EndingDelegatedPerformer extends Performer implements
-    Performer.ContinuousPerformance, Performer.PlanPerformance {
+  public static class EndingContinuousPerformer extends Performer implements
+    Performer.ContinuousPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 

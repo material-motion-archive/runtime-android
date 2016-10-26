@@ -1,4 +1,5 @@
 # Material Motion Android Runtime
+
 [![Build Status](https://travis-ci.org/material-motion/material-motion-runtime-android.svg?branch=develop)](https://travis-ci.org/material-motion/material-motion-runtime-android)
 [![codecov](https://codecov.io/gh/material-motion/material-motion-runtime-android/branch/develop/graph/badge.svg)](https://codecov.io/gh/material-motion/material-motion-runtime-android)
 
@@ -17,7 +18,9 @@ Learn more about the APIs defined in the library by reading our
 [technical documentation](https://material-motion.github.io/material-motion-runtime-android/) and our
 [Starmap](https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/).
 
-## Depending on the library
+## Installation
+
+### Installation with Jitpack
 
 Use Jitpack to depend on any of our [public releases](https://github.com/material-motion/material-motion-runtime-android/releases).
 
@@ -47,7 +50,7 @@ and reproducible. Take care to occasionally [check for updates](https://github.c
 
 ```gradle
 dependencies {
-    compile 'com.github.material-motion:material-motion-runtime-android:2.0.0'
+    compile 'com.github.material-motion:material-motion-runtime-android:3.0.0'
 }
 ```
 
@@ -91,6 +94,45 @@ local dependencies of their own, you must `gradle install` them as well. See
 You must `gradle clean` your project every time you add or remove a local
 dependency.
 
+### Usage
+
+How to use the library in your project.
+
+#### Editing the library in Android Studio
+
+Open Android Studio,
+choose `File > New > Import`,
+choose the root `build.gradle` file.
+
+## Example apps/unit tests
+
+To build the sample application, run the following commands:
+
+    git clone https://github.com/material-motion/material-motion-runtime-android.git
+    cd material-motion-runtime-android
+    gradle installDebug
+
+To run all unit tests, run the following commands:
+
+    git clone https://github.com/material-motion/material-motion-runtime-android.git
+    cd material-motion-runtime-android
+    gradle test
+
+To run all integration tests, run the following commands:
+
+    git clone https://github.com/material-motion/material-motion-runtime-android.git
+    cd material-motion-runtime-android
+    gradle connectedAndroidTest
+
+## Guides
+
+1. [Architecture](#architecture)
+2. [How to ...](#how-to-...)
+
+### Architecture
+
+### How to ...
+
 ## Contributing
 
 We welcome contributions!
@@ -100,16 +142,6 @@ Check out our [upcoming milestones](https://github.com/material-motion/material-
 Learn more about [our team](https://material-motion.gitbooks.io/material-motion-team/content/),
 [our community](https://material-motion.gitbooks.io/material-motion-team/content/community/),
 and our [contributor essentials](https://material-motion.gitbooks.io/material-motion-team/content/essentials/).
-
-### Editing the library in Android Studio
-
-Open Android Studio,
-choose `File > New > Import`,
-choose the root `build.gradle` file.
-
-### Building the sample
-
-Run `gradle installDebug` from the project root.
 
 ## License
 
