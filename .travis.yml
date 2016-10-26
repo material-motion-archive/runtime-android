@@ -11,9 +11,14 @@ android:
     - tools
     - android-23
     - build-tools-23.0.2
+    - sys-img-armeabi-v7a-android-23
 
 licenses:
   - 'android-sdk-license-.+'
+
+before_install:
+  - echo yes | android update sdk --filter extra-android-support --no-ui --force > /dev/null
+  - echo yes | android update sdk --filter extra-android-m2repository --no-ui --force > /dev/null
 
 script:
   - ./gradlew :library:check
