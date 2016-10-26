@@ -36,6 +36,7 @@ import java.util.Set;
  * Commit this Transaction to a Scheduler by passing this into
  * {@link Scheduler#commitTransaction(Transaction)}.
  *
+ * @deprecated 3.0.0 Plans should be added directly to the Scheduler instead of using Transactions.
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/transaction.html">The Transaction specification</a>
  */
 public final class Transaction {
@@ -60,7 +61,10 @@ public final class Transaction {
   /**
    * Adds a named {@link Plan} to this Transaction, targeting the given object. The Plan overwrites any
    * previously added Plans with the same name.
+   * @deprecated 3.0.0. Named Plans should be added directly to the Scheduler instead of using Transactions. <br />
+   *              use {@link com.google.android.material.motion.runtime.Scheduler#addNamedPlan(NamedPlan, String, Object)} on the Scheduler instead
    */
+  @Deprecated
   public void addNamedPlan(Plan plan, String name, Object target) {
     PlanInfo info = removeNamedPlanInternal(name, target);
     info.plan = plan.clone();
@@ -71,7 +75,10 @@ public final class Transaction {
 
   /**
    * Removes a named {@link Plan} with the given name from this Transaction.
+   * @deprecated 3.0.0. Named Plans should be removed directly from the Scheduler instead of using Transactions. <br />
+   *              use {@link com.google.android.material.motion.runtime.Scheduler#removeNamedPlan(String, Object)} on the Scheduler instead
    */
+  @Deprecated
   public void removeNamedPlan(String name, Object target) {
     removeNamedPlanInternal(name, target);
   }

@@ -56,6 +56,27 @@ public abstract class Performer {
   }
 
   /**
+   * A Performer can implement this interface in order to support the add and remove for {@link NamedPlan}s APIs.
+   */
+  public interface NamedPlanPerformance {
+
+    /**
+     * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any plan
+     * added in this manner.
+     * @param plan the plan which was added to this performer.
+     * @param name the name by which this plan can be identified.
+     */
+    void addPlan(NamedPlan plan, String name);
+
+    /**
+     * Provides a {@link NamedPlan} to this Performer. The Performer is expected remove any plan
+     * presented in this manner.
+     * @param name the name by which this plan was identified.
+     */
+    void removePlan(String name);
+  }
+
+  /**
    * A Performer implements this interface in order to request and release is-active tokens.
    * The scheduler uses these tokens to inform its active state. If any performer owns an is-active
    * token then the scheduler is active. Otherwise, the scheduler is idle.

@@ -169,6 +169,33 @@ public final class Scheduler {
     getTargetScope(target).commitPlan(planInfo);
   }
 
+  /**
+   * Adds a {@link NamedPlan} to this scheduler.
+   * When this method is invoked, a {@link NamedPlan} with the same name and target
+   * is removed from the scheduler before the plan is eventually added.
+   * @param plan the {@link NamedPlan} to add to the scheduler.
+   * @param name the name by which this plan can be identified.
+   * @param target the target on which the plan will operate.
+   */
+  public void addNamedPlan(NamedPlan plan, String name, Object target) {
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("A NamedPlan must have a name with more than zero characters");
+    }
+    getTargetScope(target).commitAddNamedPlan(plan.clone(), name, target);
+  }
+
+  /**
+   * Removes a {@link NamedPlan} from this scheduler.
+   * @param name the name by which the named plan can be identified.
+   * @param target the target on which the named plan was added.
+   */
+  public void removeNamedPlan(String name, Object target) {
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("A NamedPlan must have a name with more than zero characters");
+    }
+    getTargetScope(target).commitRemoveNamedPlan(name);
+  }
+
   private TargetScope getTargetScope(Object target) {
     TargetScope targetScope = targets.get(target);
 

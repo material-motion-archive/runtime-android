@@ -28,6 +28,7 @@ import com.google.android.material.motion.runtime.Performer.ContinuousPerformanc
 import com.google.android.material.motion.runtime.Performer.ManualPerformance;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
 import com.google.android.material.motion.runtime.Scheduler.State;
+import com.google.android.material.motion.runtime.Performer.NamedPlanPerformance;
 import com.google.android.material.motion.runtime.Transaction.PlanInfo;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,6 +44,7 @@ class TargetScope {
 
   private final SimpleArrayMap<Class<? extends Performer>, Performer> cache =
     new SimpleArrayMap<>();
+  private final SimpleArrayMap<String, NamedPlanPerformance> namedCache = new SimpleArrayMap<>();
 
   private final Set<ManualPerformance> activeManualPerformances = new HashSet<>();
 
@@ -68,6 +70,29 @@ class TargetScope {
     }
 
     performer.addPlan(plan.plan);
+  }
+
+  void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
+    // remove first
+    commitRemoveNamedPlan(name);
+
+    // then add
+    NamedPlanPerformance namedPerformer = namedCache.get(name);
+    if (namedPerformer == null) {
+      // TODO: refactor getPerformer() and use it here
+      namedPerformer = (NamedPlanPerformance)createPerformer(plan, target);
+    }
+    namedPerformer.addPlan(plan, name);
+
+    namedCache.put(name, namedPerformer);
+  }
+
+  void commitRemoveNamedPlan(String name) {
+    NamedPlanPerformance performer = namedCache.get(name);
+    if (performer != null) {
+      performer.removePlan(name);
+    }
+    namedCache.remove(name);
   }
 
   void update(float deltaTimeMs) {
@@ -108,19 +133,19 @@ class TargetScope {
     Performer performer = cache.get(performerClass);
 
     if (performer == null) {
-      performer = createPerformer(plan);
+      performer = createPerformer(plan.plan, plan.target);
       cache.put(performerClass, performer);
     }
 
     return performer;
   }
 
-  private Performer createPerformer(PlanInfo plan) {
-    Class<? extends Performer> performerClass = plan.plan.getPerformerClass();
+  private Performer createPerformer(Plan plan, Object target) {
+    Class<? extends Performer> performerClass = plan.getPerformerClass();
 
     try {
       Performer performer = performerClass.newInstance();
-      performer.initialize(plan.target);
+      performer.initialize(target);
 
       if (performer instanceof ContinuousPerformance) {
         ContinuousPerformance continuousPerformance = (ContinuousPerformance) performer;
