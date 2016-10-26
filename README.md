@@ -50,7 +50,7 @@ and reproducible. Take care to occasionally [check for updates](https://github.c
 
 ```gradle
 dependencies {
-    compile 'com.github.material-motion:material-motion-runtime-android:2.0.0'
+    compile 'com.github.material-motion:material-motion-runtime-android:3.0.0'
 }
 ```
 
