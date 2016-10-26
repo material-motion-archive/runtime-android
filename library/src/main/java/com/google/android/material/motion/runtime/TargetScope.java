@@ -75,17 +75,24 @@ class TargetScope {
   void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
     // remove first
     commitRemoveNamedPlan(name);
+
     // then add
     NamedPlanPerformance namedPerformer = namedCache.get(name);
     if (namedPerformer == null) {
+      // TODO: refactor getPerformer() and use it here
       namedPerformer = (NamedPlanPerformance)createPerformer(plan, target);
     }
-    namedCache.put(name, namedPerformer);
     namedPerformer.addPlan(plan, name);
+
+    namedCache.put(name, namedPerformer);
   }
 
   void commitRemoveNamedPlan(String name) {
-    removeNamedPlan(name, namedCache.get(name));
+    NamedPlanPerformance performer = namedCache.get(name);
+    if (performer != null) {
+      performer.removePlan(name);
+    }
+    namedCache.remove(name);
   }
 
   void update(float deltaTimeMs) {
@@ -119,13 +126,6 @@ class TargetScope {
       state |= CONTINUOUS_DETAILED_STATE_FLAG;
     }
     return state;
-  }
-
-  private void removeNamedPlan(String name, NamedPlanPerformance performer) {
-    if (performer != null) {
-      performer.removePlan(name);
-    }
-    namedCache.remove(name);
   }
 
   private Performer getPerformer(PlanInfo plan) {
