@@ -316,23 +316,35 @@ public class SchedulerTests {
   }
 
   private static class StorageNamedPlan extends NamedPlan {
+
     @Override
-    public Class<? extends Performer> getPerformerClass() { return StoragePlanPerformer.class; }
+    public Class<? extends Performer> getPerformerClass() {
+      return StoragePlanPerformer.class;
+    }
   }
 
   private static class RegularPlanTargetAlteringPlan extends Plan {
+
     @Override
-    public Class<? extends Performer> getPerformerClass() { return GenericPlanPerformer.class; }
+    public Class<? extends Performer> getPerformerClass() {
+      return GenericPlanPerformer.class;
+    }
   }
 
   private static class NamedCounterAlteringPlan extends NamedPlan {
+
     @Override
-    public Class<? extends Performer> getPerformerClass() { return NamedCounterPlanPerformer.class; }
+    public Class<? extends Performer> getPerformerClass() {
+      return NamedCounterPlanPerformer.class;
+    }
   }
 
   private static class NamedTargetAlteringPlan extends NamedPlan {
+
     @Override
-    public Class<? extends Performer> getPerformerClass() { return GenericPlanPerformer.class; }
+    public Class<? extends Performer> getPerformerClass() {
+      return GenericPlanPerformer.class;
+    }
   }
 
   private static class StandardPlan extends Plan {
@@ -392,11 +404,13 @@ public class SchedulerTests {
   }
 
   public class IncrementerTarget {
+
     int addCounter = 0;
     int removeCounter = 0;
   }
 
-  public static class NamedCounterPlanPerformer extends Performer implements Performer.NamedPlanPerformance {
+  public static class NamedCounterPlanPerformer extends Performer implements
+    Performer.NamedPlanPerformance {
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
@@ -411,7 +425,8 @@ public class SchedulerTests {
     }
   }
 
-  public static class StoragePlanPerformer extends Performer implements Performer.NamedPlanPerformance {
+  public static class StoragePlanPerformer extends Performer implements
+    Performer.NamedPlanPerformance {
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
@@ -426,7 +441,8 @@ public class SchedulerTests {
     }
   }
 
-  public static class GenericPlanPerformer extends Performer implements Performer.NamedPlanPerformance {
+  public static class GenericPlanPerformer extends Performer implements
+    Performer.NamedPlanPerformance {
 
     @Override
     public void addPlan(Plan plan) {

@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private static class DemoPlan2 extends Plan {
+
     private final float alpha;
 
     private DemoPlan2(float alpha) {
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  public static class DemoPerformer2 extends Performer implements  ContinuousPerformance {
+  public static class DemoPerformer2 extends Performer implements ContinuousPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 

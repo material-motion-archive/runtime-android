@@ -80,7 +80,7 @@ class TargetScope {
     NamedPlanPerformance namedPerformer = namedCache.get(name);
     if (namedPerformer == null) {
       // TODO: refactor getPerformer() and use it here
-      namedPerformer = (NamedPlanPerformance)createPerformer(plan, target);
+      namedPerformer = (NamedPlanPerformance) createPerformer(plan, target);
     }
     namedPerformer.addPlan(plan, name);
 
@@ -167,10 +167,11 @@ class TargetScope {
   }
 
   /**
-   * Creates a {@link IsActiveTokenGenerator} to be assigned to the given
-   * {@link ContinuousPerformance}.
+   * Creates a {@link IsActiveTokenGenerator} to be assigned to the given {@link
+   * ContinuousPerformance}.
    */
-  private IsActiveTokenGenerator createIsActiveTokenGenerator(final ContinuousPerformance performer) {
+  private IsActiveTokenGenerator createIsActiveTokenGenerator(
+    final ContinuousPerformance performer) {
     return new IsActiveTokenGenerator() {
       @Override
       public IsActiveToken generate() {

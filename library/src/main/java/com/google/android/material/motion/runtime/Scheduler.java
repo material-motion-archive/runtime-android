@@ -33,21 +33,19 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * The Scheduler generates relevant events for Performers and {@link StateListener listeners} and
  * monitors {@link State}.
  *
- * <p>
- * Commit Transactions to this Scheduler by calling {@link #commitTransaction(Transaction)}.
- * A Scheduler ensures that only one {@link Performer} instance is created for each type of
- * Performer required by a target. This allows multiple {@link Plan Plans} to affect a single
- * Performer instance. The Performers can then maintain state across multiple Plans.
+ * <p> Commit Transactions to this Scheduler by calling {@link #commitTransaction(Transaction)}. A
+ * Scheduler ensures that only one {@link Performer} instance is created for each type of Performer
+ * required by a target. This allows multiple {@link Plan Plans} to affect a single Performer
+ * instance. The Performers can then maintain state across multiple Plans.
  *
- * <p>
- * Query the State of this Scheduler by calling {@link #getState()}.
- * A Scheduler is active if any of its Performers are active. To listen for state changes, attach
- * listeners via {@link #addStateListener(StateListener)}.
+ * <p> Query the State of this Scheduler by calling {@link #getState()}. A Scheduler is active if
+ * any of its Performers are active. To listen for state changes, attach listeners via {@link
+ * #addStateListener(StateListener)}.
  *
- * <p>
- * This Scheduler correctly handles all the interfaces defined in {@link Performer}.
+ * <p> This Scheduler correctly handles all the interfaces defined in {@link Performer}.
  *
- * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/scheduler.html">The Scheduler specification</a>
+ * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/scheduler.html">The
+ * Scheduler specification</a>
  */
 public final class Scheduler {
 
@@ -76,24 +74,26 @@ public final class Scheduler {
    */
   @IntDef({IDLE, ACTIVE})
   @Retention(RetentionPolicy.SOURCE)
-  public @interface State {}
+  public @interface State {
+
+  }
 
   private static final String TAG = "Scheduler";
   /**
-   * Flag for detailed state bitmask specifying that the activity originates from a
-   * {@link com.google.android.material.motion.runtime.Performer.ManualPerformance}.
+   * Flag for detailed state bitmask specifying that the activity originates from a {@link
+   * com.google.android.material.motion.runtime.Performer.ManualPerformance}.
    */
   static final int MANUAL_DETAILED_STATE_FLAG = 1 << 0;
   /**
-   * Flag for detailed state bitmask specifying that the activity originates from a
-   * {@link com.google.android.material.motion.runtime.Performer.ContinuousPerformance}.
+   * Flag for detailed state bitmask specifying that the activity originates from a {@link
+   * com.google.android.material.motion.runtime.Performer.ContinuousPerformance}.
    */
   static final int CONTINUOUS_DETAILED_STATE_FLAG = 1 << 1;
 
   private final CopyOnWriteArraySet<StateListener> listeners = new CopyOnWriteArraySet<>();
   private final ChoreographerCompat choreographer = ChoreographerCompat.getInstance();
   private final ManualPerformanceFrameCallback manualPerformanceFrameCallback =
-      new ManualPerformanceFrameCallback();
+    new ManualPerformanceFrameCallback();
 
   private final SimpleArrayMap<Object, TargetScope> targets = new SimpleArrayMap<>();
   private final Set<TargetScope> activeManualPerformanceTargets = new HashSet<>();
@@ -108,8 +108,8 @@ public final class Scheduler {
   }
 
   /**
-   * Returns the detailed state of this Scheduler, which includes information on the type of
-   * {@link Performer} that affects this state.
+   * Returns the detailed state of this Scheduler, which includes information on the type of {@link
+   * Performer} that affects this state.
    *
    * @return A bitmask representing the detailed state of this Scheduler.
    */
@@ -141,12 +141,14 @@ public final class Scheduler {
   }
 
   /**
-   * Commits the given {@link Transaction}. Each {@link PlanInfo} is committed in the context of
-   * its target, called a {@link TargetScope}. Each TargetScope ensures that only one instance of a
+   * Commits the given {@link Transaction}. Each {@link PlanInfo} is committed in the context of its
+   * target, called a {@link TargetScope}. Each TargetScope ensures that only one instance of a
    * specific type of Performer is created.
-   * @deprecated 2.0.0. Plans should be added directly to the Scheduler instead of using Transactions. <br />
-   *              This will be removed in the next version <br />
-   *              use {@link com.google.android.material.motion.runtime.Scheduler#addPlan(Plan, Object)} on the Scheduler instead
+   *
+   * @deprecated 2.0.0. Plans should be added directly to the Scheduler instead of using
+   * Transactions. <br /> This will be removed in the next version <br /> use {@link
+   * com.google.android.material.motion.runtime.Scheduler#addPlan(Plan, Object)} on the Scheduler
+   * instead
    */
   @Deprecated
   public void commitTransaction(Transaction transaction) {
@@ -159,6 +161,7 @@ public final class Scheduler {
 
   /**
    * Adds a plan to this scheduler.
+   *
    * @param plan the {@link Plan} to add to the scheduler.
    * @param target the target on which the plan will operate.
    */
@@ -170,28 +173,32 @@ public final class Scheduler {
   }
 
   /**
-   * Adds a {@link NamedPlan} to this scheduler.
-   * When this method is invoked, a {@link NamedPlan} with the same name and target
-   * is removed from the scheduler before the plan is eventually added.
+   * Adds a {@link NamedPlan} to this scheduler. When this method is invoked, a {@link NamedPlan}
+   * with the same name and target is removed from the scheduler before the plan is eventually
+   * added.
+   *
    * @param plan the {@link NamedPlan} to add to the scheduler.
    * @param name the name by which this plan can be identified.
    * @param target the target on which the plan will operate.
    */
   public void addNamedPlan(NamedPlan plan, String name, Object target) {
     if (name == null || name.isEmpty()) {
-      throw new IllegalArgumentException("A NamedPlan must have a name with more than zero characters");
+      throw new IllegalArgumentException(
+        "A NamedPlan must have a name with more than zero characters");
     }
     getTargetScope(target).commitAddNamedPlan(plan.clone(), name, target);
   }
 
   /**
    * Removes a {@link NamedPlan} from this scheduler.
+   *
    * @param name the name by which the named plan can be identified.
    * @param target the target on which the named plan was added.
    */
   public void removeNamedPlan(String name, Object target) {
     if (name == null || name.isEmpty()) {
-      throw new IllegalArgumentException("A NamedPlan must have a name with more than zero characters");
+      throw new IllegalArgumentException(
+        "A NamedPlan must have a name with more than zero characters");
     }
     getTargetScope(target).commitRemoveNamedPlan(name);
   }
@@ -208,7 +215,8 @@ public final class Scheduler {
   }
 
   /**
-   * Notifies the Scheduler that a {@link TargetScope}'s detailed state may or may not have changed.
+   * Notifies the Scheduler that a {@link TargetScope}'s detailed state may or may not have
+   * changed.
    */
   void setTargetState(TargetScope target, int targetDetailedState) {
     int oldDetailedState = getDetailedState();
@@ -280,10 +288,8 @@ public final class Scheduler {
   }
 
   /**
-   * A {@link FrameCallback} that calls
-   * {@link com.google.android.material.motion.runtime.Performer.ManualPerformance#update(float)}
-   * on each frame for every active
-   * {@link com.google.android.material.motion.runtime.Performer.ManualPerformance}.
+   * A {@link FrameCallback} that calls {@link com.google.android.material.motion.runtime.Performer.ManualPerformance#update(float)}
+   * on each frame for every active {@link com.google.android.material.motion.runtime.Performer.ManualPerformance}.
    */
   private class ManualPerformanceFrameCallback extends FrameCallback {
 
