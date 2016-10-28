@@ -96,21 +96,16 @@ public class ComposablePlanTests {
   public static class ComposablePerformer extends Performer implements
     ComposablePerformance {
 
-    private TransactionEmitter transactionEmitter;
+    private PlanEmitter planEmitter;
 
-    @Override
-    public void setTransactionEmitter(TransactionEmitter transactionEmitter) {
-      this.transactionEmitter = transactionEmitter;
+    public void setPlanEmitter(PlanEmitter planEmitter) {
+      this.planEmitter = planEmitter;
     }
 
     @Override
     public void addPlan(BasePlan plan) {
       // immediately delegate the actual work of changing the text view to the leaf plan
-      Transaction transaction = new Transaction();
-      LeafPlan leafPlan = new LeafPlan("leafPlan");
-      transaction.addNamedPlan(leafPlan, "leafPlan", getTarget());
-
-      transactionEmitter.emit(transaction);
+      planEmitter.emit(new LeafPlan("leafPlan"));
     }
   }
 }

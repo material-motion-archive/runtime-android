@@ -163,26 +163,25 @@ public final class PerformerFeatures {
   /**
    * A Performer implements this interface in order to commit new {@link Plan Plans}.
    *
-   * <p> The Performer should call {@link TransactionEmitter#emit(Transaction)} to add new plans.
+   * <p> The Performer should call {@link PlanEmitter#emit(Plan)} to add new plans.
    */
   public interface ComposablePerformance extends BasePerformance {
 
     /**
-     * Called by the {@link Scheduler} to supply the {@link Performer} with a {@link
-     * TransactionEmitter}.
+     * Called by the {@link Scheduler} to supply the {@link Performer} with a {@link PlanEmitter}.
      */
-    void setTransactionEmitter(TransactionEmitter transactionEmitter);
+    void setPlanEmitter(PlanEmitter planEmitter);
 
     /**
-     * A transaction emitter to be provided to a {@link ComposablePerformance} Performer.
+     * A plan emitter allows an object to emit new plans to a backing scheduler for the target to
+     * which the performer is associated.
      */
-    interface TransactionEmitter {
+    interface PlanEmitter {
 
       /**
-       * Adds the plans in the transaction to the {@link Scheduler}.
+       * Emit a new plan. The plan will immediately be added to the backing scheduler.
        */
-      void emit(Transaction transaction);
+      void emit(Plan plan);
     }
   }
-
 }

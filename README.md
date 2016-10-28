@@ -324,11 +324,11 @@ reuse of plans and the creation of higher-order abstractions.
 ```java
 public class MyPerformer extends Performer implements ComposablePerformance {
   // Store the emitter in your class' definition.
-  private TransactionEmitter emitter;
+  private PlanEmitter emitter;
 
   @Override
-  public void setTransactionEmitter(TransactionEmitter transactionEmitter) {
-    this.emitter = transactionEmitter;
+  public void setPlanEmitter(PlanEmitter planEmitter) {
+    this.emitter = planEmitter;
   }
 }
 ```
@@ -338,9 +338,9 @@ public class MyPerformer extends Performer implements ComposablePerformance {
 Performers are only able to emit plans for their associated target.
 
 ```java
-Transaction transaction = new Transaction();
-transaction.addPlan(plan, getTarget());
-emitter.emit(transaction);
+Plan plan;
+
+emitter.emit(plan);
 ```
 
 ## How to indicate continuous performance

@@ -23,7 +23,7 @@ import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
 import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
 import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance.TransactionEmitter;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance.PlanEmitter;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance.IsActiveToken;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance.IsActiveTokenGenerator;
@@ -69,7 +69,8 @@ class TargetScope {
     }
 
     if (performer instanceof ComposablePerformance) {
-      ((ComposablePerformance) performer).setTransactionEmitter(transactionEmitter);
+      ComposablePerformance composablePerformance = (ComposablePerformance) performer;
+      composablePerformance.setPlanEmitter(createPlanEmitter(composablePerformance));
     }
 
     performer.addPlan(plan.plan);
@@ -209,10 +210,15 @@ class TargetScope {
     };
   }
 
-  private final TransactionEmitter transactionEmitter = new TransactionEmitter() {
-    @Override
-    public void emit(Transaction transaction) {
-      scheduler.commitTransaction(transaction);
-    }
-  };
+  /**
+   * Creates a {@link PlanEmitter} to be assigned to the given {@link ComposablePerformance}.
+   */
+  private PlanEmitter createPlanEmitter(final ComposablePerformance performer) {
+    return new PlanEmitter() {
+      @Override
+      public void emit(Plan plan) {
+        scheduler.addPlan(plan, performer.getTarget());
+      }
+    };
+  }
 }
