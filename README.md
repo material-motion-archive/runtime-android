@@ -5,14 +5,14 @@
 
 The Material Motion Runtime is a tool for describing motion declaratively.
 
-## Declarative motion, aka motion as data
+## Declarative motion: motion as data
 
 This library does not do much on its own. What it does do, however, is enable the expression of
-motion as data.
+motion as discrete units of data that can be introspected, composed, and sent over a wire.
 
 This library encourages you to describe motion as data, or what we call *plans*. Plans are committed
-to a *scheduler*. The scheduler then coordinates the creation of *performers*, objects responsible
-for translating plans into concrete execution.
+to a *scheduler*. A scheduler coordinates the creation of *performers*, objects responsible for
+translating plans into concrete execution.
 
 Learn more about the APIs defined in the library by reading our
 [technical documentation](https://material-motion.github.io/material-motion-runtime-android/) and our
@@ -60,7 +60,7 @@ introducing breaking changes into your project.
 
 ```gradle
 dependencies {
-    compile 'com.github.material-motion:material-motion-runtime-android:1.+'
+    compile 'com.github.material-motion:material-motion-runtime-android:3.+'
 }
 ```
 
@@ -118,14 +118,284 @@ To run all unit tests, run the following commands:
     cd material-motion-runtime-android
     gradle test
 
-## Guides
+# Guides
 
 1. [Architecture](#architecture)
-2. [How to ...](#how-to-...)
+1. [How to define a new plan and performer type](#how-to-create-a-new-plan-and-performer-type)
+1. [How to commit a plan to a scheduler](#how-to-commit-a-plan-to-a-scheduler)
+1. [How to commit a named plan to a scheduler](#how-to-commit-a-named-plan-to-a-scheduler)
+1. [How to configure performers with plans](#how-to-configure-performers-with-plans)
+1. [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
+1. [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
+1. [How to indicate continuous performance](#how-to-indicate-continuous-performance)
 
-### Architecture
+## Architecture
 
-### How to ...
+The Material Motion Runtime consists of two groups of APIs: a scheduler/transaction object and a
+constellation of protocols loosely consisting of plan and performing types.
+
+### Scheduler
+
+The Scheduler](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Scheduler.html)
+object is a coordinating entity whose primary responsibility is to fulfill plans by creating
+performers. You can create many schedulers throughout the lifetime of your application. A good rule
+of thumb is to have one scheduler per interaction or transition.
+
+### Plan + Performance types
+
+The [Plan](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Plan.html)
+and [Performer](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.html)
+classes each define the minimal characteristics required for an object to be considered either a
+plan or a performer, respectively, by the Material Motion Runtime.
+
+Plans and performers have a symbiotic relationship. A plan is executed by the performer it defines.
+Performer behavior is configured by the provided plan instances.
+
+Learn more about the Material Motion Runtime by reading the
+[Starmap](https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/).
+
+## How to create a new plan and performer type
+
+The following steps provide copy-pastable snippets of code.
+
+### Step 1: Define the plan type
+
+Questions to ask yourself when creating a new plan type:
+
+- What do I want my plan/performer to accomplish?
+- Will my performer need many plans to achieve the desired outcome?
+- How can I name my plan such that it clearly communicates either a **behavior** or a
+  **change in state**?
+
+As general rules:
+
+1. Plans with an *-able* suffix alter the **behavior** of the target, often indefinitely. Examples:
+   Draggable, Pinchable, Tossable.
+2. Plans that are *verbs* describe some **change in state**, often over a period of time. Examples:
+   FadeIn, Tween, SpringTo.
+
+```java
+public class MyPlan {
+}
+```
+
+### Step 2: Define the performer type
+
+Performers are responsible for fulfilling plans. Fulfillment is possible in a variety of ways:
+
+- [PlanPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.PlanPerformance.html): [How to configure performers with plans](#how-to-configure-performers-with-plans)
+- [NamedPlanPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.NamedPlanPerformance.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
+- [ContinuousPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ContinuousPerformance.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
+- [ComposablePerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ComposablePerformance.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
+
+See the associated links for more details on each performing type.
+
+> Note: only one instance of a type of performer **per target** is ever created. This allows you to
+> register multiple plans to the same target in order to configure a performer. See
+> [How to configure performers with plans](#how-to-configure-performers-with-plans) for more details.
+
+```java
+public class MyPerformer extends Performer {
+}
+```
+
+### Step 3: Make the plan type a formal Plan
+
+Conforming to Plan requires:
+
+1. that you define the type of performer your plan requires, and
+2. that your plan be Cloneable.
+
+```java
+public class MyPlan extends Plan {
+  @Override
+  public Class<? extends Performer> getPerformerClass() {
+    return MyPerformer.class;
+  }
+
+  @Override
+  public Plan clone() {
+    // Only override this method if you need to deep clone reference-typed fields.
+    return super.clone();
+  }
+}
+```
+
+## How to commit a plan to a scheduler
+
+### Step 1: Create and store a reference to a scheduler instance
+
+```java
+public class MyActivity extends Activity {
+  private final Scheduler scheduler = new Scheduler();
+}
+```
+
+### Step 2: Associate plans with targets
+
+```java
+Plan plan;
+View target;
+
+scheduler.addPlan(plan, target);
+```
+
+## How to commit a named plan to a scheduler
+
+### Step 1: Create and store a reference to a scheduler instance
+
+```java
+public class MyActivity extends Activity {
+  private final Scheduler scheduler = new Scheduler();
+}
+```
+
+### Step 2: Associate plans with targets
+
+```java
+NamedPlan plan;
+String name;
+View target;
+
+scheduler.addNamedPlan(plan, name, target);
+```
+
+## How to configure performers with plans
+
+Configuring performers with plans starts by making your performer conform to
+[PlanPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.PlanPerformance.html).
+
+PlanPerformance requires that you implement the `addPlan()` method. This method will only be invoked
+with plans that require use of this performer.
+
+```java
+public class MyPerformer extends Performer implements PlanPerformance {
+  @Override
+  public void addPlan(Plan plan) {
+    MyPlan myPlan = (MyPlan) plan;
+
+    // Do something with myPlan.
+  }
+}
+```
+
+***Handling multiple plan types***
+
+```java
+public class MyPerformer extends Performer implements PlanPerformance {
+  @Override
+  public void addPlan(Plan plan) {
+    if (plan instanceof Plan1) {
+      addPlan1((Plan1) plan);
+    } else if (plan instanceof Plan2) {
+      addPlan2((Plan2) plan);
+    } else {
+      throw new IllegalArgumentException("Plan type not supported for " + plan);
+    }
+  }
+}
+```
+
+## How to configure performers with named plans
+
+```java
+public class MyPerformer extends Performer implements PlanPerformance {
+  @Override
+  public void addPlan(NamedPlan plan, String name) {
+    MyPlan myPlan = (MyPlan) plan;
+
+    // Do something with myPlan.
+  }
+
+  @Override
+  public void removePlan(String name) {
+    // Remove any configuration associated with the given name.
+  }
+}
+```
+
+## How to use composition to fulfill plans
+
+A composition performer is able to emit new plans using a plan emitter. This feature enables the
+reuse of plans and the creation of higher-order abstractions.
+
+### Step 1: Conform to ComposablePerformance and store the plan emitter
+
+```java
+public class MyPerformer extends Performer implements ComposablePerformance {
+  // Store the emitter in your class' definition.
+  private TransactionEmitter emitter;
+
+  @Override
+  public void setTransactionEmitter(TransactionEmitter transactionEmitter) {
+    this.emitter = transactionEmitter;
+  }
+}
+```
+
+### Step 2: Emit plans
+
+Performers are only able to emit plans for their associated target.
+
+```java
+Transaction transaction = new Transaction();
+transaction.addPlan(plan, getTarget());
+emitter.emit(transaction);
+```
+
+## How to indicate continuous performance
+
+Performers will often perform their actions over a period of time or while an interaction is
+active. These types of performers are called continuous performers.
+
+A continuous performer is able to affect the active state of the scheduler by generating is-active
+tokens. The scheduler is considered active so long as an is-active token exists and has not been
+terminated. Continuous performers are expected to terminate a token when its corresponding work has
+completed.
+
+For example, a performer that registers a platform animation might generate a token when the
+animation starts. When the animation completes the token would be terminated.
+
+### Step 1: Conform to ContinuousPerformance and store the token generator
+
+```java
+public class MyPerformer extends Performer implements ComposablePerformance {
+  // Store the emitter in your class' definition.
+  private IsActiveTokenGenerator tokenGenerator;
+
+  @Override
+  public void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator) {
+    tokenGenerator = isActiveTokenGenerator;
+  }
+}
+```
+
+### Step 2: Generate a token when some continuous work has started
+
+You will likely need to store the token in order to be able to reference it at a later point.
+
+```java
+Animator animator;
+animator.addListener(new AnimatorListenerAdapter() {
+
+  private IsActiveToken token;
+
+  @Override
+  public void onAnimationStart(Animator animation) {
+    token = tokenGenerator.generate();
+  }
+});
+animator.start();
+```
+
+### Step 3: Terminate the token when work has completed
+
+```java
+@Override
+public void onAnimationEnd(Animator animation) {
+  token.terminate();
+}
+```
 
 ## Contributing
 
