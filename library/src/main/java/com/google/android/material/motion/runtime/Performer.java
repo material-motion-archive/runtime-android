@@ -17,8 +17,6 @@
 package com.google.android.material.motion.runtime;
 
 import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.PlanPerformance;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 
 /**
  * A Performer is an object responsible for executing a {@link Plan}.
@@ -58,13 +56,6 @@ public abstract class Performer implements BasePerformance {
   public final void initialize(Object target) {
     this.target = target;
     onInitialize(target);
-  }
-
-  /**
-   * Note: Once {@link PlanPerformance} is removed, this empty implementation will be removed.
-   */
-  @Override
-  public void addPlan(BasePlan plan) {
   }
 
   /**

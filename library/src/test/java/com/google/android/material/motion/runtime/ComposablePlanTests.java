@@ -21,7 +21,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
 import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,27 +37,24 @@ public class ComposablePlanTests {
 
   private Scheduler scheduler;
   private TextView textView;
-  private Transaction transaction;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
     scheduler = new Scheduler();
     textView = new TextView(context);
-    transaction = new Transaction();
   }
 
   @Test
   public void testComposablePlan() {
     // add the root plan and have it delegate to the leaf plan
     RootPlan rootPlan = new RootPlan("rootPlan");
-    transaction.addNamedPlan(rootPlan, "rootPlan", textView);
-    scheduler.commitTransaction(transaction);
+    scheduler.addNamedPlan(rootPlan, "rootPlan", textView);
 
     assertThat(textView.getText()).isEqualTo("leafPlan");
   }
 
-  private class RootPlan extends Plan {
+  private class RootPlan extends Plan implements NamedPlan {
 
     private String text;
 
@@ -64,7 +63,7 @@ public class ComposablePlanTests {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return ComposablePerformer.class;
     }
   }
@@ -94,7 +93,7 @@ public class ComposablePlanTests {
   }
 
   public static class ComposablePerformer extends Performer implements
-    ComposablePerformance {
+    ComposablePerformance, NamedPlanPerformance {
 
     private PlanEmitter planEmitter;
 
@@ -106,6 +105,16 @@ public class ComposablePlanTests {
     public void addPlan(BasePlan plan) {
       // immediately delegate the actual work of changing the text view to the leaf plan
       planEmitter.emit(new LeafPlan("leafPlan"));
+    }
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      addPlan(plan);
+    }
+
+    @Override
+    public void removePlan(String name) {
+
     }
   }
 }

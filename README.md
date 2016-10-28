@@ -131,7 +131,7 @@ To run all unit tests, run the following commands:
 
 ## Architecture
 
-The Material Motion Runtime consists of two groups of APIs: a scheduler/transaction object and a
+The Material Motion Runtime consists of two groups of APIs: a scheduler object and a
 constellation of protocols loosely consisting of plan and performing types.
 
 ### Scheduler
@@ -183,7 +183,6 @@ public class MyPlan {
 
 Performers are responsible for fulfilling plans. Fulfillment is possible in a variety of ways:
 
-- [PlanPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.PlanPerformance.html): [How to configure performers with plans](#how-to-configure-performers-with-plans)
 - [NamedPlanPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.NamedPlanPerformance.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
 - [ContinuousPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ContinuousPerformance.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
 - [ComposablePerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ComposablePerformance.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
@@ -196,6 +195,9 @@ See the associated links for more details on each performing type.
 
 ```java
 public class MyPerformer extends Performer {
+  @Override
+  public void addPlan(BasePlan plan) {
+  }
 }
 ```
 
@@ -262,16 +264,12 @@ scheduler.addNamedPlan(plan, name, target);
 
 ## How to configure performers with plans
 
-Configuring performers with plans starts by making your performer conform to
-[PlanPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.PlanPerformance.html).
-
-PlanPerformance requires that you implement the `addPlan()` method. This method will only be invoked
-with plans that require use of this performer.
+The `addPlan()` method will be invoked with plans that require use of this performer.
 
 ```java
-public class MyPerformer extends Performer implements PlanPerformance {
+public class MyPerformer extends Performer {
   @Override
-  public void addPlan(Plan plan) {
+  public void addPlan(BasePlan plan) {
     MyPlan myPlan = (MyPlan) plan;
 
     // Do something with myPlan.
@@ -282,9 +280,9 @@ public class MyPerformer extends Performer implements PlanPerformance {
 ***Handling multiple plan types***
 
 ```java
-public class MyPerformer extends Performer implements PlanPerformance {
+public class MyPerformer extends Performer {
   @Override
-  public void addPlan(Plan plan) {
+  public void addPlan(BasePlan plan) {
     if (plan instanceof Plan1) {
       addPlan1((Plan1) plan);
     } else if (plan instanceof Plan2) {
@@ -299,7 +297,7 @@ public class MyPerformer extends Performer implements PlanPerformance {
 ## How to configure performers with named plans
 
 ```java
-public class MyPerformer extends Performer implements PlanPerformance {
+public class MyPerformer extends Performer {
   @Override
   public void addPlan(NamedPlan plan, String name) {
     MyPlan myPlan = (MyPlan) plan;

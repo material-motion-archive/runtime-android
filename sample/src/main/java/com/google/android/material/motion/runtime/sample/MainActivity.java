@@ -24,10 +24,11 @@ import android.widget.TextView;
 import com.google.android.material.motion.runtime.Performer;
 import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
 import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.Scheduler;
-import com.google.android.material.motion.runtime.Transaction;
 
 /**
  * Material Motion Android Runtime sample Activity.
@@ -47,18 +48,15 @@ public class MainActivity extends AppCompatActivity {
     text2.setAlpha(0f);
 
     Scheduler scheduler = new Scheduler();
-    Transaction transaction = new Transaction();
 
-    transaction.addNamedPlan(new DemoPlan1("trash"), "cd", text1);
-    transaction.addPlan(new DemoPlan1("get"), text1);
-    transaction.addNamedPlan(new DemoPlan1("real"), "cd", text1);
+    scheduler.addNamedPlan(new DemoPlan1("trash"), "cd", text1);
+    scheduler.addPlan(new DemoPlan1("get"), text1);
+    scheduler.addNamedPlan(new DemoPlan1("real"), "cd", text1);
 
-    transaction.addPlan(new DemoPlan2(.5f), text2);
-
-    scheduler.commitTransaction(transaction);
+    scheduler.addPlan(new DemoPlan2(.5f), text2);
   }
 
-  private static class DemoPlan1 extends Plan {
+  private static class DemoPlan1 extends Plan implements NamedPlan {
 
     private final String text;
 
@@ -67,12 +65,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends BasePerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return DemoPerformer1.class;
     }
   }
 
-  public static class DemoPerformer1 extends Performer {
+  public static class DemoPerformer1 extends Performer implements NamedPlanPerformance {
 
     @Override
     public void addPlan(BasePlan plan) {
@@ -80,6 +78,15 @@ public class MainActivity extends AppCompatActivity {
       TextView target = getTarget();
 
       target.setText(target.getText() + " " + demoPlan.text);
+    }
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      addPlan(plan);
+    }
+
+    @Override
+    public void removePlan(String name) {
     }
   }
 

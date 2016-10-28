@@ -21,23 +21,21 @@ import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Transaction.PlanInfo;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * A Scheduler accepts {@link Transaction Transactions} and creates {@link Performer Performers}.
- * The Scheduler generates relevant events for Performers and {@link StateListener listeners} and
- * monitors {@link State}.
+ * A Scheduler accepts {@link Plan Plans} and creates {@link Performer Performers}. The Scheduler
+ * generates relevant events for Performers and {@link StateListener listeners} and monitors {@link
+ * State}.
  *
- * <p> Commit Transactions to this Scheduler by calling {@link #commitTransaction(Transaction)}. A
- * Scheduler ensures that only one {@link Performer} instance is created for each type of Performer
- * required by a target. This allows multiple {@link Plan Plans} to affect a single Performer
- * instance. The Performers can then maintain state across multiple Plans.
+ * <p> Commit Plans to this Scheduler by calling {@link #addPlan(Plan, Object)}. A Scheduler ensures
+ * that only one {@link Performer} instance is created for each type of Performer required by a
+ * target. This allows multiple {@link Plan Plans} to affect a single Performer instance. The
+ * Performers can then maintain state across multiple Plans.
  *
  * <p> Query the State of this Scheduler by calling {@link #getState()}. A Scheduler is active if
  * any of its Performers are active. To listen for state changes, attach listeners via {@link
@@ -142,35 +140,13 @@ public final class Scheduler {
   }
 
   /**
-   * Commits the given {@link Transaction}. Each {@link PlanInfo} is committed in the context of its
-   * target, called a {@link TargetScope}. Each TargetScope ensures that only one instance of a
-   * specific type of Performer is created.
-   *
-   * @deprecated 2.0.0. Plans should be added directly to the Scheduler instead of using
-   * Transactions. <br /> This will be removed in the next version <br /> use {@link
-   * com.google.android.material.motion.runtime.Scheduler#addPlan(Plan, Object)} on the Scheduler
-   * instead
-   */
-  @Deprecated
-  public void commitTransaction(Transaction transaction) {
-    List<PlanInfo> plans = transaction.getPlans();
-    for (int i = 0, count = plans.size(); i < count; i++) {
-      PlanInfo plan = plans.get(i);
-      getTargetScope(plan.target).commitPlan(plan.plan, plan.target);
-    }
-  }
-
-  /**
    * Adds a plan to this scheduler.
    *
    * @param plan the {@link Plan} to add to the scheduler.
    * @param target the target on which the plan will operate.
    */
   public void addPlan(Plan plan, Object target) {
-    PlanInfo planInfo = new PlanInfo();
-    planInfo.target = target;
-    planInfo.plan = plan.clone();
-    getTargetScope(target).commitPlan(planInfo.plan, planInfo.target);
+    getTargetScope(target).commitPlan(plan.clone(), target);
   }
 
   /**
@@ -184,8 +160,7 @@ public final class Scheduler {
    */
   public void addNamedPlan(NamedPlan plan, String name, Object target) {
     if (name == null || name.isEmpty()) {
-      throw new IllegalArgumentException(
-        "A NamedPlan must have a name with more than zero characters");
+      throw new IllegalArgumentException("A NamedPlan must have a non-empty name.");
     }
     getTargetScope(target).commitAddNamedPlan((NamedPlan) plan.clone(), name, target);
   }
@@ -198,8 +173,7 @@ public final class Scheduler {
    */
   public void removeNamedPlan(String name, Object target) {
     if (name == null || name.isEmpty()) {
-      throw new IllegalArgumentException(
-        "A NamedPlan must have a name with more than zero characters");
+      throw new IllegalArgumentException("A NamedPlan must have a non-empty name.");
     }
     getTargetScope(target).commitRemoveNamedPlan(name);
   }

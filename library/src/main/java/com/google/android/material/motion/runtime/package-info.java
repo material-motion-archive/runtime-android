@@ -26,9 +26,8 @@
  *   <li>{@link com.google.android.material.motion.runtime.Plan}</li>
  *   <li>{@link com.google.android.material.motion.runtime.Performer}</li>
  * </ul>
- * and two concrete classes:
+ * and one concrete class:
  * <ul>
- *   <li>{@link com.google.android.material.motion.runtime.Transaction}</li>
  *   <li>{@link com.google.android.material.motion.runtime.Scheduler}</li>
  * </ul>
  *

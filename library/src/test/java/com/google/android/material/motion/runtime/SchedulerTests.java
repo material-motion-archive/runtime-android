@@ -40,14 +40,12 @@ public class SchedulerTests {
 
   private Scheduler scheduler;
   private TextView textView;
-  private Transaction transaction;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
     scheduler = new Scheduler();
     textView = new TextView(context);
-    transaction = new Transaction();
   }
 
   @Test
@@ -57,16 +55,14 @@ public class SchedulerTests {
 
   @Test
   public void testStandardPerformerSchedulerState() {
-    transaction.addNamedPlan(new StandardPlan("standard"), "plan", textView);
-    scheduler.commitTransaction(transaction);
+    scheduler.addNamedPlan(new StandardPlan("standard"), "plan", textView);
 
     assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
   }
 
   @Test
   public void testManualPerformerSchedulerState() {
-    transaction.addNamedPlan(new ManualPlan("manual"), "plan", textView);
-    scheduler.commitTransaction(transaction);
+    scheduler.addNamedPlan(new ManualPlan("manual"), "plan", textView);
 
     assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
   }
@@ -78,10 +74,8 @@ public class SchedulerTests {
     scheduler.addStateListener(firstListener);
     scheduler.addStateListener(secondListener);
 
-    transaction.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
-    transaction.addPlan(new StandardPlan("standard one"), textView);
-
-    scheduler.commitTransaction(transaction);
+    scheduler.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
+    scheduler.addPlan(new StandardPlan("standard one"), textView);
 
     assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
     assertThat(secondListener.getState()).isEqualTo(Scheduler.ACTIVE);
@@ -94,10 +88,8 @@ public class SchedulerTests {
     scheduler.addStateListener(firstListener);
     scheduler.addStateListener(secondListener);
 
-    transaction.addPlan(new StandardPlan("standard one"), textView);
-    transaction.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
-
-    scheduler.commitTransaction(transaction);
+    scheduler.addPlan(new StandardPlan("standard one"), textView);
+    scheduler.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
 
     assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
     assertThat(secondListener.getState()).isEqualTo(Scheduler.ACTIVE);
@@ -108,13 +100,11 @@ public class SchedulerTests {
     TestSchedulerListener firstListener = new TestSchedulerListener();
     TestSchedulerListener secondListener = new TestSchedulerListener();
     scheduler.addStateListener(firstListener);
+
     scheduler.addStateListener(secondListener);
-
-    transaction.addNamedPlan(new ManualPlan("manual"), "plan", textView);
-
     scheduler.removeStateListener(secondListener);
 
-    scheduler.commitTransaction(transaction);
+    scheduler.addNamedPlan(new ManualPlan("manual"), "plan", textView);
 
     assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
     assertThat(secondListener.getState()).isEqualTo(Scheduler.IDLE);
@@ -122,16 +112,14 @@ public class SchedulerTests {
 
   @Test
   public void testNeverEndingDelegatePerformanceSchedulerState() {
-    transaction.addNamedPlan(new NeverEndingContinuousPlan("continuous"), "plan", textView);
-    scheduler.commitTransaction(transaction);
+    scheduler.addNamedPlan(new NeverEndingContinuousPlan("continuous"), "plan", textView);
 
     assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
   }
 
   @Test
   public void testEndingContinuousPerformanceSchedulerState() {
-    transaction.addNamedPlan(new EndingContinuousPlan("continuous"), "plan", textView);
-    scheduler.commitTransaction(transaction);
+    scheduler.addNamedPlan(new EndingContinuousPlan("continuous"), "plan", textView);
 
     assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
   }
@@ -351,7 +339,7 @@ public class SchedulerTests {
     }
   }
 
-  private static class StandardPlan extends Plan {
+  private static class StandardPlan extends Plan implements NamedPlan {
 
     private final String text;
 
@@ -360,12 +348,12 @@ public class SchedulerTests {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return StandardPerformer.class;
     }
   }
 
-  private static class ManualPlan extends Plan {
+  private static class ManualPlan extends Plan implements NamedPlan {
 
     private final String text;
 
@@ -374,12 +362,12 @@ public class SchedulerTests {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return ManualPerformer.class;
     }
   }
 
-  private static class NeverEndingContinuousPlan extends Plan {
+  private static class NeverEndingContinuousPlan extends Plan implements NamedPlan {
 
     private final String text;
 
@@ -388,12 +376,12 @@ public class SchedulerTests {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return NeverEndingContinuousPerformer.class;
     }
   }
 
-  private static class EndingContinuousPlan extends Plan {
+  private static class EndingContinuousPlan extends Plan implements NamedPlan {
 
     private final String text;
 
@@ -402,7 +390,7 @@ public class SchedulerTests {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return EndingContinuousPerformer.class;
     }
   }
@@ -414,6 +402,11 @@ public class SchedulerTests {
   }
 
   public static class NamedCounterPlanPerformer extends Performer implements NamedPlanPerformance {
+
+    @Override
+    public void addPlan(BasePlan plan) {
+      throw new UnsupportedOperationException();
+    }
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
@@ -429,6 +422,11 @@ public class SchedulerTests {
   }
 
   public static class StoragePlanPerformer extends Performer implements NamedPlanPerformance {
+
+    @Override
+    public void addPlan(BasePlan plan) {
+      throw new UnsupportedOperationException();
+    }
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
@@ -464,7 +462,7 @@ public class SchedulerTests {
     }
   }
 
-  public static class StandardPerformer extends Performer {
+  public static class StandardPerformer extends Performer implements NamedPlanPerformance {
 
     @Override
     public void addPlan(BasePlan plan) {
@@ -472,18 +470,41 @@ public class SchedulerTests {
       TextView target = getTarget();
       target.setText(target.getText() + " " + standardPlan.text);
     }
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      addPlan(plan);
+    }
+
+    @Override
+    public void removePlan(String name) {
+    }
   }
 
-  public static class ManualPerformer extends Performer implements ManualPerformance {
+  public static class ManualPerformer extends Performer implements ManualPerformance,
+    NamedPlanPerformance {
 
     @Override
     public int update(float deltaTimeMs) {
       return Scheduler.ACTIVE;
     }
+
+    @Override
+    public void addPlan(BasePlan plan) {
+    }
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      addPlan(plan);
+    }
+
+    @Override
+    public void removePlan(String name) {
+    }
   }
 
   public static class NeverEndingContinuousPerformer extends Performer implements
-    ContinuousPerformance {
+    ContinuousPerformance, NamedPlanPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
@@ -497,22 +518,41 @@ public class SchedulerTests {
     public void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator) {
       this.isActiveTokenGenerator = isActiveTokenGenerator;
     }
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      addPlan(plan);
+    }
+
+    @Override
+    public void removePlan(String name) {
+    }
   }
 
-  public static class EndingContinuousPerformer extends Performer implements ContinuousPerformance {
+  public static class EndingContinuousPerformer extends Performer implements ContinuousPerformance,
+    NamedPlanPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
     @Override
     public void addPlan(BasePlan plan) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator) {
+      this.isActiveTokenGenerator = isActiveTokenGenerator;
+    }
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
       // start and end it immediately
       IsActiveToken token = isActiveTokenGenerator.generate();
       token.terminate();
     }
 
     @Override
-    public void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator) {
-      this.isActiveTokenGenerator = isActiveTokenGenerator;
+    public void removePlan(String name) {
     }
   }
 

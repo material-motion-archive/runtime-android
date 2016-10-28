@@ -53,26 +53,6 @@ public final class PerformerFeatures {
   }
 
   /**
-   * A Performer implements this interface in order to support the Add Plans API.
-   *
-   * <p> A Performer can have logic that is configured by the {@link Plan Plans} provided to it.
-   *
-   * @deprecated 2.0.0. Override {@link Performer#addPlan(BasePlan)} instead.
-   */
-  @Deprecated
-  public interface PlanPerformance extends BasePerformance {
-
-    /**
-     * Provides a {@link Plan} to this Performer. The Performer is expected to execute any plan
-     * added in this manner.
-     *
-     * @deprecated 2.0.0. Override {@link Performer#addPlan(BasePlan)} instead.
-     */
-    @Deprecated
-    void addPlan(BasePlan plan);
-  }
-
-  /**
    * A Performer can implement this interface in order to support the add and remove for {@link
    * NamedPlan}s APIs.
    */
