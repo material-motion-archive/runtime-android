@@ -156,7 +156,7 @@ public final class Scheduler {
     List<PlanInfo> plans = transaction.getPlans();
     for (int i = 0, count = plans.size(); i < count; i++) {
       PlanInfo plan = plans.get(i);
-      getTargetScope(plan.target).commitPlan(plan);
+      getTargetScope(plan.target).commitPlan(plan.plan, plan.target);
     }
   }
 
@@ -170,7 +170,7 @@ public final class Scheduler {
     PlanInfo planInfo = new PlanInfo();
     planInfo.target = target;
     planInfo.plan = plan.clone();
-    getTargetScope(target).commitPlan(planInfo);
+    getTargetScope(target).commitPlan(planInfo.plan, planInfo.target);
   }
 
   /**

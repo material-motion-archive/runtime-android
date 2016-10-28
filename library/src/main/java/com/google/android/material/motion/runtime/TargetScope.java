@@ -32,7 +32,6 @@ import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPer
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.Scheduler.State;
-import com.google.android.material.motion.runtime.Transaction.PlanInfo;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -60,8 +59,23 @@ class TargetScope {
     this.scheduler = scheduler;
   }
 
-  void commitPlan(PlanInfo plan) {
-    BasePerformance performer = getPerformer(plan);
+  void commitPlan(BasePlan plan, Object target) {
+    BasePerformance performer = commitPlanInternal(plan, target);
+    performer.addPlan(plan);
+  }
+
+  void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
+    // remove first
+    commitRemoveNamedPlan(name);
+
+    // then add
+    NamedPlanPerformance performer = commitPlanInternal(plan, target);
+    performer.addPlan(plan, name);
+    namedCache.put(name, performer);
+  }
+
+  private <T extends BasePerformance> T commitPlanInternal(BasePlan plan, Object target) {
+    BasePerformance performer = getPerformer(plan, target);
 
     if (performer instanceof ManualPerformance) {
       activeManualPerformances.add((ManualPerformance) performer);
@@ -73,22 +87,8 @@ class TargetScope {
       composablePerformance.setPlanEmitter(createPlanEmitter(composablePerformance));
     }
 
-    performer.addPlan(plan.plan);
-  }
-
-  void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
-    // remove first
-    commitRemoveNamedPlan(name);
-
-    // then add
-    NamedPlanPerformance namedPlanPerformance = namedCache.get(name);
-    if (namedPlanPerformance == null) {
-      // TODO: refactor getPerformer() and use it here
-      namedPlanPerformance = (NamedPlanPerformance) createPerformer(plan, target);
-    }
-    namedPlanPerformance.addPlan(plan, name);
-
-    namedCache.put(name, namedPlanPerformance);
+    //noinspection unchecked
+    return (T) performer;
   }
 
   void commitRemoveNamedPlan(String name) {
@@ -132,12 +132,12 @@ class TargetScope {
     return state;
   }
 
-  private BasePerformance getPerformer(PlanInfo plan) {
-    Class<? extends BasePerformance> performerClass = plan.plan.getPerformerClass();
+  private BasePerformance getPerformer(BasePlan plan, Object target) {
+    Class<? extends BasePerformance> performerClass = plan.getPerformerClass();
     BasePerformance performer = cache.get(performerClass);
 
     if (performer == null) {
-      performer = createPerformer(plan.plan, plan.target);
+      performer = createPerformer(plan, target);
       cache.put(performerClass, performer);
     }
 
