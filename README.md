@@ -209,7 +209,7 @@ Conforming to Plan requires:
 ```java
 public class MyPlan extends Plan {
   @Override
-  public Class<? extends Performer> getPerformerClass() {
+  public Class<? extends BasePerformance> getPerformerClass() {
     return MyPerformer.class;
   }
 

@@ -20,15 +20,18 @@ import static com.google.android.material.motion.runtime.Scheduler.CONTINUOUS_DE
 import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAILED_STATE_FLAG;
 
 import android.support.v4.util.SimpleArrayMap;
-import com.google.android.material.motion.runtime.Performer.ComposablePerformance;
-import com.google.android.material.motion.runtime.Performer.ComposablePerformance.TransactionEmitter;
-import com.google.android.material.motion.runtime.Performer.ContinuousPerformance;
-import com.google.android.material.motion.runtime.Performer.ContinuousPerformance.IsActiveToken;
-import com.google.android.material.motion.runtime.Performer.ContinuousPerformance.IsActiveTokenGenerator;
-import com.google.android.material.motion.runtime.Performer.ManualPerformance;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance.TransactionEmitter;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance.IsActiveToken;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance.IsActiveTokenGenerator;
+import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
+import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.Scheduler.State;
-import com.google.android.material.motion.runtime.Performer.NamedPlanPerformance;
 import com.google.android.material.motion.runtime.Transaction.PlanInfo;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,7 +45,7 @@ import java.util.Set;
  */
 class TargetScope {
 
-  private final SimpleArrayMap<Class<? extends Performer>, Performer> cache =
+  private final SimpleArrayMap<Class<? extends BasePerformance>, BasePerformance> cache =
     new SimpleArrayMap<>();
   private final SimpleArrayMap<String, NamedPlanPerformance> namedCache = new SimpleArrayMap<>();
 
@@ -58,7 +61,7 @@ class TargetScope {
   }
 
   void commitPlan(PlanInfo plan) {
-    Performer performer = getPerformer(plan);
+    BasePerformance performer = getPerformer(plan);
 
     if (performer instanceof ManualPerformance) {
       activeManualPerformances.add((ManualPerformance) performer);
@@ -77,14 +80,14 @@ class TargetScope {
     commitRemoveNamedPlan(name);
 
     // then add
-    NamedPlanPerformance namedPerformer = namedCache.get(name);
-    if (namedPerformer == null) {
+    NamedPlanPerformance namedPlanPerformance = namedCache.get(name);
+    if (namedPlanPerformance == null) {
       // TODO: refactor getPerformer() and use it here
-      namedPerformer = (NamedPlanPerformance) createPerformer(plan, target);
+      namedPlanPerformance = (NamedPlanPerformance) createPerformer(plan, target);
     }
-    namedPerformer.addPlan(plan, name);
+    namedPlanPerformance.addPlan(plan, name);
 
-    namedCache.put(name, namedPerformer);
+    namedCache.put(name, namedPlanPerformance);
   }
 
   void commitRemoveNamedPlan(String name) {
@@ -128,9 +131,9 @@ class TargetScope {
     return state;
   }
 
-  private Performer getPerformer(PlanInfo plan) {
-    Class<? extends Performer> performerClass = plan.plan.getPerformerClass();
-    Performer performer = cache.get(performerClass);
+  private BasePerformance getPerformer(PlanInfo plan) {
+    Class<? extends BasePerformance> performerClass = plan.plan.getPerformerClass();
+    BasePerformance performer = cache.get(performerClass);
 
     if (performer == null) {
       performer = createPerformer(plan.plan, plan.target);
@@ -140,11 +143,11 @@ class TargetScope {
     return performer;
   }
 
-  private Performer createPerformer(Plan plan, Object target) {
-    Class<? extends Performer> performerClass = plan.getPerformerClass();
+  private BasePerformance createPerformer(BasePlan plan, Object target) {
+    Class<? extends BasePerformance> performerClass = plan.getPerformerClass();
 
     try {
-      Performer performer = performerClass.newInstance();
+      BasePerformance performer = performerClass.newInstance();
       performer.initialize(target);
 
       if (performer instanceof ContinuousPerformance) {

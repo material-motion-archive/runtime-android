@@ -20,15 +20,19 @@ import static com.google.common.truth.Truth.assertThat;
 import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
+import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import java.util.List;
-import java.util.ArrayList;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
@@ -315,10 +319,10 @@ public class SchedulerTests {
     assertThat(errorThrown);
   }
 
-  private static class StorageNamedPlan extends NamedPlan {
+  private static class StorageNamedPlan extends Plan implements NamedPlan {
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return StoragePlanPerformer.class;
     }
   }
@@ -326,23 +330,23 @@ public class SchedulerTests {
   private static class RegularPlanTargetAlteringPlan extends Plan {
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return GenericPlanPerformer.class;
     }
   }
 
-  private static class NamedCounterAlteringPlan extends NamedPlan {
+  private static class NamedCounterAlteringPlan extends Plan implements NamedPlan {
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return NamedCounterPlanPerformer.class;
     }
   }
 
-  private static class NamedTargetAlteringPlan extends NamedPlan {
+  private static class NamedTargetAlteringPlan extends Plan implements NamedPlan {
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerformance> getPerformerClass() {
       return GenericPlanPerformer.class;
     }
   }
@@ -409,8 +413,7 @@ public class SchedulerTests {
     int removeCounter = 0;
   }
 
-  public static class NamedCounterPlanPerformer extends Performer implements
-    Performer.NamedPlanPerformance {
+  public static class NamedCounterPlanPerformer extends Performer implements NamedPlanPerformance {
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
@@ -425,8 +428,7 @@ public class SchedulerTests {
     }
   }
 
-  public static class StoragePlanPerformer extends Performer implements
-    Performer.NamedPlanPerformance {
+  public static class StoragePlanPerformer extends Performer implements NamedPlanPerformance {
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
@@ -441,11 +443,10 @@ public class SchedulerTests {
     }
   }
 
-  public static class GenericPlanPerformer extends Performer implements
-    Performer.NamedPlanPerformance {
+  public static class GenericPlanPerformer extends Performer implements NamedPlanPerformance {
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       TextView target = getTarget();
       target.setText(target.getText() + " regularAddPlanInvoked");
     }
@@ -466,14 +467,14 @@ public class SchedulerTests {
   public static class StandardPerformer extends Performer {
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       StandardPlan standardPlan = (StandardPlan) plan;
       TextView target = getTarget();
       target.setText(target.getText() + " " + standardPlan.text);
     }
   }
 
-  public static class ManualPerformer extends Performer implements Performer.ManualPerformance {
+  public static class ManualPerformer extends Performer implements ManualPerformance {
 
     @Override
     public int update(float deltaTimeMs) {
@@ -482,12 +483,12 @@ public class SchedulerTests {
   }
 
   public static class NeverEndingContinuousPerformer extends Performer implements
-    Performer.ContinuousPerformance {
+    ContinuousPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       // start the plan, but never finish it
       IsActiveToken token = isActiveTokenGenerator.generate();
     }
@@ -498,13 +499,12 @@ public class SchedulerTests {
     }
   }
 
-  public static class EndingContinuousPerformer extends Performer implements
-    Performer.ContinuousPerformance {
+  public static class EndingContinuousPerformer extends Performer implements ContinuousPerformance {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       // start and end it immediately
       IsActiveToken token = isActiveTokenGenerator.generate();
       token.terminate();

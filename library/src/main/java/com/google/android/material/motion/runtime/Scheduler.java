@@ -20,6 +20,7 @@ import android.support.annotation.IntDef;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.Transaction.PlanInfo;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -81,12 +82,12 @@ public final class Scheduler {
   private static final String TAG = "Scheduler";
   /**
    * Flag for detailed state bitmask specifying that the activity originates from a {@link
-   * com.google.android.material.motion.runtime.Performer.ManualPerformance}.
+   * com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance}.
    */
   static final int MANUAL_DETAILED_STATE_FLAG = 1 << 0;
   /**
    * Flag for detailed state bitmask specifying that the activity originates from a {@link
-   * com.google.android.material.motion.runtime.Performer.ContinuousPerformance}.
+   * com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance}.
    */
   static final int CONTINUOUS_DETAILED_STATE_FLAG = 1 << 1;
 
@@ -186,7 +187,7 @@ public final class Scheduler {
       throw new IllegalArgumentException(
         "A NamedPlan must have a name with more than zero characters");
     }
-    getTargetScope(target).commitAddNamedPlan(plan.clone(), name, target);
+    getTargetScope(target).commitAddNamedPlan((NamedPlan) plan.clone(), name, target);
   }
 
   /**
@@ -288,8 +289,8 @@ public final class Scheduler {
   }
 
   /**
-   * A {@link FrameCallback} that calls {@link com.google.android.material.motion.runtime.Performer.ManualPerformance#update(float)}
-   * on each frame for every active {@link com.google.android.material.motion.runtime.Performer.ManualPerformance}.
+   * A {@link FrameCallback} that calls {@link com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance#update(float)}
+   * on each frame for every active {@link com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance}.
    */
   private class ManualPerformanceFrameCallback extends FrameCallback {
 

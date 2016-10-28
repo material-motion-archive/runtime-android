@@ -17,6 +17,7 @@
 package com.google.android.material.motion.runtime;
 
 import android.support.annotation.Nullable;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

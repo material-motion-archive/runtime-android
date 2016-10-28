@@ -20,6 +20,8 @@ import static com.google.common.truth.Truth.assertThat;
 import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance;
+import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -84,7 +86,7 @@ public class ComposablePlanTests {
   public static class LeafPerformer extends Performer {
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       LeafPlan leafPlan = (LeafPlan) plan;
       TextView target = getTarget();
       target.setText(leafPlan.text);
@@ -92,7 +94,7 @@ public class ComposablePlanTests {
   }
 
   public static class ComposablePerformer extends Performer implements
-    Performer.ComposablePerformance {
+    ComposablePerformance {
 
     private TransactionEmitter transactionEmitter;
 
@@ -102,7 +104,7 @@ public class ComposablePlanTests {
     }
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       // immediately delegate the actual work of changing the text view to the leaf plan
       Transaction transaction = new Transaction();
       LeafPlan leafPlan = new LeafPlan("leafPlan");

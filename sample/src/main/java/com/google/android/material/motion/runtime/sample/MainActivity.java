@@ -22,8 +22,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.Performer.ContinuousPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance;
 import com.google.android.material.motion.runtime.Plan;
+import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.Scheduler;
 import com.google.android.material.motion.runtime.Transaction;
 
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends BasePerformance> getPerformerClass() {
       return DemoPerformer1.class;
     }
   }
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
   public static class DemoPerformer1 extends Performer {
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       DemoPlan1 demoPlan = (DemoPlan1) plan;
       TextView target = getTarget();
 
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends BasePerformance> getPerformerClass() {
       return DemoPerformer2.class;
     }
   }
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       DemoPlan2 demoPlan = (DemoPlan2) plan;
       View target = getTarget();
 
