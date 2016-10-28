@@ -20,9 +20,9 @@ import static com.google.common.truth.Truth.assertThat;
 import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
-import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import java.util.ArrayList;
@@ -111,14 +111,14 @@ public class SchedulerTests {
   }
 
   @Test
-  public void testNeverEndingDelegatePerformanceSchedulerState() {
+  public void testNeverEndingDelegatePerformingSchedulerState() {
     scheduler.addNamedPlan(new NeverEndingContinuousPlan("continuous"), "plan", textView);
 
     assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
   }
 
   @Test
-  public void testEndingContinuousPerformanceSchedulerState() {
+  public void testEndingContinuousPerformingSchedulerState() {
     scheduler.addNamedPlan(new EndingContinuousPlan("continuous"), "plan", textView);
 
     assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
@@ -310,7 +310,7 @@ public class SchedulerTests {
   private static class StorageNamedPlan extends Plan implements NamedPlan {
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return StoragePlanPerformer.class;
     }
   }
@@ -318,7 +318,7 @@ public class SchedulerTests {
   private static class RegularPlanTargetAlteringPlan extends Plan {
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return GenericPlanPerformer.class;
     }
   }
@@ -326,7 +326,7 @@ public class SchedulerTests {
   private static class NamedCounterAlteringPlan extends Plan implements NamedPlan {
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return NamedCounterPlanPerformer.class;
     }
   }
@@ -334,7 +334,7 @@ public class SchedulerTests {
   private static class NamedTargetAlteringPlan extends Plan implements NamedPlan {
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return GenericPlanPerformer.class;
     }
   }
@@ -348,7 +348,7 @@ public class SchedulerTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return StandardPerformer.class;
     }
   }
@@ -362,7 +362,7 @@ public class SchedulerTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return ManualPerformer.class;
     }
   }
@@ -376,7 +376,7 @@ public class SchedulerTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return NeverEndingContinuousPerformer.class;
     }
   }
@@ -390,7 +390,7 @@ public class SchedulerTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return EndingContinuousPerformer.class;
     }
   }
@@ -401,7 +401,7 @@ public class SchedulerTests {
     int removeCounter = 0;
   }
 
-  public static class NamedCounterPlanPerformer extends Performer implements NamedPlanPerformance {
+  public static class NamedCounterPlanPerformer extends Performer implements NamedPlanPerforming {
 
     @Override
     public void addPlan(BasePlan plan) {
@@ -421,7 +421,7 @@ public class SchedulerTests {
     }
   }
 
-  public static class StoragePlanPerformer extends Performer implements NamedPlanPerformance {
+  public static class StoragePlanPerformer extends Performer implements NamedPlanPerforming {
 
     @Override
     public void addPlan(BasePlan plan) {
@@ -441,7 +441,7 @@ public class SchedulerTests {
     }
   }
 
-  public static class GenericPlanPerformer extends Performer implements NamedPlanPerformance {
+  public static class GenericPlanPerformer extends Performer implements NamedPlanPerforming {
 
     @Override
     public void addPlan(BasePlan plan) {
@@ -462,7 +462,7 @@ public class SchedulerTests {
     }
   }
 
-  public static class StandardPerformer extends Performer implements NamedPlanPerformance {
+  public static class StandardPerformer extends Performer implements NamedPlanPerforming {
 
     @Override
     public void addPlan(BasePlan plan) {
@@ -481,8 +481,8 @@ public class SchedulerTests {
     }
   }
 
-  public static class ManualPerformer extends Performer implements ManualPerformance,
-    NamedPlanPerformance {
+  public static class ManualPerformer extends Performer implements ManualPerforming,
+    NamedPlanPerforming {
 
     @Override
     public int update(float deltaTimeMs) {
@@ -504,7 +504,7 @@ public class SchedulerTests {
   }
 
   public static class NeverEndingContinuousPerformer extends Performer implements
-    ContinuousPerformance, NamedPlanPerformance {
+    ContinuousPerforming, NamedPlanPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
@@ -529,8 +529,8 @@ public class SchedulerTests {
     }
   }
 
-  public static class EndingContinuousPerformer extends Performer implements ContinuousPerformance,
-    NamedPlanPerformance {
+  public static class EndingContinuousPerformer extends Performer implements ContinuousPerforming,
+    NamedPlanPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 

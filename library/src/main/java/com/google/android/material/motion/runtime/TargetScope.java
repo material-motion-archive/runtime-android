@@ -21,14 +21,14 @@ import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAIL
 
 import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance.PlanEmitter;
-import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance.IsActiveToken;
-import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance.IsActiveTokenGenerator;
-import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming.PlanEmitter;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveToken;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveTokenGenerator;
+import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.Scheduler.State;
@@ -44,14 +44,14 @@ import java.util.Set;
  */
 class TargetScope {
 
-  private final SimpleArrayMap<Class<? extends BasePerformance>, BasePerformance> cache =
+  private final SimpleArrayMap<Class<? extends BasePerforming>, BasePerforming> cache =
     new SimpleArrayMap<>();
-  private final SimpleArrayMap<String, NamedPlanPerformance> namedCache = new SimpleArrayMap<>();
+  private final SimpleArrayMap<String, NamedPlanPerforming> namedCache = new SimpleArrayMap<>();
 
-  private final Set<ManualPerformance> activeManualPerformances = new HashSet<>();
+  private final Set<ManualPerforming> activeManualPerformers = new HashSet<>();
 
-  private final SimpleArrayMap<ContinuousPerformance, Set<IsActiveToken>>
-    activeContinuousPerformances = new SimpleArrayMap<>();
+  private final SimpleArrayMap<ContinuousPerforming, Set<IsActiveToken>>
+    activeContinuousPerformers = new SimpleArrayMap<>();
 
   private final Scheduler scheduler;
 
@@ -60,7 +60,7 @@ class TargetScope {
   }
 
   void commitPlan(BasePlan plan, Object target) {
-    BasePerformance performer = commitPlanInternal(plan, target);
+    BasePerforming performer = commitPlanInternal(plan, target);
     performer.addPlan(plan);
   }
 
@@ -69,22 +69,22 @@ class TargetScope {
     commitRemoveNamedPlan(name);
 
     // then add
-    NamedPlanPerformance performer = commitPlanInternal(plan, target);
+    NamedPlanPerforming performer = commitPlanInternal(plan, target);
     performer.addPlan(plan, name);
     namedCache.put(name, performer);
   }
 
-  private <T extends BasePerformance> T commitPlanInternal(BasePlan plan, Object target) {
-    BasePerformance performer = getPerformer(plan, target);
+  private <T extends BasePerforming> T commitPlanInternal(BasePlan plan, Object target) {
+    BasePerforming performer = getPerformer(plan, target);
 
-    if (performer instanceof ManualPerformance) {
-      activeManualPerformances.add((ManualPerformance) performer);
+    if (performer instanceof ManualPerforming) {
+      activeManualPerformers.add((ManualPerforming) performer);
       notifyTargetStateChanged();
     }
 
-    if (performer instanceof ComposablePerformance) {
-      ComposablePerformance composablePerformance = (ComposablePerformance) performer;
-      composablePerformance.setPlanEmitter(createPlanEmitter(composablePerformance));
+    if (performer instanceof ComposablePerforming) {
+      ComposablePerforming composablePerformer = (ComposablePerforming) performer;
+      composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
     }
 
     //noinspection unchecked
@@ -92,7 +92,7 @@ class TargetScope {
   }
 
   void commitRemoveNamedPlan(String name) {
-    NamedPlanPerformance performer = namedCache.get(name);
+    NamedPlanPerforming performer = namedCache.get(name);
     if (performer != null) {
       performer.removePlan(name);
     }
@@ -100,11 +100,11 @@ class TargetScope {
   }
 
   void update(float deltaTimeMs) {
-    Iterator<ManualPerformance> iterator = activeManualPerformances.iterator();
+    Iterator<ManualPerforming> iterator = activeManualPerformers.iterator();
 
     boolean changed = false;
     while (iterator.hasNext()) {
-      ManualPerformance performer = iterator.next();
+      ManualPerforming performer = iterator.next();
       @State int state = performer.update(deltaTimeMs);
       if (state == Scheduler.IDLE) {
         iterator.remove();
@@ -123,18 +123,18 @@ class TargetScope {
 
   private int getDetailedState() {
     int state = 0;
-    if (!activeManualPerformances.isEmpty()) {
+    if (!activeManualPerformers.isEmpty()) {
       state |= MANUAL_DETAILED_STATE_FLAG;
     }
-    if (!activeContinuousPerformances.isEmpty()) {
+    if (!activeContinuousPerformers.isEmpty()) {
       state |= CONTINUOUS_DETAILED_STATE_FLAG;
     }
     return state;
   }
 
-  private BasePerformance getPerformer(BasePlan plan, Object target) {
-    Class<? extends BasePerformance> performerClass = plan.getPerformerClass();
-    BasePerformance performer = cache.get(performerClass);
+  private BasePerforming getPerformer(BasePlan plan, Object target) {
+    Class<? extends BasePerforming> performerClass = plan.getPerformerClass();
+    BasePerforming performer = cache.get(performerClass);
 
     if (performer == null) {
       performer = createPerformer(plan, target);
@@ -144,17 +144,17 @@ class TargetScope {
     return performer;
   }
 
-  private BasePerformance createPerformer(BasePlan plan, Object target) {
-    Class<? extends BasePerformance> performerClass = plan.getPerformerClass();
+  private BasePerforming createPerformer(BasePlan plan, Object target) {
+    Class<? extends BasePerforming> performerClass = plan.getPerformerClass();
 
     try {
-      BasePerformance performer = performerClass.newInstance();
+      BasePerforming performer = performerClass.newInstance();
       performer.initialize(target);
 
-      if (performer instanceof ContinuousPerformance) {
-        ContinuousPerformance continuousPerformance = (ContinuousPerformance) performer;
-        continuousPerformance
-          .setIsActiveTokenGenerator(createIsActiveTokenGenerator(continuousPerformance));
+      if (performer instanceof ContinuousPerforming) {
+        ContinuousPerforming continuousPerformer = (ContinuousPerforming) performer;
+        continuousPerformer
+          .setIsActiveTokenGenerator(createIsActiveTokenGenerator(continuousPerformer));
       }
 
       if (performer.getClass() != performerClass) {
@@ -172,20 +172,20 @@ class TargetScope {
 
   /**
    * Creates a {@link IsActiveTokenGenerator} to be assigned to the given {@link
-   * ContinuousPerformance}.
+   * ContinuousPerforming}.
    */
   private IsActiveTokenGenerator createIsActiveTokenGenerator(
-    final ContinuousPerformance performer) {
+    final ContinuousPerforming performer) {
     return new IsActiveTokenGenerator() {
       @Override
       public IsActiveToken generate() {
         final Set<IsActiveToken> tokens;
 
-        if (activeContinuousPerformances.containsKey(performer)) {
-          tokens = activeContinuousPerformances.get(performer);
+        if (activeContinuousPerformers.containsKey(performer)) {
+          tokens = activeContinuousPerformers.get(performer);
         } else {
           tokens = new HashSet<>();
-          activeContinuousPerformances.put(performer, tokens);
+          activeContinuousPerformers.put(performer, tokens);
         }
 
         IsActiveToken token = new IsActiveToken() {
@@ -197,7 +197,7 @@ class TargetScope {
             }
 
             if (tokens.isEmpty()) {
-              activeContinuousPerformances.remove(performer);
+              activeContinuousPerformers.remove(performer);
             }
             notifyTargetStateChanged();
           }
@@ -211,9 +211,9 @@ class TargetScope {
   }
 
   /**
-   * Creates a {@link PlanEmitter} to be assigned to the given {@link ComposablePerformance}.
+   * Creates a {@link PlanEmitter} to be assigned to the given {@link ComposablePerforming}.
    */
-  private PlanEmitter createPlanEmitter(final ComposablePerformance performer) {
+  private PlanEmitter createPlanEmitter(final ComposablePerforming performer) {
     return new PlanEmitter() {
       @Override
       public void emit(Plan plan) {

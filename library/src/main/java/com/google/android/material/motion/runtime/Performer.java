@@ -16,7 +16,7 @@
 
 package com.google.android.material.motion.runtime;
 
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 
 /**
  * A Performer is an object responsible for executing a {@link Plan}.
@@ -31,7 +31,7 @@ import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforma
  * Performer specification</a>
  */
 
-public abstract class Performer implements BasePerformance {
+public abstract class Performer implements BasePerforming {
 
   /**
    * Thrown when there is an instantiation failure. Make sure that your {@link Performer}'s class
@@ -40,7 +40,7 @@ public abstract class Performer implements BasePerformance {
   public static class PerformerInstantiationException extends RuntimeException {
 
     public PerformerInstantiationException(
-      Class<? extends BasePerformance> klass, Exception cause) {
+      Class<? extends BasePerforming> klass, Exception cause) {
       super(
         "Unable to instantiate Performer "
           + klass.getName()

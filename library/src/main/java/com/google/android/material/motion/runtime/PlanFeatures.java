@@ -17,8 +17,8 @@ package com.google.android.material.motion.runtime;
 
 import android.util.JsonReader;
 import android.util.JsonWriter;
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 
 /**
  * Defines the APIs that a {@link Plan} can implement.
@@ -37,7 +37,7 @@ public final class PlanFeatures {
     /**
      * @return The {@link Class} of the {@link Performer} that can fulfill this plan.
      */
-    Class<? extends BasePerformance> getPerformerClass();
+    Class<? extends BasePerforming> getPerformerClass();
 
     BasePlan clone();
   }
@@ -58,10 +58,10 @@ public final class PlanFeatures {
   public interface NamedPlan extends BasePlan {
 
     /**
-     * @return The {@link Class} of the {@link NamedPlanPerformance} that can fulfill this plan.
+     * @return The {@link Class} of the {@link NamedPlanPerforming} that can fulfill this plan.
      */
     @Override
-    Class<? extends NamedPlanPerformance> getPerformerClass();
+    Class<? extends NamedPlanPerforming> getPerformerClass();
   }
 
   /**

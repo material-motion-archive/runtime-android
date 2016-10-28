@@ -141,7 +141,7 @@ object is a coordinating entity whose primary responsibility is to fulfill plans
 performers. You can create many schedulers throughout the lifetime of your application. A good rule
 of thumb is to have one scheduler per interaction or transition.
 
-### Plan + Performance types
+### Plan + Performing types
 
 The [Plan](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Plan.html)
 and [Performer](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.html)
@@ -183,9 +183,9 @@ public class MyPlan {
 
 Performers are responsible for fulfilling plans. Fulfillment is possible in a variety of ways:
 
-- [NamedPlanPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.NamedPlanPerformance.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
-- [ContinuousPerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ContinuousPerformance.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
-- [ComposablePerformance](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ComposablePerformance.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
+- [NamedPlanPerforming](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.NamedPlanPerforming.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
+- [ContinuousPerforming](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ContinuousPerforming.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
+- [ComposablePerforming](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ComposablePerforming.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
 
 See the associated links for more details on each performing type.
 
@@ -211,7 +211,7 @@ Conforming to Plan requires:
 ```java
 public class MyPlan extends Plan {
   @Override
-  public Class<? extends BasePerformance> getPerformerClass() {
+  public Class<? extends BasePerforming> getPerformerClass() {
     return MyPerformer.class;
   }
 
@@ -317,10 +317,10 @@ public class MyPerformer extends Performer {
 A composition performer is able to emit new plans using a plan emitter. This feature enables the
 reuse of plans and the creation of higher-order abstractions.
 
-### Step 1: Conform to ComposablePerformance and store the plan emitter
+### Step 1: Conform to ComposablePerforming and store the plan emitter
 
 ```java
-public class MyPerformer extends Performer implements ComposablePerformance {
+public class MyPerformer extends Performer implements ComposablePerforming {
   // Store the emitter in your class' definition.
   private PlanEmitter emitter;
 
@@ -354,10 +354,10 @@ completed.
 For example, a performer that registers a platform animation might generate a token when the
 animation starts. When the animation completes the token would be terminated.
 
-### Step 1: Conform to ContinuousPerformance and store the token generator
+### Step 1: Conform to ContinuousPerforming and store the token generator
 
 ```java
-public class MyPerformer extends Performer implements ComposablePerformance {
+public class MyPerformer extends Performer implements ComposablePerforming {
   // Store the emitter in your class' definition.
   private IsActiveTokenGenerator tokenGenerator;
 

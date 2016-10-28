@@ -22,9 +22,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
@@ -65,12 +65,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return DemoPerformer1.class;
     }
   }
 
-  public static class DemoPerformer1 extends Performer implements NamedPlanPerformance {
+  public static class DemoPerformer1 extends Performer implements NamedPlanPerforming {
 
     @Override
     public void addPlan(BasePlan plan) {
@@ -99,12 +99,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends BasePerformance> getPerformerClass() {
+    public Class<? extends BasePerforming> getPerformerClass() {
       return DemoPerformer2.class;
     }
   }
 
-  public static class DemoPerformer2 extends Performer implements ContinuousPerformance {
+  public static class DemoPerformer2 extends Performer implements ContinuousPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 

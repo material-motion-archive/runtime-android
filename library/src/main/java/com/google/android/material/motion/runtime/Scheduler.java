@@ -20,6 +20,8 @@ import android.support.annotation.IntDef;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -80,23 +82,23 @@ public final class Scheduler {
   private static final String TAG = "Scheduler";
   /**
    * Flag for detailed state bitmask specifying that the activity originates from a {@link
-   * com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance}.
+   * ManualPerforming}.
    */
   static final int MANUAL_DETAILED_STATE_FLAG = 1 << 0;
   /**
    * Flag for detailed state bitmask specifying that the activity originates from a {@link
-   * com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerformance}.
+   * ContinuousPerforming}.
    */
   static final int CONTINUOUS_DETAILED_STATE_FLAG = 1 << 1;
 
   private final CopyOnWriteArraySet<StateListener> listeners = new CopyOnWriteArraySet<>();
   private final ChoreographerCompat choreographer = ChoreographerCompat.getInstance();
-  private final ManualPerformanceFrameCallback manualPerformanceFrameCallback =
-    new ManualPerformanceFrameCallback();
+  private final ManualPerformingFrameCallback manualPerformingFrameCallback =
+    new ManualPerformingFrameCallback();
 
   private final SimpleArrayMap<Object, TargetScope> targets = new SimpleArrayMap<>();
-  private final Set<TargetScope> activeManualPerformanceTargets = new HashSet<>();
-  private final Set<TargetScope> activeContinuousPerformanceTargets = new HashSet<>();
+  private final Set<TargetScope> activeManualPerformerTargets = new HashSet<>();
+  private final Set<TargetScope> activeContinuousPerformerTargets = new HashSet<>();
 
   /**
    * @return The current {@link State} of this Scheduler.
@@ -114,10 +116,10 @@ public final class Scheduler {
    */
   private int getDetailedState() {
     int state = 0;
-    if (!activeManualPerformanceTargets.isEmpty()) {
+    if (!activeManualPerformerTargets.isEmpty()) {
       state |= MANUAL_DETAILED_STATE_FLAG;
     }
-    if (!activeContinuousPerformanceTargets.isEmpty()) {
+    if (!activeContinuousPerformerTargets.isEmpty()) {
       state |= CONTINUOUS_DETAILED_STATE_FLAG;
     }
     return state;
@@ -197,15 +199,15 @@ public final class Scheduler {
     int oldDetailedState = getDetailedState();
 
     if (isSet(targetDetailedState, MANUAL_DETAILED_STATE_FLAG)) {
-      activeManualPerformanceTargets.add(target);
+      activeManualPerformerTargets.add(target);
     } else {
-      activeManualPerformanceTargets.remove(target);
+      activeManualPerformerTargets.remove(target);
     }
 
     if (isSet(targetDetailedState, CONTINUOUS_DETAILED_STATE_FLAG)) {
-      activeContinuousPerformanceTargets.add(target);
+      activeContinuousPerformerTargets.add(target);
     } else {
-      activeContinuousPerformanceTargets.remove(target);
+      activeContinuousPerformerTargets.remove(target);
     }
 
     int newDetailedState = getDetailedState();
@@ -217,18 +219,18 @@ public final class Scheduler {
   private void onDetailedStateChange(int oldDetailedState, int newDetailedState) {
     if (changed(oldDetailedState, newDetailedState, MANUAL_DETAILED_STATE_FLAG)) {
       if (isSet(newDetailedState, MANUAL_DETAILED_STATE_FLAG)) {
-        Log.d(TAG, "Manual performance TargetScopes now active.");
-        manualPerformanceFrameCallback.start();
+        Log.d(TAG, "Manual performing TargetScopes now active.");
+        manualPerformingFrameCallback.start();
       } else {
-        Log.d(TAG, "Manual performance TargetScopes now idle.");
-        manualPerformanceFrameCallback.stop();
+        Log.d(TAG, "Manual performing TargetScopes now idle.");
+        manualPerformingFrameCallback.stop();
       }
     }
     if (changed(oldDetailedState, newDetailedState, CONTINUOUS_DETAILED_STATE_FLAG)) {
       if (isSet(newDetailedState, CONTINUOUS_DETAILED_STATE_FLAG)) {
-        Log.d(TAG, "Continuous performance TargetScopes now active.");
+        Log.d(TAG, "Continuous performing TargetScopes now active.");
       } else {
-        Log.d(TAG, "Continuous performance TargetScopes now idle.");
+        Log.d(TAG, "Continuous performing TargetScopes now idle.");
       }
     }
 
@@ -263,10 +265,10 @@ public final class Scheduler {
   }
 
   /**
-   * A {@link FrameCallback} that calls {@link com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance#update(float)}
-   * on each frame for every active {@link com.google.android.material.motion.runtime.PerformerFeatures.ManualPerformance}.
+   * A {@link FrameCallback} that calls {@link ManualPerforming#update(float)} on each frame for
+   * every active {@link ManualPerforming manual performer}.
    */
-  private class ManualPerformanceFrameCallback extends FrameCallback {
+  private class ManualPerformingFrameCallback extends FrameCallback {
 
     private double lastTimeMs = 0.0;
 
@@ -281,7 +283,7 @@ public final class Scheduler {
 
     @Override
     public void doFrame(long frameTimeNanos) {
-      for (TargetScope activeTarget : activeManualPerformanceTargets) {
+      for (TargetScope activeTarget : activeManualPerformerTargets) {
         double frameTimeMs = frameTimeNanos / 1000;
         float deltaTimeMs = lastTimeMs == 0.0 ? 0f : (float) (frameTimeMs - lastTimeMs);
 

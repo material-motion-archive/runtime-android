@@ -20,8 +20,8 @@ import static com.google.common.truth.Truth.assertThat;
 import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
-import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerformance;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import org.junit.Before;
@@ -63,7 +63,7 @@ public class ComposablePlanTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerformance> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return ComposablePerformer.class;
     }
   }
@@ -93,7 +93,7 @@ public class ComposablePlanTests {
   }
 
   public static class ComposablePerformer extends Performer implements
-    ComposablePerformance, NamedPlanPerformance {
+    ComposablePerforming, NamedPlanPerforming {
 
     private PlanEmitter planEmitter;
 

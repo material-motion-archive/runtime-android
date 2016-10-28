@@ -31,7 +31,7 @@ public final class PerformerFeatures {
    * Defines the base functionality for {@link Performer}s. You should not have to implement this
    * interface yourself.
    */
-  public interface BasePerformance {
+  public interface BasePerforming {
 
     /**
      * Performers are initialized with a target.
@@ -56,7 +56,7 @@ public final class PerformerFeatures {
    * A Performer can implement this interface in order to support the add and remove for {@link
    * NamedPlan}s APIs.
    */
-  public interface NamedPlanPerformance extends BasePerformance {
+  public interface NamedPlanPerforming extends BasePerforming {
 
     /**
      * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any plan
@@ -86,7 +86,7 @@ public final class PerformerFeatures {
    * IsActiveTokenGenerator#generate() starts} and release the token when the continuous performance
    * {@link IsActiveToken#terminate() ends}.
    */
-  public interface ContinuousPerformance extends BasePerformance {
+  public interface ContinuousPerforming extends BasePerforming {
 
     /**
      * Called by the {@link Scheduler} to supply the {@link Performer} with a {@link
@@ -103,7 +103,7 @@ public final class PerformerFeatures {
        * Generate and return a new is-active token. The receiver of this token is expected to
        * eventually {@link IsActiveToken#terminate()} the token.
        *
-       * Usually called by a {@link ContinuousPerformance} when it starts.
+       * Usually called by a {@link ContinuousPerforming} when it starts.
        */
       IsActiveToken generate();
     }
@@ -127,7 +127,7 @@ public final class PerformerFeatures {
    *
    * <p> The Performer is expected to calculate and set its target's next state on each update.
    */
-  public interface ManualPerformance extends BasePerformance {
+  public interface ManualPerforming extends BasePerforming {
 
     /**
      * Called by the {@link Scheduler} to notify the {@link Performer} of a new frame.
@@ -145,7 +145,7 @@ public final class PerformerFeatures {
    *
    * <p> The Performer should call {@link PlanEmitter#emit(Plan)} to add new plans.
    */
-  public interface ComposablePerformance extends BasePerformance {
+  public interface ComposablePerforming extends BasePerforming {
 
     /**
      * Called by the {@link Scheduler} to supply the {@link Performer} with a {@link PlanEmitter}.
