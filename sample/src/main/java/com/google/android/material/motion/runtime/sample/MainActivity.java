@@ -22,10 +22,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.Performer.ContinuousPerformance;
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.Plan;
-import com.google.android.material.motion.runtime.Scheduler;
-import com.google.android.material.motion.runtime.Transaction;
+import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
+import com.google.android.material.motion.runtime.Runtime;
 
 /**
  * Material Motion Android Runtime sample Activity.
@@ -44,19 +47,16 @@ public class MainActivity extends AppCompatActivity {
     text1.setText("");
     text2.setAlpha(0f);
 
-    Scheduler scheduler = new Scheduler();
-    Transaction transaction = new Transaction();
+    Runtime runtime = new Runtime();
 
-    transaction.addNamedPlan(new DemoPlan1("trash"), "cd", text1);
-    transaction.addPlan(new DemoPlan1("get"), text1);
-    transaction.addNamedPlan(new DemoPlan1("real"), "cd", text1);
+    runtime.addNamedPlan(new DemoPlan1("trash"), "cd", text1);
+    runtime.addPlan(new DemoPlan1("get"), text1);
+    runtime.addNamedPlan(new DemoPlan1("real"), "cd", text1);
 
-    transaction.addPlan(new DemoPlan2(.5f), text2);
-
-    scheduler.commitTransaction(transaction);
+    runtime.addPlan(new DemoPlan2(.5f), text2);
   }
 
-  private static class DemoPlan1 extends Plan {
+  private static class DemoPlan1 extends Plan implements NamedPlan {
 
     private final String text;
 
@@ -65,23 +65,33 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return DemoPerformer1.class;
     }
   }
 
-  public static class DemoPerformer1 extends Performer {
+  public static class DemoPerformer1 extends Performer implements NamedPlanPerforming {
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       DemoPlan1 demoPlan = (DemoPlan1) plan;
       TextView target = getTarget();
 
       target.setText(target.getText() + " " + demoPlan.text);
     }
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      addPlan(plan);
+    }
+
+    @Override
+    public void removePlan(String name) {
+    }
   }
 
   private static class DemoPlan2 extends Plan {
+
     private final float alpha;
 
     private DemoPlan2(float alpha) {
@@ -89,12 +99,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends BasePerforming> getPerformerClass() {
       return DemoPerformer2.class;
     }
   }
 
-  public static class DemoPerformer2 extends Performer implements  ContinuousPerformance {
+  public static class DemoPerformer2 extends Performer implements ContinuousPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
@@ -104,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       DemoPlan2 demoPlan = (DemoPlan2) plan;
       View target = getTarget();
 

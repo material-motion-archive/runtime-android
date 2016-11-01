@@ -16,68 +16,104 @@
 
 package com.google.android.material.motion.runtime;
 
-import static com.google.android.material.motion.runtime.Scheduler.CONTINUOUS_DETAILED_STATE_FLAG;
-import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAILED_STATE_FLAG;
+import static com.google.android.material.motion.runtime.Runtime.CONTINUOUS_DETAILED_STATE_FLAG;
+import static com.google.android.material.motion.runtime.Runtime.MANUAL_DETAILED_STATE_FLAG;
 
 import android.support.v4.util.SimpleArrayMap;
-import com.google.android.material.motion.runtime.Performer.ComposablePerformance;
-import com.google.android.material.motion.runtime.Performer.ComposablePerformance.TransactionEmitter;
-import com.google.android.material.motion.runtime.Performer.ContinuousPerformance;
-import com.google.android.material.motion.runtime.Performer.ContinuousPerformance.IsActiveToken;
-import com.google.android.material.motion.runtime.Performer.ContinuousPerformance.IsActiveTokenGenerator;
-import com.google.android.material.motion.runtime.Performer.ManualPerformance;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
-import com.google.android.material.motion.runtime.Scheduler.State;
-import com.google.android.material.motion.runtime.Transaction.PlanInfo;
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming.PlanEmitter;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveToken;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveTokenGenerator;
+import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
+import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
+import com.google.android.material.motion.runtime.Runtime.State;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A helper class for {@link Scheduler} that scopes {@link Performer} instances by target.
+ * A helper class for {@link Runtime} that scopes {@link Performer} instances by target.
  *
  * <p> Ensures only a single instance of Performer is created for each type of Performer required by
  * a target.
  */
 class TargetScope {
 
-  private final SimpleArrayMap<Class<? extends Performer>, Performer> cache =
+  private final SimpleArrayMap<Class<? extends BasePerforming>, BasePerforming> cache =
     new SimpleArrayMap<>();
+  private final SimpleArrayMap<String, NamedPlanPerforming> namedCache = new SimpleArrayMap<>();
 
-  private final Set<ManualPerformance> activeManualPerformances = new HashSet<>();
+  private final Set<ManualPerforming> activeManualPerformers = new HashSet<>();
 
-  private final SimpleArrayMap<ContinuousPerformance, Set<IsActiveToken>>
-    activeContinuousPerformances = new SimpleArrayMap<>();
+  private final SimpleArrayMap<ContinuousPerforming, Set<IsActiveToken>>
+    activeContinuousPerformers = new SimpleArrayMap<>();
 
+  @Deprecated
   private final Scheduler scheduler;
+  private final Runtime runtime;
 
   TargetScope(Scheduler scheduler) {
     this.scheduler = scheduler;
+    this.runtime = null;
+  }
+  TargetScope(Runtime runtime) {
+    this.scheduler = null;
+    this.runtime = runtime;
   }
 
-  void commitPlan(PlanInfo plan) {
-    Performer performer = getPerformer(plan);
+  void commitPlan(BasePlan plan, Object target) {
+    BasePerforming performer = commitPlanInternal(plan, target);
+    performer.addPlan(plan);
+  }
 
-    if (performer instanceof ManualPerformance) {
-      activeManualPerformances.add((ManualPerformance) performer);
+  void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
+    // remove first
+    commitRemoveNamedPlan(name);
+
+    // then add
+    NamedPlanPerforming performer = commitPlanInternal(plan, target);
+    performer.addPlan(plan, name);
+    namedCache.put(name, performer);
+  }
+
+  private <T extends BasePerforming> T commitPlanInternal(BasePlan plan, Object target) {
+    BasePerforming performer = getPerformer(plan, target);
+
+    if (performer instanceof ManualPerforming) {
+      activeManualPerformers.add((ManualPerforming) performer);
       notifyTargetStateChanged();
     }
 
-    if (performer instanceof ComposablePerformance) {
-      ((ComposablePerformance) performer).setTransactionEmitter(transactionEmitter);
+    if (performer instanceof ComposablePerforming) {
+      ComposablePerforming composablePerformer = (ComposablePerforming) performer;
+      composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
     }
 
-    performer.addPlan(plan.plan);
+    //noinspection unchecked
+    return (T) performer;
+  }
+
+  void commitRemoveNamedPlan(String name) {
+    NamedPlanPerforming performer = namedCache.get(name);
+    if (performer != null) {
+      performer.removePlan(name);
+    }
+    namedCache.remove(name);
   }
 
   void update(float deltaTimeMs) {
-    Iterator<ManualPerformance> iterator = activeManualPerformances.iterator();
+    Iterator<ManualPerforming> iterator = activeManualPerformers.iterator();
 
     boolean changed = false;
     while (iterator.hasNext()) {
-      ManualPerformance performer = iterator.next();
+      ManualPerforming performer = iterator.next();
       @State int state = performer.update(deltaTimeMs);
-      if (state == Scheduler.IDLE) {
+      if (state == Runtime.IDLE) {
         iterator.remove();
         changed = true;
       }
@@ -89,43 +125,48 @@ class TargetScope {
   }
 
   private void notifyTargetStateChanged() {
-    scheduler.setTargetState(this, getDetailedState());
+    if (scheduler != null) {
+      scheduler.setTargetState(this, getDetailedState());
+    }
+    if (runtime != null) {
+      runtime.setTargetState(this, getDetailedState());
+    }
   }
 
   private int getDetailedState() {
     int state = 0;
-    if (!activeManualPerformances.isEmpty()) {
+    if (!activeManualPerformers.isEmpty()) {
       state |= MANUAL_DETAILED_STATE_FLAG;
     }
-    if (!activeContinuousPerformances.isEmpty()) {
+    if (!activeContinuousPerformers.isEmpty()) {
       state |= CONTINUOUS_DETAILED_STATE_FLAG;
     }
     return state;
   }
 
-  private Performer getPerformer(PlanInfo plan) {
-    Class<? extends Performer> performerClass = plan.plan.getPerformerClass();
-    Performer performer = cache.get(performerClass);
+  private BasePerforming getPerformer(BasePlan plan, Object target) {
+    Class<? extends BasePerforming> performerClass = plan.getPerformerClass();
+    BasePerforming performer = cache.get(performerClass);
 
     if (performer == null) {
-      performer = createPerformer(plan);
+      performer = createPerformer(plan, target);
       cache.put(performerClass, performer);
     }
 
     return performer;
   }
 
-  private Performer createPerformer(PlanInfo plan) {
-    Class<? extends Performer> performerClass = plan.plan.getPerformerClass();
+  private BasePerforming createPerformer(BasePlan plan, Object target) {
+    Class<? extends BasePerforming> performerClass = plan.getPerformerClass();
 
     try {
-      Performer performer = performerClass.newInstance();
-      performer.initialize(plan.target);
+      BasePerforming performer = performerClass.newInstance();
+      performer.initialize(target);
 
-      if (performer instanceof ContinuousPerformance) {
-        ContinuousPerformance continuousPerformance = (ContinuousPerformance) performer;
-        continuousPerformance
-          .setIsActiveTokenGenerator(createIsActiveTokenGenerator(continuousPerformance));
+      if (performer instanceof ContinuousPerforming) {
+        ContinuousPerforming continuousPerformer = (ContinuousPerforming) performer;
+        continuousPerformer
+          .setIsActiveTokenGenerator(createIsActiveTokenGenerator(continuousPerformer));
       }
 
       if (performer.getClass() != performerClass) {
@@ -142,20 +183,21 @@ class TargetScope {
   }
 
   /**
-   * Creates a {@link IsActiveTokenGenerator} to be assigned to the given
-   * {@link ContinuousPerformance}.
+   * Creates a {@link IsActiveTokenGenerator} to be assigned to the given {@link
+   * ContinuousPerforming}.
    */
-  private IsActiveTokenGenerator createIsActiveTokenGenerator(final ContinuousPerformance performer) {
+  private IsActiveTokenGenerator createIsActiveTokenGenerator(
+    final ContinuousPerforming performer) {
     return new IsActiveTokenGenerator() {
       @Override
       public IsActiveToken generate() {
         final Set<IsActiveToken> tokens;
 
-        if (activeContinuousPerformances.containsKey(performer)) {
-          tokens = activeContinuousPerformances.get(performer);
+        if (activeContinuousPerformers.containsKey(performer)) {
+          tokens = activeContinuousPerformers.get(performer);
         } else {
           tokens = new HashSet<>();
-          activeContinuousPerformances.put(performer, tokens);
+          activeContinuousPerformers.put(performer, tokens);
         }
 
         IsActiveToken token = new IsActiveToken() {
@@ -167,7 +209,7 @@ class TargetScope {
             }
 
             if (tokens.isEmpty()) {
-              activeContinuousPerformances.remove(performer);
+              activeContinuousPerformers.remove(performer);
             }
             notifyTargetStateChanged();
           }
@@ -180,10 +222,20 @@ class TargetScope {
     };
   }
 
-  private final TransactionEmitter transactionEmitter = new TransactionEmitter() {
-    @Override
-    public void emit(Transaction transaction) {
-      scheduler.commitTransaction(transaction);
-    }
-  };
+  /**
+   * Creates a {@link PlanEmitter} to be assigned to the given {@link ComposablePerforming}.
+   */
+  private PlanEmitter createPlanEmitter(final ComposablePerforming performer) {
+    return new PlanEmitter() {
+      @Override
+      public void emit(Plan plan) {
+        if (scheduler != null) {
+          scheduler.addPlan(plan, performer.getTarget());
+        }
+        if (runtime != null) {
+          runtime.addPlan(plan, performer.getTarget());
+        }
+      }
+    };
+  }
 }

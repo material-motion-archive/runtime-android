@@ -20,6 +20,10 @@ import static com.google.common.truth.Truth.assertThat;
 import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
+import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
+import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
+import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,29 +35,26 @@ import org.robolectric.annotation.Config;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class ComposablePlanTests {
 
-  private Scheduler scheduler;
+  private Runtime runtime;
   private TextView textView;
-  private Transaction transaction;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
-    scheduler = new Scheduler();
+    runtime = new Runtime();
     textView = new TextView(context);
-    transaction = new Transaction();
   }
 
   @Test
   public void testComposablePlan() {
     // add the root plan and have it delegate to the leaf plan
     RootPlan rootPlan = new RootPlan("rootPlan");
-    transaction.addNamedPlan(rootPlan, "rootPlan", textView);
-    scheduler.commitTransaction(transaction);
+    runtime.addNamedPlan(rootPlan, "rootPlan", textView);
 
     assertThat(textView.getText()).isEqualTo("leafPlan");
   }
 
-  private class RootPlan extends Plan {
+  private class RootPlan extends Plan implements NamedPlan {
 
     private String text;
 
@@ -62,7 +63,7 @@ public class ComposablePlanTests {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return ComposablePerformer.class;
     }
   }
@@ -84,7 +85,7 @@ public class ComposablePlanTests {
   public static class LeafPerformer extends Performer {
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       LeafPlan leafPlan = (LeafPlan) plan;
       TextView target = getTarget();
       target.setText(leafPlan.text);
@@ -92,23 +93,28 @@ public class ComposablePlanTests {
   }
 
   public static class ComposablePerformer extends Performer implements
-    Performer.ComposablePerformance {
+    ComposablePerforming, NamedPlanPerforming {
 
-    private TransactionEmitter transactionEmitter;
+    private PlanEmitter planEmitter;
 
-    @Override
-    public void setTransactionEmitter(TransactionEmitter transactionEmitter) {
-      this.transactionEmitter = transactionEmitter;
+    public void setPlanEmitter(PlanEmitter planEmitter) {
+      this.planEmitter = planEmitter;
     }
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(BasePlan plan) {
       // immediately delegate the actual work of changing the text view to the leaf plan
-      Transaction transaction = new Transaction();
-      LeafPlan leafPlan = new LeafPlan("leafPlan");
-      transaction.addNamedPlan(leafPlan, "leafPlan", getTarget());
+      planEmitter.emit(new LeafPlan("leafPlan"));
+    }
 
-      transactionEmitter.emit(transaction);
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      addPlan(plan);
+    }
+
+    @Override
+    public void removePlan(String name) {
+
     }
   }
 }
