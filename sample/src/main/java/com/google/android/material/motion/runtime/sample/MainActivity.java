@@ -28,7 +28,7 @@ import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPer
 import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Scheduler;
+import com.google.android.material.motion.runtime.Runtime;
 
 /**
  * Material Motion Android Runtime sample Activity.
@@ -47,13 +47,13 @@ public class MainActivity extends AppCompatActivity {
     text1.setText("");
     text2.setAlpha(0f);
 
-    Scheduler scheduler = new Scheduler();
+    Runtime runtime = new Runtime();
 
-    scheduler.addNamedPlan(new DemoPlan1("trash"), "cd", text1);
-    scheduler.addPlan(new DemoPlan1("get"), text1);
-    scheduler.addNamedPlan(new DemoPlan1("real"), "cd", text1);
+    runtime.addNamedPlan(new DemoPlan1("trash"), "cd", text1);
+    runtime.addPlan(new DemoPlan1("get"), text1);
+    runtime.addNamedPlan(new DemoPlan1("real"), "cd", text1);
 
-    scheduler.addPlan(new DemoPlan2(.5f), text2);
+    runtime.addPlan(new DemoPlan2(.5f), text2);
   }
 
   private static class DemoPlan1 extends Plan implements NamedPlan {

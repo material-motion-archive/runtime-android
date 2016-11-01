@@ -11,7 +11,7 @@ This library does not do much on its own. What it does do, however, is enable th
 motion as discrete units of data that can be introspected, composed, and sent over a wire.
 
 This library encourages you to describe motion as data, or what we call *plans*. Plans are committed
-to a *scheduler*. A scheduler coordinates the creation of *performers*, objects responsible for
+to the *runtime*. The runtime coordinates the creation of *performers*, objects responsible for
 translating plans into concrete execution.
 
 Learn more about the APIs defined in the library by reading our
@@ -122,8 +122,8 @@ To run all unit tests, run the following commands:
 
 1. [Architecture](#architecture)
 1. [How to define a new plan and performer type](#how-to-create-a-new-plan-and-performer-type)
-1. [How to commit a plan to a scheduler](#how-to-commit-a-plan-to-a-scheduler)
-1. [How to commit a named plan to a scheduler](#how-to-commit-a-named-plan-to-a-scheduler)
+1. [How to commit a plan to the runtime](#how-to-commit-a-plan-to-the-runtime)
+1. [How to commit a named plan to the runtime](#how-to-commit-a-named-plan-to-the-runtime)
 1. [How to configure performers with plans](#how-to-configure-performers-with-plans)
 1. [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
 1. [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
@@ -131,15 +131,15 @@ To run all unit tests, run the following commands:
 
 ## Architecture
 
-The Material Motion Runtime consists of two groups of APIs: a scheduler object and a
+The Material Motion Runtime consists of two groups of APIs: a runtime object and a
 constellation of protocols loosely consisting of plan and performing types.
 
-### Scheduler
+### Runtime
 
-The Scheduler](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Scheduler.html)
+The Runtime](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Runtime.html)
 object is a coordinating entity whose primary responsibility is to fulfill plans by creating
-performers. You can create many schedulers throughout the lifetime of your application. A good rule
-of thumb is to have one scheduler per interaction or transition.
+performers. You can create many runtimes throughout the lifetime of your application. A good rule
+of thumb is to have one runtime per interaction or transition.
 
 ### Plan + Performing types
 
@@ -223,13 +223,13 @@ public class MyPlan extends Plan {
 }
 ```
 
-## How to commit a plan to a scheduler
+## How to commit a plan to the runtime
 
-### Step 1: Create and store a reference to a scheduler instance
+### Step 1: Create and store a reference to a runtime instance
 
 ```java
 public class MyActivity extends Activity {
-  private final Scheduler scheduler = new Scheduler();
+  private final Runtime runtime = new Runtime();
 }
 ```
 
@@ -239,16 +239,16 @@ public class MyActivity extends Activity {
 Plan plan;
 View target;
 
-scheduler.addPlan(plan, target);
+runtime.addPlan(plan, target);
 ```
 
-## How to commit a named plan to a scheduler
+## How to commit a named plan to the runtime
 
-### Step 1: Create and store a reference to a scheduler instance
+### Step 1: Create and store a reference to a runtime instance
 
 ```java
 public class MyActivity extends Activity {
-  private final Scheduler scheduler = new Scheduler();
+  private final Runtime runtime = new Runtime();
 }
 ```
 
@@ -259,7 +259,7 @@ NamedPlan plan;
 String name;
 View target;
 
-scheduler.addNamedPlan(plan, name, target);
+runtime.addNamedPlan(plan, name, target);
 ```
 
 ## How to configure performers with plans
@@ -346,8 +346,8 @@ emitter.emit(plan);
 Performers will often perform their actions over a period of time or while an interaction is
 active. These types of performers are called continuous performers.
 
-A continuous performer is able to affect the active state of the scheduler by generating is-active
-tokens. The scheduler is considered active so long as an is-active token exists and has not been
+A continuous performer is able to affect the active state of the runtime by generating is-active
+tokens. The runtime is considered active so long as an is-active token exists and has not been
 terminated. Continuous performers are expected to terminate a token when its corresponding work has
 completed.
 

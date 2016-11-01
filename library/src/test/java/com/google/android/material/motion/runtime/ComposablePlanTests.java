@@ -35,13 +35,13 @@ import org.robolectric.annotation.Config;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class ComposablePlanTests {
 
-  private Scheduler scheduler;
+  private Runtime runtime;
   private TextView textView;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
-    scheduler = new Scheduler();
+    runtime = new Runtime();
     textView = new TextView(context);
   }
 
@@ -49,7 +49,7 @@ public class ComposablePlanTests {
   public void testComposablePlan() {
     // add the root plan and have it delegate to the leaf plan
     RootPlan rootPlan = new RootPlan("rootPlan");
-    scheduler.addNamedPlan(rootPlan, "rootPlan", textView);
+    runtime.addNamedPlan(rootPlan, "rootPlan", textView);
 
     assertThat(textView.getText()).isEqualTo("leafPlan");
   }

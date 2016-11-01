@@ -25,6 +25,7 @@ import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerfor
 import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
+import com.google.android.material.motion.runtime.Runtime.State;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -36,135 +37,135 @@ import org.robolectric.annotation.Config;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
-public class SchedulerTests {
+public class RuntimeTests {
 
-  private Scheduler scheduler;
+  private Runtime runtime;
   private TextView textView;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
-    scheduler = new Scheduler();
+    runtime = new Runtime();
     textView = new TextView(context);
   }
 
   @Test
-  public void testInitialSchedulerState() {
-    assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
+  public void testInitialRuntimeState() {
+    assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
   }
 
   @Test
-  public void testStandardPerformerSchedulerState() {
-    scheduler.addNamedPlan(new StandardPlan("standard"), "plan", textView);
+  public void testStandardPerformerRuntimeState() {
+    runtime.addNamedPlan(new StandardPlan("standard"), "plan", textView);
 
-    assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
+    assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
   }
 
   @Test
-  public void testManualPerformerSchedulerState() {
-    scheduler.addNamedPlan(new ManualPlan("manual"), "plan", textView);
+  public void testManualPerformerRuntimeState() {
+    runtime.addNamedPlan(new ManualPlan("manual"), "plan", textView);
 
-    assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
   }
 
   @Test
-  public void testAddingMultipleSchedulerListeners() {
-    TestSchedulerListener firstListener = new TestSchedulerListener();
-    TestSchedulerListener secondListener = new TestSchedulerListener();
-    scheduler.addStateListener(firstListener);
-    scheduler.addStateListener(secondListener);
+  public void testAddingMultipleRuntimeListeners() {
+    TestRuntimeListener firstListener = new TestRuntimeListener();
+    TestRuntimeListener secondListener = new TestRuntimeListener();
+    runtime.addStateListener(firstListener);
+    runtime.addStateListener(secondListener);
 
-    scheduler.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
-    scheduler.addPlan(new StandardPlan("standard one"), textView);
+    runtime.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
+    runtime.addPlan(new StandardPlan("standard one"), textView);
 
-    assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
-    assertThat(secondListener.getState()).isEqualTo(Scheduler.ACTIVE);
+    assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(Runtime.ACTIVE);
   }
 
   @Test
-  public void testAddOrderedMultipleSchedulerListeners() {
-    TestSchedulerListener firstListener = new TestSchedulerListener();
-    TestSchedulerListener secondListener = new TestSchedulerListener();
-    scheduler.addStateListener(firstListener);
-    scheduler.addStateListener(secondListener);
+  public void testAddOrderedMultipleRuntimeListeners() {
+    TestRuntimeListener firstListener = new TestRuntimeListener();
+    TestRuntimeListener secondListener = new TestRuntimeListener();
+    runtime.addStateListener(firstListener);
+    runtime.addStateListener(secondListener);
 
-    scheduler.addPlan(new StandardPlan("standard one"), textView);
-    scheduler.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
+    runtime.addPlan(new StandardPlan("standard one"), textView);
+    runtime.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
 
-    assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
-    assertThat(secondListener.getState()).isEqualTo(Scheduler.ACTIVE);
+    assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(Runtime.ACTIVE);
   }
 
   @Test
-  public void testRemovingSchedulerListeners() {
-    TestSchedulerListener firstListener = new TestSchedulerListener();
-    TestSchedulerListener secondListener = new TestSchedulerListener();
-    scheduler.addStateListener(firstListener);
+  public void testRemovingRuntimeListeners() {
+    TestRuntimeListener firstListener = new TestRuntimeListener();
+    TestRuntimeListener secondListener = new TestRuntimeListener();
+    runtime.addStateListener(firstListener);
 
-    scheduler.addStateListener(secondListener);
-    scheduler.removeStateListener(secondListener);
+    runtime.addStateListener(secondListener);
+    runtime.removeStateListener(secondListener);
 
-    scheduler.addNamedPlan(new ManualPlan("manual"), "plan", textView);
+    runtime.addNamedPlan(new ManualPlan("manual"), "plan", textView);
 
-    assertThat(firstListener.getState()).isEqualTo(Scheduler.ACTIVE);
-    assertThat(secondListener.getState()).isEqualTo(Scheduler.IDLE);
+    assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(Runtime.IDLE);
   }
 
   @Test
-  public void testNeverEndingDelegatePerformingSchedulerState() {
-    scheduler.addNamedPlan(new NeverEndingContinuousPlan("continuous"), "plan", textView);
+  public void testNeverEndingDelegatePerformingRuntimeState() {
+    runtime.addNamedPlan(new NeverEndingContinuousPlan("continuous"), "plan", textView);
 
-    assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
   }
 
   @Test
-  public void testEndingContinuousPerformingSchedulerState() {
-    scheduler.addNamedPlan(new EndingContinuousPlan("continuous"), "plan", textView);
+  public void testEndingContinuousPerformingRuntimeState() {
+    runtime.addNamedPlan(new EndingContinuousPlan("continuous"), "plan", textView);
 
-    assertThat(scheduler.getState()).isEqualTo(Scheduler.IDLE);
+    assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
   }
 
   @Test
-  public void testAddingPlanDirectlyToScheduler() {
-    scheduler.addPlan(new NeverEndingContinuousPlan("continuous"), textView);
+  public void testAddingPlanDirectlyToRuntime() {
+    runtime.addPlan(new NeverEndingContinuousPlan("continuous"), textView);
 
-    assertThat(scheduler.getState()).isEqualTo(Scheduler.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
   }
 
   @Test
-  public void testAddingStandardPlanDirectlyToScheduler() {
-    scheduler.addPlan(new StandardPlan("standard"), textView);
+  public void testAddingStandardPlanDirectlyToRuntime() {
+    runtime.addPlan(new StandardPlan("standard"), textView);
 
     assertThat(textView.getText()).isEqualTo(" standard");
   }
 
   @Test
   public void testAddingNamedPlan() {
-    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
+    runtime.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
 
     assertThat(textView.getText()).isEqualTo(" addPlanInvoked");
   }
 
   @Test
   public void testAddAndRemoveTheSameNamedPlan() {
-    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "name_one", textView);
-    scheduler.removeNamedPlan("name_one", textView);
+    runtime.addNamedPlan(new NamedTargetAlteringPlan(), "name_one", textView);
+    runtime.removeNamedPlan("name_one", textView);
 
     assertThat(textView.getText()).isEqualTo(" addPlanInvoked removePlanInvoked");
   }
 
   @Test
   public void testRemoveNamedPlanThatWasNeverAdded() {
-    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
-    scheduler.removeNamedPlan("this_was_never_added", textView);
+    runtime.addNamedPlan(new NamedTargetAlteringPlan(), "common_name", textView);
+    runtime.removeNamedPlan("this_was_never_added", textView);
 
     assertThat(textView.getText()).isEqualTo(" addPlanInvoked");
   }
 
   @Test
   public void testNamedPlansMakeMultipleAddCalls() {
-    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "one", textView);
-    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "two", textView);
+    runtime.addNamedPlan(new NamedTargetAlteringPlan(), "one", textView);
+    runtime.addNamedPlan(new NamedTargetAlteringPlan(), "two", textView);
 
     assertThat(textView.getText()).isEqualTo(" addPlanInvoked addPlanInvoked");
   }
@@ -173,9 +174,9 @@ public class SchedulerTests {
   public void testAddAndRemoveCallbacksAreInvoked() {
     NamedTargetAlteringPlan plan1 = new NamedTargetAlteringPlan();
     NamedTargetAlteringPlan plan2 = new NamedTargetAlteringPlan();
-    Scheduler scheduler = new Scheduler();
-    scheduler.addNamedPlan(plan1, "common_name", textView);
-    scheduler.addNamedPlan(plan2, "common_name", textView);
+    Runtime runtime = new Runtime();
+    runtime.addNamedPlan(plan1, "common_name", textView);
+    runtime.addNamedPlan(plan2, "common_name", textView);
 
     assertThat(textView.getText()).isEqualTo(" addPlanInvoked removePlanInvoked addPlanInvoked");
   }
@@ -186,8 +187,8 @@ public class SchedulerTests {
     NamedCounterAlteringPlan planA = new NamedCounterAlteringPlan();
     NamedCounterAlteringPlan planB = new NamedCounterAlteringPlan();
 
-    scheduler.addNamedPlan(planA, "one", incrementerTarget);
-    scheduler.addNamedPlan(planB, "one", incrementerTarget);
+    runtime.addNamedPlan(planA, "one", incrementerTarget);
+    runtime.addNamedPlan(planB, "one", incrementerTarget);
 
     assertThat(incrementerTarget.addCounter).isEqualTo(2);
     assertThat(incrementerTarget.removeCounter).isEqualTo(1);
@@ -196,8 +197,8 @@ public class SchedulerTests {
   @Test
   public void testAddingTheSameNamedPlanToTheSameTarget() {
     IncrementerTarget incrementerTarget = new IncrementerTarget();
-    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
-    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
+    runtime.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
+    runtime.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
 
     assertThat(incrementerTarget.addCounter).isEqualTo(2);
     assertThat(incrementerTarget.removeCounter).isEqualTo(1);
@@ -206,10 +207,10 @@ public class SchedulerTests {
   @Test
   public void testAddingSimilarNamesToTheSameTarget() {
     IncrementerTarget incrementerTarget = new IncrementerTarget();
-    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
-    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "One", incrementerTarget);
-    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "1", incrementerTarget);
-    scheduler.addNamedPlan(new NamedCounterAlteringPlan(), "ONE", incrementerTarget);
+    runtime.addNamedPlan(new NamedCounterAlteringPlan(), "one", incrementerTarget);
+    runtime.addNamedPlan(new NamedCounterAlteringPlan(), "One", incrementerTarget);
+    runtime.addNamedPlan(new NamedCounterAlteringPlan(), "1", incrementerTarget);
+    runtime.addNamedPlan(new NamedCounterAlteringPlan(), "ONE", incrementerTarget);
 
     assertThat(incrementerTarget.addCounter).isEqualTo(4);
     assertThat(incrementerTarget.removeCounter).isEqualTo(0);
@@ -221,8 +222,8 @@ public class SchedulerTests {
     IncrementerTarget secondIncrementerTarget = new IncrementerTarget();
     NamedCounterAlteringPlan plan = new NamedCounterAlteringPlan();
 
-    scheduler.addNamedPlan(plan, "one", firstIncrementerTarget);
-    scheduler.addNamedPlan(plan, "one", secondIncrementerTarget);
+    runtime.addNamedPlan(plan, "one", firstIncrementerTarget);
+    runtime.addNamedPlan(plan, "one", secondIncrementerTarget);
 
     assertThat(firstIncrementerTarget.addCounter).isEqualTo(1);
     assertThat(firstIncrementerTarget.removeCounter).isEqualTo(0);
@@ -232,14 +233,14 @@ public class SchedulerTests {
 
   @Test
   public void testNamedPlanOnlyInvokesNamedPlanCallbacks() {
-    scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "one", textView);
+    runtime.addNamedPlan(new NamedTargetAlteringPlan(), "one", textView);
 
     assertThat(textView.getText().toString().contains("regularAddPlanInvoked"));
   }
 
   @Test
   public void testPlanOnlyInvokedPlanCallbacks() {
-    scheduler.addPlan(new RegularPlanTargetAlteringPlan(), textView);
+    runtime.addPlan(new RegularPlanTargetAlteringPlan(), textView);
 
     assertThat(!textView.getText().toString().contains("addPlanInvoked"));
     assertThat(textView.getText().toString().contains("regularAddPlanInvoked"));
@@ -249,7 +250,7 @@ public class SchedulerTests {
   public void testPlanStorageExample() {
     StorageNamedPlan plan = new StorageNamedPlan();
     List<String> list = new ArrayList<>();
-    scheduler.addNamedPlan(plan, "one", list);
+    runtime.addNamedPlan(plan, "one", list);
 
     assertThat(list.size()).isEqualTo(1);
     assertThat(list.get(0)).isEqualTo("one");
@@ -258,7 +259,7 @@ public class SchedulerTests {
   @Test
   public void testPlanStorageRemoveNamedPlanExample() {
     List<NamedPlan> list = new ArrayList<NamedPlan>();
-    scheduler.removeNamedPlan("never_added", list);
+    runtime.removeNamedPlan("never_added", list);
 
     assertThat(list.size() == 0);
   }
@@ -267,7 +268,7 @@ public class SchedulerTests {
   public void testExceptionThrownWhenAddingANamedPlanWithoutAName() {
     boolean errorThrown = false;
     try {
-      scheduler.addNamedPlan(new NamedTargetAlteringPlan(), null, textView);
+      runtime.addNamedPlan(new NamedTargetAlteringPlan(), null, textView);
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
@@ -278,7 +279,7 @@ public class SchedulerTests {
   public void testExceptionThrownWhenAddingANamedPlanWithAnEmptyName() {
     boolean errorThrown = false;
     try {
-      scheduler.addNamedPlan(new NamedTargetAlteringPlan(), "", textView);
+      runtime.addNamedPlan(new NamedTargetAlteringPlan(), "", textView);
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
@@ -289,7 +290,7 @@ public class SchedulerTests {
   public void testExceptionThrownWhenRemovingANamedPlanWithoutAName() {
     boolean errorThrown = false;
     try {
-      scheduler.removeNamedPlan(null, textView);
+      runtime.removeNamedPlan(null, textView);
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
@@ -300,7 +301,7 @@ public class SchedulerTests {
   public void testExceptionThrownWhenRemovingANamedPlanWithAnEmptyName() {
     boolean errorThrown = false;
     try {
-      scheduler.removeNamedPlan("", textView);
+      runtime.removeNamedPlan("", textView);
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
@@ -486,7 +487,7 @@ public class SchedulerTests {
 
     @Override
     public int update(float deltaTimeMs) {
-      return Scheduler.ACTIVE;
+      return Runtime.ACTIVE;
     }
 
     @Override
@@ -556,12 +557,12 @@ public class SchedulerTests {
     }
   }
 
-  public static class TestSchedulerListener implements Scheduler.StateListener {
+  public static class TestRuntimeListener implements Runtime.StateListener {
 
     private int state;
 
     @Override
-    public void onStateChange(Scheduler scheduler, @Scheduler.State int newState) {
+    public void onStateChange(Runtime runtime, @State int newState) {
       this.state = newState;
     }
 

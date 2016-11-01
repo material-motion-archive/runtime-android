@@ -30,38 +30,36 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
- * A Scheduler accepts {@link Plan Plans} and creates {@link Performer Performers}. The Scheduler
- * generates relevant events for Performers and {@link StateListener listeners} and monitors {@link
- * State}.
+ * The Material Motion runtime accepts {@link Plan Plans} and creates {@link Performer Performers}.
+ * The runtime generates relevant events for Performers and {@link StateListener listeners} and
+ * monitors {@link State}.
  *
- * <p> Commit Plans to this Scheduler by calling {@link #addPlan(Plan, Object)}. A Scheduler ensures
- * that only one {@link Performer} instance is created for each type of Performer required by a
- * target. This allows multiple {@link Plan Plans} to affect a single Performer instance. The
- * Performers can then maintain state across multiple Plans.
+ * <p> Commit Plans to the runtime by calling {@link #addPlan(Plan, Object)}. A runtime ensures that
+ * only one {@link Performer} instance is created for each type of Performer required by a target.
+ * This allows multiple {@link Plan Plans} to affect a single Performer instance. The Performers can
+ * then maintain state across multiple Plans.
  *
- * <p> Query the State of this Scheduler by calling {@link #getState()}. A Scheduler is active if
- * any of its Performers are active. To listen for state changes, attach listeners via {@link
+ * <p> Query the State of the runtime by calling {@link #getState()}. The runtime is active if any
+ * of its Performers are active. To listen for state changes, attach listeners via {@link
  * #addStateListener(StateListener)}.
  *
- * <p> This Scheduler correctly handles all the interfaces defined in {@link Performer}.
+ * <p> The runtime correctly handles all the interfaces defined in {@link PlanFeatures} and {@link
+ * PerformerFeatures}.
  *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/runtime.html">The
- * Scheduler specification</a>
- *
- * @deprecated 3.0.0 Use {@link Runtime}
+ * runtime specification</a>
  */
-@Deprecated
-public final class Scheduler {
+public final class Runtime {
 
   /**
-   * A listener that receives callbacks when the {@link Scheduler}'s {@link State} changes.
+   * A listener that receives callbacks when the {@link Runtime}'s {@link State} changes.
    */
   public interface StateListener {
 
     /**
-     * Notifies the {@link State} change of the {@link Scheduler}.
+     * Notifies the {@link State} change of the {@link Runtime}.
      */
-    void onStateChange(Scheduler scheduler, @State int newState);
+    void onStateChange(Runtime runtime, @State int newState);
   }
 
   /**
@@ -74,7 +72,7 @@ public final class Scheduler {
   public static final int ACTIVE = 1;
 
   /**
-   * The state of a {@link Scheduler}.
+   * The state of a {@link Runtime}.
    */
   @IntDef({IDLE, ACTIVE})
   @Retention(RetentionPolicy.SOURCE)
@@ -82,7 +80,7 @@ public final class Scheduler {
 
   }
 
-  private static final String TAG = "Scheduler";
+  private static final String TAG = "Runtime";
   /**
    * Flag for detailed state bitmask specifying that the activity originates from a {@link
    * ManualPerforming}.
@@ -104,7 +102,7 @@ public final class Scheduler {
   private final Set<TargetScope> activeContinuousPerformerTargets = new HashSet<>();
 
   /**
-   * @return The current {@link State} of this Scheduler.
+   * @return The current {@link State} of the runtime.
    */
   @State
   public int getState() {
@@ -112,10 +110,10 @@ public final class Scheduler {
   }
 
   /**
-   * Returns the detailed state of this Scheduler, which includes information on the type of {@link
+   * Returns the detailed state of the runtime, which includes information on the type of {@link
    * Performer} that affects this state.
    *
-   * @return A bitmask representing the detailed state of this Scheduler.
+   * @return A bitmask representing the detailed state of the runtime.
    */
   private int getDetailedState() {
     int state = 0;
@@ -129,7 +127,7 @@ public final class Scheduler {
   }
 
   /**
-   * Adds a {@link StateListener} to be notified of this Scheduler's {@link State} changes.
+   * Adds a {@link StateListener} to be notified of the runtime's {@link State} changes.
    */
   public void addStateListener(StateListener listener) {
     if (!listeners.contains(listener)) {
@@ -138,16 +136,16 @@ public final class Scheduler {
   }
 
   /**
-   * Removes a {@link StateListener} from this Scheduler's {@link State} changes.
+   * Removes a {@link StateListener} from the runtime's {@link State} changes.
    */
   public void removeStateListener(StateListener listener) {
     listeners.remove(listener);
   }
 
   /**
-   * Adds a plan to this scheduler.
+   * Adds a plan to the runtime.
    *
-   * @param plan the {@link Plan} to add to the scheduler.
+   * @param plan the {@link Plan} to add to the runtime.
    * @param target the target on which the plan will operate.
    */
   public void addPlan(Plan plan, Object target) {
@@ -155,11 +153,10 @@ public final class Scheduler {
   }
 
   /**
-   * Adds a {@link NamedPlan} to this scheduler. When this method is invoked, a {@link NamedPlan}
-   * with the same name and target is removed from the scheduler before the plan is eventually
-   * added.
+   * Adds a {@link NamedPlan} to the runtime. When this method is invoked, a {@link NamedPlan} with
+   * the same name and target is removed from the runtime before the plan is eventually added.
    *
-   * @param plan the {@link NamedPlan} to add to the scheduler.
+   * @param plan the {@link NamedPlan} to add to the runtime.
    * @param name the name by which this plan can be identified.
    * @param target the target on which the plan will operate.
    */
@@ -171,7 +168,7 @@ public final class Scheduler {
   }
 
   /**
-   * Removes a {@link NamedPlan} from this scheduler.
+   * Removes a {@link NamedPlan} from the runtime.
    *
    * @param name the name by which the named plan can be identified.
    * @param target the target on which the named plan was added.
@@ -195,8 +192,7 @@ public final class Scheduler {
   }
 
   /**
-   * Notifies the Scheduler that a {@link TargetScope}'s detailed state may or may not have
-   * changed.
+   * Notifies the runtime that a {@link TargetScope}'s detailed state may or may not have changed.
    */
   void setTargetState(TargetScope target, int targetDetailedState) {
     int oldDetailedState = getDetailedState();
@@ -239,7 +235,7 @@ public final class Scheduler {
 
     if ((oldDetailedState == 0) != (newDetailedState == 0)) {
       @State int state = newDetailedState == 0 ? IDLE : ACTIVE;
-      Log.d(TAG, "Scheduler state now: " + state);
+      Log.d(TAG, "Runtime state now: " + state);
       for (StateListener listener : listeners) {
         listener.onStateChange(this, state);
       }

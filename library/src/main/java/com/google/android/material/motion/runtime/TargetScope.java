@@ -16,8 +16,8 @@
 
 package com.google.android.material.motion.runtime;
 
-import static com.google.android.material.motion.runtime.Scheduler.CONTINUOUS_DETAILED_STATE_FLAG;
-import static com.google.android.material.motion.runtime.Scheduler.MANUAL_DETAILED_STATE_FLAG;
+import static com.google.android.material.motion.runtime.Runtime.CONTINUOUS_DETAILED_STATE_FLAG;
+import static com.google.android.material.motion.runtime.Runtime.MANUAL_DETAILED_STATE_FLAG;
 
 import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
@@ -31,13 +31,13 @@ import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerfor
 import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Scheduler.State;
+import com.google.android.material.motion.runtime.Runtime.State;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A helper class for {@link Scheduler} that scopes {@link Performer} instances by target.
+ * A helper class for {@link Runtime} that scopes {@link Performer} instances by target.
  *
  * <p> Ensures only a single instance of Performer is created for each type of Performer required by
  * a target.
@@ -53,10 +53,17 @@ class TargetScope {
   private final SimpleArrayMap<ContinuousPerforming, Set<IsActiveToken>>
     activeContinuousPerformers = new SimpleArrayMap<>();
 
+  @Deprecated
   private final Scheduler scheduler;
+  private final Runtime runtime;
 
   TargetScope(Scheduler scheduler) {
     this.scheduler = scheduler;
+    this.runtime = null;
+  }
+  TargetScope(Runtime runtime) {
+    this.scheduler = null;
+    this.runtime = runtime;
   }
 
   void commitPlan(BasePlan plan, Object target) {
@@ -106,7 +113,7 @@ class TargetScope {
     while (iterator.hasNext()) {
       ManualPerforming performer = iterator.next();
       @State int state = performer.update(deltaTimeMs);
-      if (state == Scheduler.IDLE) {
+      if (state == Runtime.IDLE) {
         iterator.remove();
         changed = true;
       }
@@ -118,7 +125,12 @@ class TargetScope {
   }
 
   private void notifyTargetStateChanged() {
-    scheduler.setTargetState(this, getDetailedState());
+    if (scheduler != null) {
+      scheduler.setTargetState(this, getDetailedState());
+    }
+    if (runtime != null) {
+      runtime.setTargetState(this, getDetailedState());
+    }
   }
 
   private int getDetailedState() {
@@ -217,7 +229,12 @@ class TargetScope {
     return new PlanEmitter() {
       @Override
       public void emit(Plan plan) {
-        scheduler.addPlan(plan, performer.getTarget());
+        if (scheduler != null) {
+          scheduler.addPlan(plan, performer.getTarget());
+        }
+        if (runtime != null) {
+          runtime.addPlan(plan, performer.getTarget());
+        }
       }
     };
   }

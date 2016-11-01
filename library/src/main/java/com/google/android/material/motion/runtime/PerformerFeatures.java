@@ -17,7 +17,7 @@ package com.google.android.material.motion.runtime;
 
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Scheduler.State;
+import com.google.android.material.motion.runtime.Runtime.State;
 
 /**
  * Defines the APIs that a {@link Performer} can implement.
@@ -78,8 +78,8 @@ public final class PerformerFeatures {
 
   /**
    * A Performer implements this interface in order to request and release is-active tokens. The
-   * scheduler uses these tokens to inform its active state. If any performer owns an is-active
-   * token then the scheduler is active. Otherwise, the scheduler is idle.
+   * runtime uses these tokens to inform its active state. If any performer owns an is-active token
+   * then the runtime is active. Otherwise, the runtime is idle.
    *
    * <p> The only requirement is that the Performer must request a token from the {@link
    * IsActiveTokenGenerator token generator} when the continuous performance {@link
@@ -89,7 +89,7 @@ public final class PerformerFeatures {
   public interface ContinuousPerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Scheduler} to supply the {@link Performer} with a {@link
+     * Called by the {@link Runtime} to supply the {@link Performer} with a {@link
      * IsActiveTokenGenerator}.
      */
     void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator);
@@ -130,10 +130,10 @@ public final class PerformerFeatures {
   public interface ManualPerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Scheduler} to notify the {@link Performer} of a new frame.
+     * Called by the {@link Runtime} to notify the {@link Performer} of a new frame.
      *
      * @param deltaTimeMs The elapsed time in milliseconds since the last update.
-     * @return The {@link State} of this Performer after this update. {@link Scheduler#IDLE} means
+     * @return The {@link State} of this Performer after this update. {@link Runtime#IDLE} means
      * this Performer does not wish to get any more frame updates.
      */
     @State
@@ -148,18 +148,18 @@ public final class PerformerFeatures {
   public interface ComposablePerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Scheduler} to supply the {@link Performer} with a {@link PlanEmitter}.
+     * Called by the {@link Runtime} to supply the {@link Performer} with a {@link PlanEmitter}.
      */
     void setPlanEmitter(PlanEmitter planEmitter);
 
     /**
-     * A plan emitter allows an object to emit new plans to a backing scheduler for the target to
+     * A plan emitter allows an object to emit new plans to a backing runtime for the target to
      * which the performer is associated.
      */
     interface PlanEmitter {
 
       /**
-       * Emit a new plan. The plan will immediately be added to the backing scheduler.
+       * Emit a new plan. The plan will immediately be added to the backing runtime.
        */
       void emit(Plan plan);
     }
