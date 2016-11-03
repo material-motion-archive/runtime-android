@@ -89,11 +89,6 @@ class TargetScope {
       notifyTargetStateChanged();
     }
 
-    if (performer instanceof ComposablePerforming) {
-      ComposablePerforming composablePerformer = (ComposablePerforming) performer;
-      composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
-    }
-
     //noinspection unchecked
     return (T) performer;
   }
@@ -169,9 +164,9 @@ class TargetScope {
           .setIsActiveTokenGenerator(createIsActiveTokenGenerator(continuousPerformer));
       }
 
-      if (performer.getClass() != performerClass) {
-        throw new IllegalStateException(
-          "#createPerformer returned wrong type. Expected " + performerClass.getName());
+      if (performer instanceof ComposablePerforming) {
+        ComposablePerforming composablePerformer = (ComposablePerforming) performer;
+        composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
       }
 
       return performer;
