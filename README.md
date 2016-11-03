@@ -14,6 +14,16 @@ This library encourages you to describe motion as data, or what we call *plans*.
 to the *runtime*. The runtime coordinates the creation of *performers*, objects responsible for
 translating plans into concrete execution.
 
+To use the runtime, simply instantiate a `Runtime` object and add a plan.
+
+```
+Plan plan;
+View target;
+
+Runtime runtime = new Runtime();
+runtime.addPlan(plan, target);
+```
+
 Learn more about the APIs defined in the library by reading our
 [technical documentation](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/4.0.0/javadoc/) and our
 [Starmap](https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/).
