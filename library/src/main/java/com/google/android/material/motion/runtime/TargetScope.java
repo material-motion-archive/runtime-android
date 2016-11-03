@@ -53,16 +53,9 @@ class TargetScope {
   private final SimpleArrayMap<ContinuousPerforming, Set<IsActiveToken>>
     activeContinuousPerformers = new SimpleArrayMap<>();
 
-  @Deprecated
-  private final Scheduler scheduler;
   private final Runtime runtime;
 
-  TargetScope(Scheduler scheduler) {
-    this.scheduler = scheduler;
-    this.runtime = null;
-  }
   TargetScope(Runtime runtime) {
-    this.scheduler = null;
     this.runtime = runtime;
   }
 
@@ -120,9 +113,6 @@ class TargetScope {
   }
 
   private void notifyTargetStateChanged() {
-    if (scheduler != null) {
-      scheduler.setTargetState(this, getDetailedState());
-    }
     if (runtime != null) {
       runtime.setTargetState(this, getDetailedState());
     }
@@ -224,9 +214,6 @@ class TargetScope {
     return new PlanEmitter() {
       @Override
       public void emit(Plan plan) {
-        if (scheduler != null) {
-          scheduler.addPlan(plan, performer.getTarget());
-        }
         if (runtime != null) {
           runtime.addPlan(plan, performer.getTarget());
         }
