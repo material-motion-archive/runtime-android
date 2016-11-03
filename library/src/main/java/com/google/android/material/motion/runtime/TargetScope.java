@@ -19,6 +19,7 @@ package com.google.android.material.motion.runtime;
 import static com.google.android.material.motion.runtime.Runtime.CONTINUOUS_DETAILED_STATE_FLAG;
 import static com.google.android.material.motion.runtime.Runtime.MANUAL_DETAILED_STATE_FLAG;
 
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
 import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
@@ -169,7 +170,8 @@ class TargetScope {
    * Creates a {@link IsActiveTokenGenerator} to be assigned to the given {@link
    * ContinuousPerforming}.
    */
-  private IsActiveTokenGenerator createIsActiveTokenGenerator(
+  @VisibleForTesting
+  IsActiveTokenGenerator createIsActiveTokenGenerator(
     final ContinuousPerforming performer) {
     return new IsActiveTokenGenerator() {
       @Override

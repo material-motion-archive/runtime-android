@@ -17,6 +17,7 @@
 package com.google.android.material.motion.runtime;
 
 import android.support.annotation.IntDef;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
@@ -92,8 +93,10 @@ public final class Runtime {
    */
   static final int CONTINUOUS_DETAILED_STATE_FLAG = 1 << 1;
 
+  @VisibleForTesting
+  static ChoreographerCompat choreographer = ChoreographerCompat.getInstance();
+
   private final CopyOnWriteArraySet<StateListener> listeners = new CopyOnWriteArraySet<>();
-  private final ChoreographerCompat choreographer = ChoreographerCompat.getInstance();
   private final ManualPerformingFrameCallback manualPerformingFrameCallback =
     new ManualPerformingFrameCallback();
 
