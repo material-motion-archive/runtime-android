@@ -15,8 +15,13 @@
  */
 package com.google.android.material.motion.runtime;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import android.app.Activity;
 import android.content.Context;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
@@ -26,6 +31,7 @@ import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPer
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.Runtime.State;
+import com.google.android.material.motion.runtime.Runtime.StateListener;
 import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 
@@ -45,13 +51,18 @@ import static com.google.common.truth.Truth.assertThat;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class RuntimeTests {
 
+  private static final float EPSILON = 0.0001f;
+
   private Runtime runtime;
+  private StepChoreographer choreographer;
   private TextView textView;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
     runtime = new Runtime();
+    choreographer = new StepChoreographer();
+    runtime.choreographer = choreographer;
     textView = new TextView(context);
   }
 
@@ -72,6 +83,31 @@ public class RuntimeTests {
     runtime.addNamedPlan(new ManualPlan("manual"), "plan", textView);
 
     assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+  }
+
+  @Test
+  public void testTwoActivePerformersStillActive() {
+    runtime.addNamedPlan(new ManualPlan("manual"), "plan", textView);
+
+    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+
+    runtime.addPlan(new NeverEndingContinuousPlan("continuous"), textView);
+
+    // Still active.
+    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+  }
+
+  @Test
+  public void testManualPerformerUpdatesWithCorrectDelta() {
+    runtime.addPlan(new ManualPlan("manual"), textView);
+
+    // First frame updates with delta == 0.
+    choreographer.advance(StepChoreographer.FRAME_MS);
+    assertThat((float) textView.getTag()).isWithin(0f).of(0f);
+
+    // Next frame updates with correct delta.
+    choreographer.advance(StepChoreographer.FRAME_MS);
+    assertThat((float) textView.getTag()).isWithin(EPSILON).of(StepChoreographer.FRAME_MS);
   }
 
   @Test
@@ -115,6 +151,19 @@ public class RuntimeTests {
 
     assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
     assertThat(secondListener.getState()).isEqualTo(Runtime.IDLE);
+  }
+
+  @Test
+  public void testAddingSameRuntimeListenerTwice() {
+    StateListener listener = mock(StateListener.class);
+
+    runtime.addStateListener(listener);
+    runtime.addStateListener(listener);
+
+    runtime.addPlan(new ManualPlan("manual"), textView);
+
+    // Listener invoked only once.
+    verify(listener, times(1)).onStateChange(runtime, Runtime.ACTIVE);
   }
 
   @Test
@@ -622,6 +671,11 @@ public class RuntimeTests {
 
     @Override
     public int update(float deltaTimeMs) {
+      // Incredibly ugly hack. Tests need to inspect that a certain deltaTimeMs was passed into
+      // this function. Save it to the target. Perhaps tracing support will make this easier to
+      // test.
+      View target = getTarget();
+      target.setTag(deltaTimeMs);
       return Runtime.ACTIVE;
     }
 

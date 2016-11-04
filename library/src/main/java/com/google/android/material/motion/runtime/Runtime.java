@@ -98,7 +98,7 @@ public final class Runtime {
   static final int CONTINUOUS_DETAILED_STATE_FLAG = 1 << 1;
 
   @VisibleForTesting
-  static ChoreographerCompat choreographer = ChoreographerCompat.getInstance();
+  ChoreographerCompat choreographer = ChoreographerCompat.getInstance();
 
   private final CopyOnWriteArraySet<StateListener> listeners = new CopyOnWriteArraySet<>();
   private final ManualPerformingFrameCallback manualPerformingFrameCallback =
@@ -320,12 +320,15 @@ public final class Runtime {
 
     @Override
     public void doFrame(long frameTimeNanos) {
-      for (TargetScope activeTarget : activeManualPerformerTargets) {
-        double frameTimeMs = frameTimeNanos / 1000;
-        float deltaTimeMs = lastTimeMs == 0.0 ? 0f : (float) (frameTimeMs - lastTimeMs);
+      double frameTimeMs = frameTimeNanos / 1000;
+      choreographer.postFrameCallback(this);
 
+      for (TargetScope activeTarget : activeManualPerformerTargets) {
+        float deltaTimeMs = lastTimeMs == 0.0 ? 0f : (float) (frameTimeMs - lastTimeMs);
         activeTarget.update(deltaTimeMs);
       }
+
+      lastTimeMs = frameTimeMs;
     }
   }
 }

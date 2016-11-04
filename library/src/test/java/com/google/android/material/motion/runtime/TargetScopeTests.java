@@ -55,6 +55,7 @@ public class TargetScopeTests {
   @Before
   public void setUp() {
     runtime = new Runtime();
+    runtime.choreographer = new StepChoreographer();
     Context context = Robolectric.setupActivity(Activity.class);
     target = new View(context);
   }
@@ -62,7 +63,6 @@ public class TargetScopeTests {
   @Test
   public void manualPerformerIdleChangesRuntimeState() {
     TargetScope targetScope = new TargetScope(runtime);
-    Runtime.choreographer = new NoOpChoreographer();
 
     // Runtime starts as idle.
     assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
@@ -181,21 +181,6 @@ public class TargetScopeTests {
 
     @Override
     public void addPlan(BasePlan plan) {
-    }
-  }
-
-  private static class NoOpChoreographer extends ChoreographerCompat {
-
-    @Override
-    public void postFrameCallback(FrameCallback callback) {
-    }
-
-    @Override
-    public void postFrameCallbackDelayed(FrameCallback callback, long delayMillis) {
-    }
-
-    @Override
-    public void removeFrameCallback(FrameCallback callback) {
     }
   }
 }
