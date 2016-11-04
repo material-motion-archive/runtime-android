@@ -113,9 +113,7 @@ class TargetScope {
   }
 
   private void notifyTargetStateChanged() {
-    if (runtime != null) {
-      runtime.setTargetState(this, getDetailedState());
-    }
+    runtime.setTargetState(this, getDetailedState());
   }
 
   private int getDetailedState() {
@@ -214,9 +212,7 @@ class TargetScope {
     return new PlanEmitter() {
       @Override
       public void emit(Plan plan) {
-        if (runtime != null) {
-          runtime.addPlan(plan, performer.getTarget());
-        }
+        runtime.addPlan(plan, performer.getTarget());
       }
     };
   }
