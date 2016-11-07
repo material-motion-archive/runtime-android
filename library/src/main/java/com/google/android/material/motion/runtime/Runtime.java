@@ -20,13 +20,17 @@ import android.support.annotation.IntDef;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
+
 import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -104,6 +108,8 @@ public final class Runtime {
   private final Set<TargetScope> activeManualPerformerTargets = new HashSet<>();
   private final Set<TargetScope> activeContinuousPerformerTargets = new HashSet<>();
 
+  private final List<Tracing> tracings = new ArrayList<>();
+
   /**
    * @return The current {@link State} of the runtime.
    */
@@ -180,7 +186,36 @@ public final class Runtime {
     if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException("A NamedPlan must have a non-empty name.");
     }
-    getTargetScope(target).commitRemoveNamedPlan(name);
+    getTargetScope(target).commitRemoveNamedPlan(name, target);
+  }
+
+  /**
+   * Adds a {@link Tracing} instance to the runtime.
+   *
+   * @param tracer the tracer to add.
+   */
+  public void addTracer(Tracing tracer) {
+    if (!tracings.contains(tracer)) {
+      tracings.add(tracer);
+    }
+  }
+
+  /**
+   * Removes a {@link Tracing} instance from the runtime.
+   *
+   * @param tracer the tracer to remove.
+   */
+  public void removeTracer(Tracing tracer) {
+    tracings.remove(tracer);
+  }
+
+  /**
+   * Retrieves a collection of currently active tracings which have been added to the runtime.
+   *
+   * @return a {@link List} of {@link Tracing}s which are associated with the runtime.
+   */
+  List<Tracing> getTracings() {
+    return tracings;
   }
 
   private TargetScope getTargetScope(Object target) {

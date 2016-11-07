@@ -61,18 +61,28 @@ class TargetScope {
   }
 
   void commitPlan(BasePlan plan, Object target) {
-    BasePerforming performer = commitPlanInternal(plan, target);
+    Performer performer = commitPlanInternal(plan, target);
     performer.addPlan(plan);
+
+    // notify tracers
+    for (Tracing tracing : runtime.getTracings()) {
+      tracing.onAddPlan((Plan) plan, target);
+    }
   }
 
   void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
     // remove first
-    commitRemoveNamedPlan(name);
+    commitRemoveNamedPlan(name, target);
 
     // then add
     NamedPlanPerforming performer = commitPlanInternal(plan, target);
     performer.addPlan(plan, name);
     namedCache.put(name, performer);
+
+    // notify tracers
+    for (Tracing tracing : runtime.getTracings()) {
+      tracing.onAddNamedPlan(plan, name, target);
+    }
   }
 
   private <T extends BasePerforming> T commitPlanInternal(BasePlan plan, Object target) {
@@ -87,10 +97,15 @@ class TargetScope {
     return (T) performer;
   }
 
-  void commitRemoveNamedPlan(String name) {
+  void commitRemoveNamedPlan(String name, Object target) {
     NamedPlanPerforming performer = namedCache.get(name);
     if (performer != null) {
       performer.removePlan(name);
+
+      // notify tracers
+      for (Tracing tracing : runtime.getTracings()) {
+        tracing.onRemoveNamedPlan(name, target);
+      }
     }
     namedCache.remove(name);
   }
@@ -156,6 +171,10 @@ class TargetScope {
       if (performer instanceof ComposablePerforming) {
         ComposablePerforming composablePerformer = (ComposablePerforming) performer;
         composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
+      }
+
+      for (Tracing tracing : runtime.getTracings()) {
+        tracing.onCreatePerformer((Performer) performer, target);
       }
 
       return performer;
