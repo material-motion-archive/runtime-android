@@ -1,7 +1,7 @@
 # Material Motion Android Runtime
 
-[![Build Status](https://travis-ci.org/material-motion/material-motion-runtime-android.svg?branch=develop)](https://travis-ci.org/material-motion/material-motion-runtime-android)
-[![codecov](https://codecov.io/gh/material-motion/material-motion-runtime-android/branch/develop/graph/badge.svg)](https://codecov.io/gh/material-motion/material-motion-runtime-android)
+[![Build Status](https://travis-ci.org/material-motion/runtime-android.svg?branch=develop)](https://travis-ci.org/material-motion/runtime-android)
+[![codecov](https://codecov.io/gh/material-motion/runtime-android/branch/develop/graph/badge.svg)](https://codecov.io/gh/material-motion/runtime-android)
 
 The Material Motion Runtime is a tool for describing motion declaratively.
 
@@ -25,7 +25,7 @@ runtime.addPlan(plan, target);
 ```
 
 Learn more about the APIs defined in the library by reading our
-[technical documentation](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/4.0.0/javadoc/) and our
+[technical documentation](https://jitpack.io/com/github/material-motion/runtime-android/4.0.0/javadoc/) and our
 [Starmap](https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/).
 
 ## Installation
@@ -42,7 +42,7 @@ allprojects {
 }
 ```
 
-Depend on the [latest version](https://github.com/material-motion/material-motion-runtime-android/releases) of the library.
+Depend on the [latest version](https://github.com/material-motion/runtime-android/releases) of the library.
 Take care to occasionally [check for updates](https://github.com/ben-manes/gradle-versions-plugin).
 
 ```gradle
@@ -75,7 +75,7 @@ For each local dependency listed, you *must* run `gradle install` from its
 project root every time you make a change to it. That command will publish your
 latest changes to the local maven repository. If your local dependencies have
 local dependencies of their own, you must `gradle install` them as well. See
-[Issue #16](https://github.com/material-motion/material-motion-runtime-android/issues/16).
+[Issue #16](https://github.com/material-motion/runtime-android/issues/16).
 
 You must `gradle clean` your project every time you add or remove a local
 dependency.
@@ -94,13 +94,13 @@ choose the root `build.gradle` file.
 
 To build the sample application, run the following commands:
 
-    git clone https://github.com/material-motion/material-motion-runtime-android.git
+    git clone https://github.com/material-motion/runtime-android.git
     cd material-motion-runtime-android
     gradle installDebug
 
 To run all unit tests, run the following commands:
 
-    git clone https://github.com/material-motion/material-motion-runtime-android.git
+    git clone https://github.com/material-motion/runtime-android.git
     cd material-motion-runtime-android
     gradle test
 
@@ -122,15 +122,15 @@ constellation of protocols loosely consisting of plan and performing types.
 
 ### Runtime
 
-The [Runtime](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/4.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Runtime.html)
+The [Runtime](https://jitpack.io/com/github/material-motion/runtime-android/4.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Runtime.html)
 object is a coordinating entity whose primary responsibility is to fulfill plans by creating
 performers. You can create many runtimes throughout the lifetime of your application. A good rule
 of thumb is to have one runtime per interaction or transition.
 
 ### Plan + Performing types
 
-The [Plan](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/4.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Plan.html)
-and [Performer](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/4.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Performer.html)
+The [Plan](https://jitpack.io/com/github/material-motion/runtime-android/4.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Plan.html)
+and [Performer](https://jitpack.io/com/github/material-motion/runtime-android/4.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Performer.html)
 classes each define the minimal characteristics required for an object to be considered either a
 plan or a performer, respectively, by the Material Motion Runtime.
 
