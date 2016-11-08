@@ -65,8 +65,8 @@ class TargetScope {
     performer.addPlan(plan);
 
     // notify tracers
-    for (Tracing tracing : runtime.getTracings()) {
-      tracing.onAddPlan((Plan) plan, target);
+    for (Tracing tracer : runtime.getTracers()) {
+      tracer.onAddPlan((Plan) plan, target);
     }
   }
 
@@ -80,8 +80,8 @@ class TargetScope {
     namedCache.put(name, performer);
 
     // notify tracers
-    for (Tracing tracing : runtime.getTracings()) {
-      tracing.onAddNamedPlan(plan, name, target);
+    for (Tracing tracer : runtime.getTracers()) {
+      tracer.onAddNamedPlan(plan, name, target);
     }
   }
 
@@ -103,8 +103,8 @@ class TargetScope {
       performer.removePlan(name);
 
       // notify tracers
-      for (Tracing tracing : runtime.getTracings()) {
-        tracing.onRemoveNamedPlan(name, target);
+      for (Tracing tracer : runtime.getTracers()) {
+        tracer.onRemoveNamedPlan(name, target);
       }
     }
     namedCache.remove(name);
@@ -173,7 +173,7 @@ class TargetScope {
         composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
       }
 
-      for (Tracing tracing : runtime.getTracings()) {
+      for (Tracing tracing : runtime.getTracers()) {
         tracing.onCreatePerformer((Performer) performer, target);
       }
 

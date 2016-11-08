@@ -108,7 +108,7 @@ public final class Runtime {
   private final Set<TargetScope> activeManualPerformerTargets = new HashSet<>();
   private final Set<TargetScope> activeContinuousPerformerTargets = new HashSet<>();
 
-  private final List<Tracing> tracings = new ArrayList<>();
+  private final List<Tracing> tracers = new ArrayList<>();
 
   /**
    * @return The current {@link State} of the runtime.
@@ -195,8 +195,8 @@ public final class Runtime {
    * @param tracer the tracer to add.
    */
   public void addTracer(Tracing tracer) {
-    if (!tracings.contains(tracer)) {
-      tracings.add(tracer);
+    if (!tracers.contains(tracer)) {
+      tracers.add(tracer);
     }
   }
 
@@ -206,16 +206,16 @@ public final class Runtime {
    * @param tracer the tracer to remove.
    */
   public void removeTracer(Tracing tracer) {
-    tracings.remove(tracer);
+    tracers.remove(tracer);
   }
 
   /**
-   * Retrieves a collection of currently active tracings which have been added to the runtime.
+   * Retrieves a collection of currently active tracers which have been added to the runtime.
    *
    * @return a {@link List} of {@link Tracing}s which are associated with the runtime.
    */
-  List<Tracing> getTracings() {
-    return tracings;
+  List<Tracing> getTracers() {
+    return tracers;
   }
 
   private TargetScope getTargetScope(Object target) {

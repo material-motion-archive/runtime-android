@@ -16,46 +16,27 @@
 
 package com.google.android.material.motion.runtime.plans;
 
-import android.widget.TextView;
-
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures;
 import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
+import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 
-public class TextViewAlteringNamedPlan extends Plan implements NamedPlan {
-
-  private final String text;
-
-  public TextViewAlteringNamedPlan(String text) {
-    this.text = text;
-  }
+public class CounterAlteringPlan extends Plan {
 
   @Override
-  public Class<? extends NamedPlanPerforming> getPerformerClass() {
-    return TextViewAlteringPerformer.class;
+  public Class<? extends PerformerFeatures.BasePerforming> getPerformerClass() {
+    return CounterAlteringPerformer.class;
   }
 
-  public static class TextViewAlteringPerformer extends Performer implements NamedPlanPerforming {
+  public static class CounterAlteringPerformer extends Performer {
 
     @Override
     public void addPlan(BasePlan plan) {
       Object target = getTarget();
-      TextViewAlteringNamedPlan textViewAlteringNamedPlan = (TextViewAlteringNamedPlan) plan;
-      if (target instanceof TextView) {
-        TextView textView = getTarget();
-        textView.setText(textView.getText() + " " + textViewAlteringNamedPlan.text);
+      if (target instanceof IncrementerTarget) {
+        ((IncrementerTarget)target).addCounter += 1;
       }
-    }
-
-    @Override
-    public void addPlan(NamedPlan plan, String name) {
-      addPlan(plan);
-    }
-
-    @Override
-    public void removePlan(String name) {
     }
   }
 }

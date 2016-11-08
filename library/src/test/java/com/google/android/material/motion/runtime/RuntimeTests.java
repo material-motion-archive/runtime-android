@@ -27,6 +27,7 @@ import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.Runtime.State;
 import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
+import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -277,7 +278,7 @@ public class RuntimeTests {
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
-    assertThat(errorThrown);
+    assertThat(errorThrown).isTrue();
   }
 
   @Test
@@ -288,7 +289,7 @@ public class RuntimeTests {
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
-    assertThat(errorThrown);
+    assertThat(errorThrown).isTrue();
   }
 
   @Test
@@ -299,7 +300,7 @@ public class RuntimeTests {
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
-    assertThat(errorThrown);
+    assertThat(errorThrown).isTrue();
   }
 
   @Test
@@ -310,7 +311,7 @@ public class RuntimeTests {
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
-    assertThat(errorThrown);
+    assertThat(errorThrown).isTrue();
   }
 
   @Test
@@ -320,7 +321,16 @@ public class RuntimeTests {
     runtime.addTracer(firstTracer);
     runtime.addTracer(secondTracer);
 
-    assertThat(runtime.getTracings().size()).isEqualTo(2);
+    assertThat(runtime.getTracers().size()).isEqualTo(2);
+  }
+
+  @Test
+  public void testTracersAreOnlyAddedOnceToARuntime() {
+    StorageTracing firstTracer = new StorageTracing();
+    runtime.addTracer(firstTracer);
+    runtime.addTracer(firstTracer);
+
+    assertThat(runtime.getTracers().size()).isEqualTo(1);
   }
 
   @Test
@@ -331,8 +341,8 @@ public class RuntimeTests {
     runtime.addTracer(secondTracer);
     runtime.removeTracer(firstTracer);
 
-    assertThat(runtime.getTracings().size()).isEqualTo(1);
-    assertThat(runtime.getTracings().contains(secondTracer)).isTrue();
+    assertThat(runtime.getTracers().size()).isEqualTo(1);
+    assertThat(runtime.getTracers().contains(secondTracer)).isTrue();
   }
 
   @Test
@@ -384,9 +394,9 @@ public class RuntimeTests {
     runtime.removeNamedPlan("tracking_plan_name", trackingTracer);
 
     List<String> expectedEvents = new ArrayList<>();
-    expectedEvents.add("addPlan");
+    expectedEvents.add("performerAddPlan");
     expectedEvents.add("onAddNamedPlan");
-    expectedEvents.add("removePlan");
+    expectedEvents.add("performerRemovePlan");
     expectedEvents.add("onRemoveNamedPlan");
 
     assertThat(trackingTracer.getEvents()).isEqualTo(expectedEvents);
@@ -531,12 +541,6 @@ public class RuntimeTests {
     }
   }
 
-  public class IncrementerTarget {
-
-    int addCounter = 0;
-    int removeCounter = 0;
-  }
-
   public static class NamedCounterPlanPerformer extends Performer implements NamedPlanPerforming {
 
     @Override
@@ -562,13 +566,13 @@ public class RuntimeTests {
     @Override
     public void addPlan(NamedPlan plan, String name) {
       TrackingTracing tracer = getTarget();
-      tracer.events.add("addPlan");
+      tracer.events.add("performerAddPlan");
     }
 
     @Override
     public void removePlan(String name) {
       TrackingTracing tracer = getTarget();
-      tracer.events.add("removePlan");
+      tracer.events.add("performerRemovePlan");
     }
   }
 

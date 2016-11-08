@@ -33,7 +33,7 @@ public interface Tracing {
    * @param plan the plan which was added.
    * @param target the object on which the plan was targeted.
    */
-  public void onAddPlan(Plan plan, Object target);
+  void onAddPlan(Plan plan, Object target);
 
   /**
    * Invoked after a named plan has been added to the runtime.
@@ -42,7 +42,7 @@ public interface Tracing {
    * @param name the name by which the plan is identifiable.
    * @param target the object on which the plan was targeted.
    */
-  public void onAddNamedPlan(NamedPlan plan, String name, Object target);
+  void onAddNamedPlan(NamedPlan plan, String name, Object target);
 
   /**
    * Invoked when a named plan is removed from the runtime.
@@ -50,7 +50,7 @@ public interface Tracing {
    * @param name the name by which the plan was identifiable.
    * @param target the object on which the plan was previously targeted.
    */
-  public void onRemoveNamedPlan(String name, Object target);
+  void onRemoveNamedPlan(String name, Object target);
 
   /**
    * Invoked after a performer has been created by the runtime.
@@ -58,5 +58,5 @@ public interface Tracing {
    * @param performer the {@link Performer} which was just created.
    * @param target the object on which the performer is targeted.
    */
-  public void onCreatePerformer(Performer performer, Object target);
+  void onCreatePerformer(Performer performer, Object target);
 }
