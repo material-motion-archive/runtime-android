@@ -19,6 +19,7 @@ package com.google.android.material.motion.runtime;
 import static com.google.android.material.motion.runtime.Runtime.CONTINUOUS_DETAILED_STATE_FLAG;
 import static com.google.android.material.motion.runtime.Runtime.MANUAL_DETAILED_STATE_FLAG;
 
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.SimpleArrayMap;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
 import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
@@ -53,32 +54,35 @@ class TargetScope {
   private final SimpleArrayMap<ContinuousPerforming, Set<IsActiveToken>>
     activeContinuousPerformers = new SimpleArrayMap<>();
 
-  @Deprecated
-  private final Scheduler scheduler;
   private final Runtime runtime;
 
-  TargetScope(Scheduler scheduler) {
-    this.scheduler = scheduler;
-    this.runtime = null;
-  }
   TargetScope(Runtime runtime) {
-    this.scheduler = null;
     this.runtime = runtime;
   }
 
   void commitPlan(BasePlan plan, Object target) {
-    BasePerforming performer = commitPlanInternal(plan, target);
+    Performer performer = commitPlanInternal(plan, target);
     performer.addPlan(plan);
+
+    // notify tracers
+    for (Tracing tracer : runtime.getTracers()) {
+      tracer.onAddPlan((Plan) plan, target);
+    }
   }
 
   void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
     // remove first
-    commitRemoveNamedPlan(name);
+    commitRemoveNamedPlan(name, target);
 
     // then add
     NamedPlanPerforming performer = commitPlanInternal(plan, target);
     performer.addPlan(plan, name);
     namedCache.put(name, performer);
+
+    // notify tracers
+    for (Tracing tracer : runtime.getTracers()) {
+      tracer.onAddNamedPlan(plan, name, target);
+    }
   }
 
   private <T extends BasePerforming> T commitPlanInternal(BasePlan plan, Object target) {
@@ -89,19 +93,19 @@ class TargetScope {
       notifyTargetStateChanged();
     }
 
-    if (performer instanceof ComposablePerforming) {
-      ComposablePerforming composablePerformer = (ComposablePerforming) performer;
-      composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
-    }
-
     //noinspection unchecked
     return (T) performer;
   }
 
-  void commitRemoveNamedPlan(String name) {
+  void commitRemoveNamedPlan(String name, Object target) {
     NamedPlanPerforming performer = namedCache.get(name);
     if (performer != null) {
       performer.removePlan(name);
+
+      // notify tracers
+      for (Tracing tracer : runtime.getTracers()) {
+        tracer.onRemoveNamedPlan(name, target);
+      }
     }
     namedCache.remove(name);
   }
@@ -125,12 +129,7 @@ class TargetScope {
   }
 
   private void notifyTargetStateChanged() {
-    if (scheduler != null) {
-      scheduler.setTargetState(this, getDetailedState());
-    }
-    if (runtime != null) {
-      runtime.setTargetState(this, getDetailedState());
-    }
+    runtime.setTargetState(this, getDetailedState());
   }
 
   private int getDetailedState() {
@@ -169,9 +168,13 @@ class TargetScope {
           .setIsActiveTokenGenerator(createIsActiveTokenGenerator(continuousPerformer));
       }
 
-      if (performer.getClass() != performerClass) {
-        throw new IllegalStateException(
-          "#createPerformer returned wrong type. Expected " + performerClass.getName());
+      if (performer instanceof ComposablePerforming) {
+        ComposablePerforming composablePerformer = (ComposablePerforming) performer;
+        composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
+      }
+
+      for (Tracing tracing : runtime.getTracers()) {
+        tracing.onCreatePerformer((Performer) performer, target);
       }
 
       return performer;
@@ -186,7 +189,8 @@ class TargetScope {
    * Creates a {@link IsActiveTokenGenerator} to be assigned to the given {@link
    * ContinuousPerforming}.
    */
-  private IsActiveTokenGenerator createIsActiveTokenGenerator(
+  @VisibleForTesting
+  IsActiveTokenGenerator createIsActiveTokenGenerator(
     final ContinuousPerforming performer) {
     return new IsActiveTokenGenerator() {
       @Override
@@ -229,12 +233,7 @@ class TargetScope {
     return new PlanEmitter() {
       @Override
       public void emit(Plan plan) {
-        if (scheduler != null) {
-          scheduler.addPlan(plan, performer.getTarget());
-        }
-        if (runtime != null) {
-          runtime.addPlan(plan, performer.getTarget());
-        }
+        runtime.addPlan(plan, performer.getTarget());
       }
     };
   }

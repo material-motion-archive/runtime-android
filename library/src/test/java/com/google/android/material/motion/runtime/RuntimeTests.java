@@ -15,19 +15,26 @@
  */
 package com.google.android.material.motion.runtime;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.View;
 import android.widget.TextView;
+
+import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.Runtime.State;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.motion.runtime.Runtime.StateListener;
+import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
+import com.google.android.material.motion.runtime.targets.IncrementerTarget;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,17 +42,27 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.common.truth.Truth.assertThat;
+
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class RuntimeTests {
 
+  private static final float EPSILON = 0.0001f;
+
   private Runtime runtime;
+  private StepChoreographer choreographer;
   private TextView textView;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
     runtime = new Runtime();
+    choreographer = new StepChoreographer();
+    runtime.choreographer = choreographer;
     textView = new TextView(context);
   }
 
@@ -56,7 +73,7 @@ public class RuntimeTests {
 
   @Test
   public void testStandardPerformerRuntimeState() {
-    runtime.addNamedPlan(new StandardPlan("standard"), "plan", textView);
+    runtime.addNamedPlan(new TextViewAlteringNamedPlan("standard"), "plan", textView);
 
     assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
   }
@@ -69,6 +86,31 @@ public class RuntimeTests {
   }
 
   @Test
+  public void testTwoActivePerformersStillActive() {
+    runtime.addNamedPlan(new ManualPlan("manual"), "plan", textView);
+
+    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+
+    runtime.addPlan(new NeverEndingContinuousPlan("continuous"), textView);
+
+    // Still active.
+    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+  }
+
+  @Test
+  public void testManualPerformerUpdatesWithCorrectDelta() {
+    runtime.addPlan(new ManualPlan("manual"), textView);
+
+    // First frame updates with delta == 0.
+    choreographer.advance(StepChoreographer.FRAME_MS);
+    assertThat((float) textView.getTag()).isWithin(0f).of(0f);
+
+    // Next frame updates with correct delta.
+    choreographer.advance(StepChoreographer.FRAME_MS);
+    assertThat((float) textView.getTag()).isWithin(EPSILON).of(StepChoreographer.FRAME_MS);
+  }
+
+  @Test
   public void testAddingMultipleRuntimeListeners() {
     TestRuntimeListener firstListener = new TestRuntimeListener();
     TestRuntimeListener secondListener = new TestRuntimeListener();
@@ -76,7 +118,7 @@ public class RuntimeTests {
     runtime.addStateListener(secondListener);
 
     runtime.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
-    runtime.addPlan(new StandardPlan("standard one"), textView);
+    runtime.addPlan(new TextViewAlteringNamedPlan("standard one"), textView);
 
     assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
     assertThat(secondListener.getState()).isEqualTo(Runtime.ACTIVE);
@@ -89,7 +131,7 @@ public class RuntimeTests {
     runtime.addStateListener(firstListener);
     runtime.addStateListener(secondListener);
 
-    runtime.addPlan(new StandardPlan("standard one"), textView);
+    runtime.addPlan(new TextViewAlteringNamedPlan("standard one"), textView);
     runtime.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
 
     assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
@@ -109,6 +151,19 @@ public class RuntimeTests {
 
     assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
     assertThat(secondListener.getState()).isEqualTo(Runtime.IDLE);
+  }
+
+  @Test
+  public void testAddingSameRuntimeListenerTwice() {
+    StateListener listener = mock(StateListener.class);
+
+    runtime.addStateListener(listener);
+    runtime.addStateListener(listener);
+
+    runtime.addPlan(new ManualPlan("manual"), textView);
+
+    // Listener invoked only once.
+    verify(listener, times(1)).onStateChange(runtime, Runtime.ACTIVE);
   }
 
   @Test
@@ -133,8 +188,8 @@ public class RuntimeTests {
   }
 
   @Test
-  public void testAddingStandardPlanDirectlyToRuntime() {
-    runtime.addPlan(new StandardPlan("standard"), textView);
+  public void testAddingTextViewAlteringNamedPlanDirectlyToRuntime() {
+    runtime.addPlan(new TextViewAlteringNamedPlan("standard"), textView);
 
     assertThat(textView.getText()).isEqualTo(" standard");
   }
@@ -272,7 +327,7 @@ public class RuntimeTests {
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
-    assertThat(errorThrown);
+    assertThat(errorThrown).isTrue();
   }
 
   @Test
@@ -283,7 +338,7 @@ public class RuntimeTests {
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
-    assertThat(errorThrown);
+    assertThat(errorThrown).isTrue();
   }
 
   @Test
@@ -294,7 +349,7 @@ public class RuntimeTests {
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
-    assertThat(errorThrown);
+    assertThat(errorThrown).isTrue();
   }
 
   @Test
@@ -305,7 +360,160 @@ public class RuntimeTests {
     } catch (IllegalArgumentException e) {
       errorThrown = true;
     }
-    assertThat(errorThrown);
+    assertThat(errorThrown).isTrue();
+  }
+
+  @Test
+  public void testTracersCanBeAddedToARuntime() {
+    StorageTracing firstTracer = new StorageTracing();
+    StorageTracing secondTracer = new StorageTracing();
+    runtime.addTracer(firstTracer);
+    runtime.addTracer(secondTracer);
+
+    assertThat(runtime.getTracers().size()).isEqualTo(2);
+  }
+
+  @Test
+  public void testTracersAreOnlyAddedOnceToARuntime() {
+    StorageTracing firstTracer = new StorageTracing();
+    runtime.addTracer(firstTracer);
+    runtime.addTracer(firstTracer);
+
+    assertThat(runtime.getTracers().size()).isEqualTo(1);
+  }
+
+  @Test
+  public void testTracersCanBeRemovedFromARuntime() {
+    StorageTracing firstTracer = new StorageTracing();
+    StorageTracing secondTracer = new StorageTracing();
+    runtime.addTracer(firstTracer);
+    runtime.addTracer(secondTracer);
+    runtime.removeTracer(firstTracer);
+
+    assertThat(runtime.getTracers().size()).isEqualTo(1);
+    assertThat(runtime.getTracers().contains(secondTracer)).isTrue();
+  }
+
+  @Test
+  public void testRegularPlansAreCommunicatedViaTracers() {
+    StorageTracing storageTracer = new StorageTracing();
+    Plan plan = new RegularPlanTargetAlteringPlan();
+
+    runtime.addTracer(storageTracer);
+    runtime.addPlan(plan, textView);
+
+    assertThat(storageTracer.addedRegularPlans.get(0) instanceof RegularPlanTargetAlteringPlan).isTrue();
+    assertThat(textView.getText()).isEqualTo(" regularAddPlanInvoked");
+  }
+
+  @Test
+  public void testNamedPlansAreCommunicatedViaTracers() {
+    StorageTracing storageTracer = new StorageTracing();
+    runtime.addTracer(storageTracer);
+
+    runtime.addNamedPlan(new TextViewAlteringNamedPlan("standard"), "plan", textView);
+    runtime.removeNamedPlan("plan", textView);
+
+    assertThat(storageTracer.addedNamePlans.size()).isEqualTo(1);
+    assertThat(storageTracer.removedNamePlans.size()).isEqualTo(1);
+    assertThat("plan").isEqualTo(storageTracer.addedNamePlans.get(0));
+    assertThat("plan").isEqualTo(storageTracer.removedNamePlans.get(0));
+  }
+
+  @Test
+  public void testPlansReusePerformers() {
+    StorageTracing storageTracer = new StorageTracing();
+    runtime.addTracer(storageTracer);
+
+    runtime.addPlan(new ManualPlan("manual one"), textView);
+    runtime.addNamedPlan(new TextViewAlteringNamedPlan("text view altering one"), "plan two", textView);
+    runtime.addNamedPlan(new TextViewAlteringNamedPlan("text view altering two"), "plan three", textView);
+    runtime.removeNamedPlan("plan two", textView);
+
+    assertThat(storageTracer.performers.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void testPerformerCallbacksAreInvokedBeforeTracers() {
+    TrackingTracing trackingTracer = new TrackingTracing();
+    TrackingPlan trackingPlan = new TrackingPlan();
+
+    runtime.addTracer(trackingTracer);
+    runtime.addNamedPlan(trackingPlan, "tracking_plan_name", trackingTracer);
+    runtime.removeNamedPlan("tracking_plan_name", trackingTracer);
+
+    List<String> expectedEvents = new ArrayList<>();
+    expectedEvents.add("performerAddPlan");
+    expectedEvents.add("onAddNamedPlan");
+    expectedEvents.add("performerRemovePlan");
+    expectedEvents.add("onRemoveNamedPlan");
+
+    assertThat(trackingTracer.getEvents()).isEqualTo(expectedEvents);
+  }
+
+  private static class TrackingTracing implements Tracing {
+
+    List<String> events = new ArrayList<>();
+
+    @Override
+    public void onAddPlan(Plan plan, Object target) {
+
+    }
+
+    @Override
+    public void onAddNamedPlan(NamedPlan plan, String name, Object target) {
+      events.add("onAddNamedPlan");
+    }
+
+    @Override
+    public void onRemoveNamedPlan(String name, Object target) {
+      events.add("onRemoveNamedPlan");
+    }
+
+    @Override
+    public void onCreatePerformer(Performer performer, Object target) {
+
+    }
+
+    List<String> getEvents() {
+      return events;
+    }
+  }
+
+  private static class TrackingPlan extends Plan implements NamedPlan {
+
+    @Override
+    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+      return TrackingPlanPerformer.class;
+    }
+  }
+
+  public static class StorageTracing implements Tracing {
+
+    List<BasePerforming> performers = new ArrayList<BasePerforming>();
+    List<BasePlan> addedRegularPlans = new ArrayList<>();
+    List<String> addedNamePlans = new ArrayList<>();
+    List<String> removedNamePlans = new ArrayList<>();
+
+    @Override
+    public void onAddPlan(Plan plan, Object target) {
+      addedRegularPlans.add(plan);
+    }
+
+    @Override
+    public void onAddNamedPlan(NamedPlan plan, String name, Object target) {
+      addedNamePlans.add(name);
+    }
+
+    @Override
+    public void onRemoveNamedPlan(String name, Object target) {
+      removedNamePlans.add(name);
+    }
+
+    @Override
+    public void onCreatePerformer(Performer performer, Object target) {
+      performers.add(performer);
+    }
   }
 
   private static class StorageNamedPlan extends Plan implements NamedPlan {
@@ -337,20 +545,6 @@ public class RuntimeTests {
     @Override
     public Class<? extends NamedPlanPerforming> getPerformerClass() {
       return GenericPlanPerformer.class;
-    }
-  }
-
-  private static class StandardPlan extends Plan implements NamedPlan {
-
-    private final String text;
-
-    private StandardPlan(String text) {
-      this.text = text;
-    }
-
-    @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
-      return StandardPerformer.class;
     }
   }
 
@@ -396,12 +590,6 @@ public class RuntimeTests {
     }
   }
 
-  public class IncrementerTarget {
-
-    int addCounter = 0;
-    int removeCounter = 0;
-  }
-
   public static class NamedCounterPlanPerformer extends Performer implements NamedPlanPerforming {
 
     @Override
@@ -419,6 +607,21 @@ public class RuntimeTests {
     public void removePlan(String name) {
       IncrementerTarget target = getTarget();
       target.removeCounter += 1;
+    }
+  }
+
+  public static class TrackingPlanPerformer extends StoragePlanPerformer {
+
+    @Override
+    public void addPlan(NamedPlan plan, String name) {
+      TrackingTracing tracer = getTarget();
+      tracer.events.add("performerAddPlan");
+    }
+
+    @Override
+    public void removePlan(String name) {
+      TrackingTracing tracer = getTarget();
+      tracer.events.add("performerRemovePlan");
     }
   }
 
@@ -463,30 +666,16 @@ public class RuntimeTests {
     }
   }
 
-  public static class StandardPerformer extends Performer implements NamedPlanPerforming {
-
-    @Override
-    public void addPlan(BasePlan plan) {
-      StandardPlan standardPlan = (StandardPlan) plan;
-      TextView target = getTarget();
-      target.setText(target.getText() + " " + standardPlan.text);
-    }
-
-    @Override
-    public void addPlan(NamedPlan plan, String name) {
-      addPlan(plan);
-    }
-
-    @Override
-    public void removePlan(String name) {
-    }
-  }
-
   public static class ManualPerformer extends Performer implements ManualPerforming,
     NamedPlanPerforming {
 
     @Override
     public int update(float deltaTimeMs) {
+      // Incredibly ugly hack. Tests need to inspect that a certain deltaTimeMs was passed into
+      // this function. Save it to the target. Perhaps tracing support will make this easier to
+      // test.
+      View target = getTarget();
+      target.setTag(deltaTimeMs);
       return Runtime.ACTIVE;
     }
 

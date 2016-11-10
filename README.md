@@ -1,7 +1,7 @@
 # Material Motion Android Runtime
 
-[![Build Status](https://travis-ci.org/material-motion/material-motion-runtime-android.svg?branch=develop)](https://travis-ci.org/material-motion/material-motion-runtime-android)
-[![codecov](https://codecov.io/gh/material-motion/material-motion-runtime-android/branch/develop/graph/badge.svg)](https://codecov.io/gh/material-motion/material-motion-runtime-android)
+[![Build Status](https://travis-ci.org/material-motion/runtime-android.svg?branch=develop)](https://travis-ci.org/material-motion/runtime-android)
+[![codecov](https://codecov.io/gh/material-motion/runtime-android/branch/develop/graph/badge.svg)](https://codecov.io/gh/material-motion/runtime-android)
 
 The Material Motion Runtime is a tool for describing motion declaratively.
 
@@ -14,15 +14,23 @@ This library encourages you to describe motion as data, or what we call *plans*.
 to the *runtime*. The runtime coordinates the creation of *performers*, objects responsible for
 translating plans into concrete execution.
 
+To use the runtime, simply instantiate a `Runtime` object and add a plan.
+
+```
+Plan plan;
+View target;
+
+Runtime runtime = new Runtime();
+runtime.addPlan(plan, target);
+```
+
 Learn more about the APIs defined in the library by reading our
-[technical documentation](https://material-motion.github.io/material-motion-runtime-android/) and our
+[technical documentation](https://jitpack.io/com/github/material-motion/runtime-android/4.1.0/javadoc/) and our
 [Starmap](https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/).
 
 ## Installation
 
 ### Installation with Jitpack
-
-Use Jitpack to depend on any of our [public releases](https://github.com/material-motion/material-motion-runtime-android/releases).
 
 Add the Jitpack repository to your project's `build.gradle`:
 
@@ -34,39 +42,17 @@ allprojects {
 }
 ```
 
-When starting out with a project it is likely that you will want to use the
-latest version of the library. Add the dependency to your module's
-`build.gradle`:
+Depend on the [latest version](https://github.com/material-motion/runtime-android/releases) of the library.
+Take care to occasionally [check for updates](https://github.com/ben-manes/gradle-versions-plugin).
 
 ```gradle
 dependencies {
-    compile 'com.github.material-motion:material-motion-runtime-android:+'
-}
-```
-
-Later on in the project you may want to freeze to a specific version of the
-library. This is **highly recommended** because it makes your builds predictable
-and reproducible. Take care to occasionally [check for updates](https://github.com/ben-manes/gradle-versions-plugin).
-
-```gradle
-dependencies {
-    compile 'com.github.material-motion:material-motion-runtime-android:4.0.0'
-}
-```
-
-It is also possible to specify a *dynamic version* range. This is useful to stay
-up to date on a major version, without the risk of new library releases
-introducing breaking changes into your project.
-
-```gradle
-dependencies {
-    compile 'com.github.material-motion:material-motion-runtime-android:4.+'
+    compile 'com.github.material-motion:material-motion-runtime-android:4.1.0'
 }
 ```
 
 For more information regarding versioning, see:
 
-- [Gradle Documentation on Dynamic Versions](https://docs.gradle.org/current/userguide/dependency_management.html#sub:dynamic_versions_and_changing_modules)
 - [Material Motion Versioning Policies](https://material-motion.gitbooks.io/material-motion-team/content/essentials/core_team_contributors/release_process.html#versioning)
 
 ### Using the files from a folder local to the machine
@@ -89,7 +75,7 @@ For each local dependency listed, you *must* run `gradle install` from its
 project root every time you make a change to it. That command will publish your
 latest changes to the local maven repository. If your local dependencies have
 local dependencies of their own, you must `gradle install` them as well. See
-[Issue #16](https://github.com/material-motion/material-motion-runtime-android/issues/16).
+[Issue #16](https://github.com/material-motion/runtime-android/issues/16).
 
 You must `gradle clean` your project every time you add or remove a local
 dependency.
@@ -108,13 +94,13 @@ choose the root `build.gradle` file.
 
 To build the sample application, run the following commands:
 
-    git clone https://github.com/material-motion/material-motion-runtime-android.git
+    git clone https://github.com/material-motion/runtime-android.git
     cd material-motion-runtime-android
     gradle installDebug
 
 To run all unit tests, run the following commands:
 
-    git clone https://github.com/material-motion/material-motion-runtime-android.git
+    git clone https://github.com/material-motion/runtime-android.git
     cd material-motion-runtime-android
     gradle test
 
@@ -136,15 +122,15 @@ constellation of protocols loosely consisting of plan and performing types.
 
 ### Runtime
 
-The Runtime](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Runtime.html)
+The [Runtime](https://jitpack.io/com/github/material-motion/runtime-android/4.1.0/javadoc/index.html?com/google/android/material/motion/runtime/Runtime.html)
 object is a coordinating entity whose primary responsibility is to fulfill plans by creating
 performers. You can create many runtimes throughout the lifetime of your application. A good rule
 of thumb is to have one runtime per interaction or transition.
 
 ### Plan + Performing types
 
-The [Plan](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Plan.html)
-and [Performer](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.html)
+The [Plan](https://jitpack.io/com/github/material-motion/runtime-android/4.1.0/javadoc/index.html?com/google/android/material/motion/runtime/Plan.html)
+and [Performer](https://jitpack.io/com/github/material-motion/runtime-android/4.1.0/javadoc/index.html?com/google/android/material/motion/runtime/Performer.html)
 classes each define the minimal characteristics required for an object to be considered either a
 plan or a performer, respectively, by the Material Motion Runtime.
 
@@ -183,9 +169,9 @@ public class MyPlan {
 
 Performers are responsible for fulfilling plans. Fulfillment is possible in a variety of ways:
 
-- [NamedPlanPerforming](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.NamedPlanPerforming.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
-- [ContinuousPerforming](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ContinuousPerforming.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
-- [ComposablePerforming](https://material-motion.github.io/material-motion-runtime-android/index.html?com/google/android/material/motion/runtime/Performer.ComposablePerforming.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
+- [NamedPlanPerforming](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/4.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.NamedPlanPerforming.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
+- [ContinuousPerforming](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/4.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ContinuousPerforming.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
+- [ComposablePerforming](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/4.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ComposablePerforming.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
 
 See the associated links for more details on each performing type.
 
