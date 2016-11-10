@@ -114,6 +114,8 @@ To run all unit tests, run the following commands:
 1. [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
 1. [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
 1. [How to indicate continuous performance](#how-to-indicate-continuous-performance)
+1. [How to trace internal runtime events](#how-to-trace-internal-runtime-events)
+1. [How to log runtime events to the console](#how-to-log-runtime-events-to-the-console)
 
 ## Architecture
 
@@ -379,6 +381,42 @@ animator.start();
 public void onAnimationEnd(Animator animation) {
   token.terminate();
 }
+```
+
+## How to trace internal runtime events
+
+Tracing allows you to observe internal events occurring within a runtime. This information may be
+used for the following purposes:
+
+- Debug logging.
+- Inspection tooling.
+
+Use for other purposes is unsupported.
+
+### Step 1: Create a tracer class
+
+```java
+public class CustomTracer implements Tracing {
+}
+```
+
+### Step 2: Implement methods
+
+The documentation for the Tracing interface enumerates the available methods.
+
+```java
+public class CustomTracer implements Tracing {
+  @Override
+  public void onAddPlan(Plan plan, Object target) {
+
+  }
+}
+```
+
+## How to log runtime events to the console
+
+```java
+runtime.addTracer(new LogcatTracer());
 ```
 
 ## Contributing
