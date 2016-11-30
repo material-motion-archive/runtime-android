@@ -30,8 +30,8 @@ import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerfor
 import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Runtime.State;
-import com.google.android.material.motion.runtime.Runtime.StateListener;
+import com.google.android.material.motion.runtime.MotionRuntime.State;
+import com.google.android.material.motion.runtime.MotionRuntime.StateListener;
 import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 import com.google.android.material.motion.runtime.testing.StepChoreographer;
@@ -54,14 +54,14 @@ public class RuntimeTests {
 
   private static final float EPSILON = 0.0001f;
 
-  private Runtime runtime;
+  private MotionRuntime runtime;
   private StepChoreographer choreographer;
   private TextView textView;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
-    runtime = new Runtime();
+    runtime = new MotionRuntime();
     choreographer = new StepChoreographer();
     runtime.choreographer = choreographer;
     textView = new TextView(context);
@@ -69,33 +69,33 @@ public class RuntimeTests {
 
   @Test
   public void testInitialRuntimeState() {
-    assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.IDLE);
   }
 
   @Test
   public void testStandardPerformerRuntimeState() {
     runtime.addNamedPlan(new TextViewAlteringNamedPlan("standard"), "plan", textView);
 
-    assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.IDLE);
   }
 
   @Test
   public void testManualPerformerRuntimeState() {
     runtime.addNamedPlan(new ManualPlan("manual"), "plan", textView);
 
-    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.ACTIVE);
   }
 
   @Test
   public void testTwoActivePerformersStillActive() {
     runtime.addNamedPlan(new ManualPlan("manual"), "plan", textView);
 
-    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.ACTIVE);
 
     runtime.addPlan(new NeverEndingContinuousPlan("continuous"), textView);
 
     // Still active.
-    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.ACTIVE);
   }
 
   @Test
@@ -121,8 +121,8 @@ public class RuntimeTests {
     runtime.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
     runtime.addPlan(new TextViewAlteringNamedPlan("standard one"), textView);
 
-    assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
-    assertThat(secondListener.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(firstListener.getState()).isEqualTo(MotionRuntime.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(MotionRuntime.ACTIVE);
   }
 
   @Test
@@ -135,8 +135,8 @@ public class RuntimeTests {
     runtime.addPlan(new TextViewAlteringNamedPlan("standard one"), textView);
     runtime.addNamedPlan(new ManualPlan("manual one"), "plan", textView);
 
-    assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
-    assertThat(secondListener.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(firstListener.getState()).isEqualTo(MotionRuntime.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(MotionRuntime.ACTIVE);
   }
 
   @Test
@@ -150,8 +150,8 @@ public class RuntimeTests {
 
     runtime.addNamedPlan(new ManualPlan("manual"), "plan", textView);
 
-    assertThat(firstListener.getState()).isEqualTo(Runtime.ACTIVE);
-    assertThat(secondListener.getState()).isEqualTo(Runtime.IDLE);
+    assertThat(firstListener.getState()).isEqualTo(MotionRuntime.ACTIVE);
+    assertThat(secondListener.getState()).isEqualTo(MotionRuntime.IDLE);
   }
 
   @Test
@@ -164,28 +164,28 @@ public class RuntimeTests {
     runtime.addPlan(new ManualPlan("manual"), textView);
 
     // Listener invoked only once.
-    verify(listener, times(1)).onStateChange(runtime, Runtime.ACTIVE);
+    verify(listener, times(1)).onStateChange(runtime, MotionRuntime.ACTIVE);
   }
 
   @Test
   public void testNeverEndingDelegatePerformingRuntimeState() {
     runtime.addNamedPlan(new NeverEndingContinuousPlan("continuous"), "plan", textView);
 
-    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.ACTIVE);
   }
 
   @Test
   public void testEndingContinuousPerformingRuntimeState() {
     runtime.addNamedPlan(new EndingContinuousPlan("continuous"), "plan", textView);
 
-    assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.IDLE);
   }
 
   @Test
   public void testAddingPlanDirectlyToRuntime() {
     runtime.addPlan(new NeverEndingContinuousPlan("continuous"), textView);
 
-    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.ACTIVE);
   }
 
   @Test
@@ -230,7 +230,7 @@ public class RuntimeTests {
   public void testAddAndRemoveCallbacksAreInvoked() {
     NamedTargetAlteringPlan plan1 = new NamedTargetAlteringPlan();
     NamedTargetAlteringPlan plan2 = new NamedTargetAlteringPlan();
-    Runtime runtime = new Runtime();
+    MotionRuntime runtime = new MotionRuntime();
     runtime.addNamedPlan(plan1, "common_name", textView);
     runtime.addNamedPlan(plan2, "common_name", textView);
 
@@ -677,7 +677,7 @@ public class RuntimeTests {
       // test.
       View target = getTarget();
       target.setTag(deltaTimeMs);
-      return Runtime.ACTIVE;
+      return MotionRuntime.ACTIVE;
     }
 
     @Override
@@ -747,12 +747,12 @@ public class RuntimeTests {
     }
   }
 
-  public static class TestRuntimeListener implements Runtime.StateListener {
+  public static class TestRuntimeListener implements MotionRuntime.StateListener {
 
     private int state;
 
     @Override
-    public void onStateChange(Runtime runtime, @State int newState) {
+    public void onStateChange(MotionRuntime runtime, @State int newState) {
       this.state = newState;
     }
 

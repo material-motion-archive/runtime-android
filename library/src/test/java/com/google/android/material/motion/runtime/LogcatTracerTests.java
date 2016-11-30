@@ -41,11 +41,11 @@ import static com.google.common.truth.Truth.assertThat;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class LogcatTracerTests {
 
-  private Runtime runtime;
+  private MotionRuntime runtime;
 
   @Before
   public void setUp() {
-    runtime = new Runtime();
+    runtime = new MotionRuntime();
     runtime.addTracer(new LogcatTracer());
   }
 

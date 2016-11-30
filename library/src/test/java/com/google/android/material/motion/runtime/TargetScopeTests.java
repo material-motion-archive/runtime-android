@@ -28,7 +28,7 @@ import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPe
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveTokenGenerator;
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.Runtime.State;
+import com.google.android.material.motion.runtime.MotionRuntime.State;
 import com.google.android.material.motion.runtime.testing.StepChoreographer;
 
 import org.junit.Before;
@@ -48,7 +48,7 @@ public class TargetScopeTests {
    * One frame in ms.
    */
   private static final float FRAME = 16;
-  private Runtime runtime;
+  private MotionRuntime runtime;
   private View target;
 
   @Rule
@@ -56,7 +56,7 @@ public class TargetScopeTests {
 
   @Before
   public void setUp() {
-    runtime = new Runtime();
+    runtime = new MotionRuntime();
     runtime.choreographer = new StepChoreographer();
     Context context = Robolectric.setupActivity(Activity.class);
     target = new View(context);
@@ -67,17 +67,17 @@ public class TargetScopeTests {
     TargetScope targetScope = new TargetScope(runtime);
 
     // Runtime starts as idle.
-    assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.IDLE);
 
-    targetScope.commitPlan(new ManualPlan(Runtime.IDLE), target);
+    targetScope.commitPlan(new ManualPlan(MotionRuntime.IDLE), target);
 
     // Runtime becomes active when a manual performer exists.
-    assertThat(runtime.getState()).isEqualTo(Runtime.ACTIVE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.ACTIVE);
 
     targetScope.update(FRAME);
 
     // Runtime becomes idle when manual performer is idle.
-    assertThat(runtime.getState()).isEqualTo(Runtime.IDLE);
+    assertThat(runtime.getState()).isEqualTo(MotionRuntime.IDLE);
   }
 
   @Test(expected = PerformerInstantiationException.class)

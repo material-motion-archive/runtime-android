@@ -19,7 +19,7 @@ import android.support.annotation.VisibleForTesting;
 
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Runtime.State;
+import com.google.android.material.motion.runtime.MotionRuntime.State;
 
 /**
  * Defines the APIs that a {@link Performer} can implement.
@@ -95,7 +95,7 @@ public final class PerformerFeatures {
   public interface ContinuousPerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Runtime} to supply the {@link Performer} with a {@link
+     * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link
      * IsActiveTokenGenerator}.
      */
     void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator);
@@ -136,10 +136,10 @@ public final class PerformerFeatures {
   public interface ManualPerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Runtime} to notify the {@link Performer} of a new frame.
+     * Called by the {@link MotionRuntime} to notify the {@link Performer} of a new frame.
      *
      * @param deltaTimeMs The elapsed time in milliseconds since the last update.
-     * @return The {@link State} of this Performer after this update. {@link Runtime#IDLE} means
+     * @return The {@link State} of this Performer after this update. {@link MotionRuntime#IDLE} means
      * this Performer does not wish to get any more frame updates.
      */
     @State
@@ -154,7 +154,7 @@ public final class PerformerFeatures {
   public interface ComposablePerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Runtime} to supply the {@link Performer} with a {@link
+     * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link
      * PlanEmitter}.
      */
     void setPlanEmitter(PlanEmitter planEmitter);

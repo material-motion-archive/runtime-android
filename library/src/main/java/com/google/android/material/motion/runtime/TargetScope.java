@@ -16,8 +16,8 @@
 
 package com.google.android.material.motion.runtime;
 
-import static com.google.android.material.motion.runtime.Runtime.CONTINUOUS_DETAILED_STATE_FLAG;
-import static com.google.android.material.motion.runtime.Runtime.MANUAL_DETAILED_STATE_FLAG;
+import static com.google.android.material.motion.runtime.MotionRuntime.CONTINUOUS_DETAILED_STATE_FLAG;
+import static com.google.android.material.motion.runtime.MotionRuntime.MANUAL_DETAILED_STATE_FLAG;
 
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.SimpleArrayMap;
@@ -32,13 +32,13 @@ import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerfor
 import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Runtime.State;
+import com.google.android.material.motion.runtime.MotionRuntime.State;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A helper class for {@link Runtime} that scopes {@link Performer} instances by target.
+ * A helper class for {@link MotionRuntime} that scopes {@link Performer} instances by target.
  *
  * <p> Ensures only a single instance of Performer is created for each type of Performer required by
  * a target.
@@ -54,9 +54,9 @@ class TargetScope {
   private final SimpleArrayMap<ContinuousPerforming, Set<IsActiveToken>>
     activeContinuousPerformers = new SimpleArrayMap<>();
 
-  private final Runtime runtime;
+  private final MotionRuntime runtime;
 
-  TargetScope(Runtime runtime) {
+  TargetScope(MotionRuntime runtime) {
     this.runtime = runtime;
   }
 
@@ -117,7 +117,7 @@ class TargetScope {
     while (iterator.hasNext()) {
       ManualPerforming performer = iterator.next();
       @State int state = performer.update(deltaTimeMs);
-      if (state == Runtime.IDLE) {
+      if (state == MotionRuntime.IDLE) {
         iterator.remove();
         changed = true;
       }

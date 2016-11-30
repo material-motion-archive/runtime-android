@@ -16,13 +16,13 @@ This library encourages you to describe motion as data, or what we call *plans*.
 to the *runtime*. The runtime coordinates the creation of *performers*, objects responsible for
 translating plans into concrete execution.
 
-To use the runtime, simply instantiate a `Runtime` object and add a plan.
+To use the runtime, simply instantiate a `MotionRuntime` object and add a plan.
 
 ```
 Plan plan;
 View target;
 
-Runtime runtime = new Runtime();
+MotionRuntime runtime = new MotionRuntime();
 runtime.addPlan(plan, target);
 ```
 
@@ -49,7 +49,7 @@ Take care to occasionally [check for updates](https://github.com/ben-manes/gradl
 
 ```gradle
 dependencies {
-    compile 'com.github.material-motion:material-motion-runtime-android:5.0.0'
+    compile 'com.github.material-motion:runtime-android:5.0.0'
 }
 ```
 
@@ -64,7 +64,7 @@ with its client project. To add a local dependency on this library, add this
 library's identifier to your project's `local.dependencies`:
 
 ```
-com.github.material-motion:material-motion-runtime-android
+com.github.material-motion:runtime-android
 ```
 
 > Because `local.dependencies` is never to be checked into Version Control
@@ -97,13 +97,13 @@ choose the root `build.gradle` file.
 To build the sample application, run the following commands:
 
     git clone https://github.com/material-motion/runtime-android.git
-    cd material-motion-runtime-android
+    cd runtime-android
     gradle installDebug
 
 To run all unit tests, run the following commands:
 
     git clone https://github.com/material-motion/runtime-android.git
-    cd material-motion-runtime-android
+    cd runtime-android
     gradle test
 
 # Guides
@@ -124,9 +124,9 @@ To run all unit tests, run the following commands:
 The Material Motion Runtime consists of two groups of APIs: a runtime object and a
 constellation of protocols loosely consisting of plan and performing types.
 
-### Runtime
+### MotionRuntime
 
-The [Runtime](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Runtime.html)
+The [MotionRuntime](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/MotionRuntime.html)
 object is a coordinating entity whose primary responsibility is to fulfill plans by creating
 performers. You can create many runtimes throughout the lifetime of your application. A good rule
 of thumb is to have one runtime per interaction or transition.
@@ -173,9 +173,9 @@ public class MyPlan {
 
 Performers are responsible for fulfilling plans. Fulfillment is possible in a variety of ways:
 
-- [NamedPlanPerforming](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.NamedPlanPerforming.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
-- [ContinuousPerforming](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ContinuousPerforming.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
-- [ComposablePerforming](https://jitpack.io/com/github/material-motion/material-motion-runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ComposablePerforming.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
+- [NamedPlanPerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.NamedPlanPerforming.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
+- [ContinuousPerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ContinuousPerforming.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
+- [ComposablePerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ComposablePerforming.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
 
 See the associated links for more details on each performing type.
 
@@ -219,7 +219,7 @@ public class MyPlan extends Plan {
 
 ```java
 public class MyActivity extends Activity {
-  private final Runtime runtime = new Runtime();
+  private final MotionRuntime runtime = new MotionRuntime();
 }
 ```
 
@@ -238,7 +238,7 @@ runtime.addPlan(plan, target);
 
 ```java
 public class MyActivity extends Activity {
-  private final Runtime runtime = new Runtime();
+  private final MotionRuntime runtime = new MotionRuntime();
 }
 ```
 
@@ -425,7 +425,7 @@ runtime.addTracer(new LogcatTracer());
 
 We welcome contributions!
 
-Check out our [upcoming milestones](https://github.com/material-motion/material-motion-runtime-android/milestones).
+Check out our [upcoming milestones](https://github.com/material-motion/runtime-android/milestones).
 
 Learn more about [our team](https://material-motion.gitbooks.io/material-motion-team/content/),
 [our community](https://material-motion.gitbooks.io/material-motion-team/content/community/),

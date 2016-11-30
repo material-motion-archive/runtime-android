@@ -35,13 +35,13 @@ import org.robolectric.annotation.Config;
 @Config(constants = BuildConfig.class, sdk = 21)
 public class ComposablePlanTests {
 
-  private Runtime runtime;
+  private MotionRuntime runtime;
   private TextView textView;
 
   @Before
   public void setUp() {
     Context context = Robolectric.setupActivity(Activity.class);
-    runtime = new Runtime();
+    runtime = new MotionRuntime();
     textView = new TextView(context);
   }
 

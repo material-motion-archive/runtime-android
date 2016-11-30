@@ -50,8 +50,8 @@ public final class PlanFeatures {
    * Plans should implement this interface if it wants to support the named plan API.
    * <p>
    * A named plan is a {@link Plan} whose performer supports adding and remove the plan by
-   * name. Register a named plan by calling {@link Runtime#addNamedPlan(NamedPlan, String,
-   * Object)}, and remove it by calling {@link Runtime#removeNamedPlan(String, Object)}.
+   * name. Register a named plan by calling {@link MotionRuntime#addNamedPlan(NamedPlan, String,
+   * Object)}, and remove it by calling {@link MotionRuntime#removeNamedPlan(String, Object)}.
    * <p>
    * A named plan or family of named plans enables fine configuration of a performer's
    * behavior.
