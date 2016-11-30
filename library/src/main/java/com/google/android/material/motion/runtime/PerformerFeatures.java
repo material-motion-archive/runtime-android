@@ -15,16 +15,20 @@
  */
 package com.google.android.material.motion.runtime;
 
+import android.support.annotation.VisibleForTesting;
+
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Runtime.State;
+import com.google.android.material.motion.runtime.MotionRuntime.State;
 
 /**
  * Defines the APIs that a {@link Performer} can implement.
  */
 public final class PerformerFeatures {
 
-  private PerformerFeatures() {
+  @VisibleForTesting
+  PerformerFeatures() {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -39,14 +43,16 @@ public final class PerformerFeatures {
     void initialize(Object target);
 
     /**
-     * Provides a {@link Plan} to this Performer. The Performer is expected to execute this plan.
+     * Provides a {@link Plan} to this Performer. The Performer is expected to execute this
+     * plan.
      */
     void addPlan(BasePlan plan);
 
     /**
      * Returns the target that this Performer is associated with.
      *
-     * @param <T> Convenience to avoid casting, for when the caller knows the type of the target.
+     * @param <T> Convenience to avoid casting, for when the caller knows the type of the
+     * target.
      * @return The target.
      */
     <T> T getTarget();
@@ -59,8 +65,8 @@ public final class PerformerFeatures {
   public interface NamedPlanPerforming extends BasePerforming {
 
     /**
-     * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any plan
-     * added in this manner.
+     * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any
+     * plan added in this manner.
      *
      * @param plan the plan which was added to this performer.
      * @param name the name by which this plan can be identified.
@@ -78,18 +84,18 @@ public final class PerformerFeatures {
 
   /**
    * A Performer implements this interface in order to request and release is-active tokens. The
-   * runtime uses these tokens to inform its active state. If any performer owns an is-active token
-   * then the runtime is active. Otherwise, the runtime is idle.
-   *
-   * <p> The only requirement is that the Performer must request a token from the {@link
+   * runtime uses these tokens to inform its active state. If any performer owns an is-active
+   * token then the runtime is active. Otherwise, the runtime is idle.
+   * <p>
+   * The only requirement is that the Performer must request a token from the {@link
    * IsActiveTokenGenerator token generator} when the continuous performance {@link
-   * IsActiveTokenGenerator#generate() starts} and release the token when the continuous performance
-   * {@link IsActiveToken#terminate() ends}.
+   * IsActiveTokenGenerator#generate() starts} and release the token when the continuous
+   * performance {@link IsActiveToken#terminate() ends}.
    */
   public interface ContinuousPerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Runtime} to supply the {@link Performer} with a {@link
+     * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link
      * IsActiveTokenGenerator}.
      */
     void setIsActiveTokenGenerator(IsActiveTokenGenerator isActiveTokenGenerator);
@@ -102,7 +108,7 @@ public final class PerformerFeatures {
       /**
        * Generate and return a new is-active token. The receiver of this token is expected to
        * eventually {@link IsActiveToken#terminate()} the token.
-       *
+       * <p>
        * Usually called by a {@link ContinuousPerforming} when it starts.
        */
       IsActiveToken generate();
@@ -114,8 +120,8 @@ public final class PerformerFeatures {
     interface IsActiveToken {
 
       /**
-       * Notifies that the continuous performance has ended. Subsequent invocations of this method
-       * will result in an exception.
+       * Notifies that the continuous performance has ended. Subsequent invocations of this
+       * method will result in an exception.
        */
       void terminate();
     }
@@ -124,16 +130,16 @@ public final class PerformerFeatures {
   /**
    * A Performer implements this interface in order to do manual calculations in {@link
    * #update(float)}.
-   *
-   * <p> The Performer is expected to calculate and set its target's next state on each update.
+   * <p>
+   * The Performer is expected to calculate and set its target's next state on each update.
    */
   public interface ManualPerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Runtime} to notify the {@link Performer} of a new frame.
+     * Called by the {@link MotionRuntime} to notify the {@link Performer} of a new frame.
      *
      * @param deltaTimeMs The elapsed time in milliseconds since the last update.
-     * @return The {@link State} of this Performer after this update. {@link Runtime#IDLE} means
+     * @return The {@link State} of this Performer after this update. {@link MotionRuntime#IDLE} means
      * this Performer does not wish to get any more frame updates.
      */
     @State
@@ -142,13 +148,14 @@ public final class PerformerFeatures {
 
   /**
    * A Performer implements this interface in order to commit new {@link Plan Plans}.
-   *
-   * <p> The Performer should call {@link PlanEmitter#emit(Plan)} to add new plans.
+   * <p>
+   * The Performer should call {@link PlanEmitter#emit(Plan)} to add new plans.
    */
   public interface ComposablePerforming extends BasePerforming {
 
     /**
-     * Called by the {@link Runtime} to supply the {@link Performer} with a {@link PlanEmitter}.
+     * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link
+     * PlanEmitter}.
      */
     void setPlanEmitter(PlanEmitter planEmitter);
 

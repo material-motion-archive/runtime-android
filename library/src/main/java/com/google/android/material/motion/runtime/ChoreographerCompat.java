@@ -17,32 +17,40 @@
 package com.google.android.material.motion.runtime;
 
 import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.view.Choreographer;
 
 /**
  * A compatibility shim for {@link Choreographer} calls, since this class was not
  * available until API 16. For older versions of Android, a Handler will be used instead.
  */
-abstract class ChoreographerCompat {
-  private static final ThreadLocal<ChoreographerCompat> threadInstance =
-      new ThreadLocal<ChoreographerCompat>() {
-        @Override
-        protected ChoreographerCompat initialValue() {
-          if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
-            return new RealChoreographer();
-          } else {
-            Looper looper = Looper.myLooper();
-            if (looper == null) {
-              throw new IllegalStateException("The current thread must have a looper!");
-            }
-            return new LegacyHandlerWrapper(looper);
-          }
+public abstract class ChoreographerCompat {
+  @VisibleForTesting
+  static boolean forceLegacy = false;
+
+  @VisibleForTesting
+  static ThreadLocal<ChoreographerCompat> threadInstance = createThreadInstance();
+
+  @VisibleForTesting
+  @NonNull
+  static ThreadLocal<ChoreographerCompat> createThreadInstance() {
+    return new ThreadLocal<ChoreographerCompat>() {
+      @Override
+      protected ChoreographerCompat initialValue() {
+        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN && !forceLegacy) {
+          return new RealChoreographer();
+        } else {
+          return new LegacyHandlerWrapper(Looper.myLooper());
         }
-      };
+      }
+    };
+  }
 
   /**
    * Return the instance of {@link ChoreographerCompat} for the current thread. The thread must have
@@ -143,11 +151,15 @@ abstract class ChoreographerCompat {
    * A {@link ChoreographerCompat} that wraps a {@link Handler} and emulates (at a basic level,
    * anyway) the behavior of a {@link Choreographer}.
    */
-  private static class LegacyHandlerWrapper extends ChoreographerCompat {
+  @VisibleForTesting
+  static class LegacyHandlerWrapper extends ChoreographerCompat {
     private static final long FRAME_TIME_MS = 17;
     private Handler handler;
 
     public LegacyHandlerWrapper(Looper looper) {
+      if (looper == null) {
+        throw new IllegalStateException("The current thread must have a looper!");
+      }
       handler = new Handler(looper);
     }
 

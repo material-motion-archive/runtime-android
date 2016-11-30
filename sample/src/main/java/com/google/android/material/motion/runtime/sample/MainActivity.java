@@ -21,6 +21,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+
+import com.google.android.material.motion.runtime.MotionRuntime;
 import com.google.android.material.motion.runtime.Performer;
 import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
@@ -28,7 +30,6 @@ import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPer
 import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.Runtime;
 
 /**
  * Material Motion Android Runtime sample Activity.
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     text1.setText("");
     text2.setAlpha(0f);
 
-    Runtime runtime = new Runtime();
+    MotionRuntime runtime = new MotionRuntime();
 
     runtime.addNamedPlan(new DemoPlan1("trash"), "cd", text1);
     runtime.addPlan(new DemoPlan1("get"), text1);

@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.android.material.motion.runtime;
+package com.google.android.material.motion.runtime.testing;
 
 import android.support.v4.util.SimpleArrayMap;
+
+import com.google.android.material.motion.runtime.ChoreographerCompat;
 
 /**
  * A {@link ChoreographerCompat} implementation for tests. Allows a test to {@link #advance(long)}

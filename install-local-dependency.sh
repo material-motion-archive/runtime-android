@@ -28,11 +28,11 @@ name="$2"
 dir="$(mdm dir $name)" || {
   cat << EOF
 Failed to get the local repo path for dependency $group:$name.
-Make sure you read through our Contributor essentials: https://www.gitbook.com/book/material-motion/material-motion-team/
+Make sure you read through our Contributor essentials: https://material-motion.github.io/material-motion/team/essentials/
 
 Especially make sure that:
 
-* You have installed our team's mdm tool https://material-motion.gitbooks.io/material-motion-team/content/essentials/frequent_contributors/tools.html
+* You have installed our team's mdm tool https://material-motion.github.io/material-motion/team/essentials/frequent_contributors/tools
     \$(mdm dir) should output the correct directory
 * You have cloned the repo for $group:$name
     \$(mdm dir $name) should output the correct directory

@@ -15,9 +15,24 @@
  */
 package com.google.android.material.motion.runtime;
 
-/**
- * @deprecated in 5.1.0 use {@link MotionRuntime}.
- */
-@Deprecated
-public class Runtime extends MotionRuntime {
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
+public class LegacyChoreographerCompatTests extends ChoreographerCompatTests {
+
+  @BeforeClass
+  public static void oneTimeSetUp() {
+    ChoreographerCompat.forceLegacy = true;
+    ChoreographerCompat.threadInstance = ChoreographerCompat.createThreadInstance();
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void nullLooperThrows() {
+    new ChoreographerCompat.LegacyHandlerWrapper(null);
+  }
 }
