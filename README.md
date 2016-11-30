@@ -27,7 +27,7 @@ runtime.addPlan(plan, target);
 ```
 
 Learn more about the APIs defined in the library by reading our
-[technical documentation](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/) and our
+[technical documentation](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/) and our
 [Starmap](https://material-motion.github.io/material-motion/starmap/).
 
 ## Installation
@@ -49,7 +49,7 @@ Take care to occasionally [check for updates](https://github.com/ben-manes/gradl
 
 ```gradle
 dependencies {
-    compile 'com.github.material-motion:runtime-android:5.0.0'
+    compile 'com.github.material-motion:runtime-android:5.1.0'
 }
 ```
 
@@ -125,15 +125,15 @@ constellation of protocols loosely consisting of plan and performing types.
 
 ### MotionRuntime
 
-The [MotionRuntime](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/MotionRuntime.html)
+The [MotionRuntime](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/MotionRuntime.html)
 object is a coordinating entity whose primary responsibility is to fulfill plans by creating
 performers. You can create many runtimes throughout the lifetime of your application. A good rule
 of thumb is to have one runtime per interaction or transition.
 
 ### Plan + Performing types
 
-The [Plan](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Plan.html)
-and [Performer](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/Performer.html)
+The [Plan](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/Plan.html)
+and [Performer](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/Performer.html)
 classes each define the minimal characteristics required for an object to be considered either a
 plan or a performer, respectively, by the Material Motion Runtime.
 
@@ -172,9 +172,9 @@ public class MyPlan {
 
 Performers are responsible for fulfilling plans. Fulfillment is possible in a variety of ways:
 
-- [NamedPlanPerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.NamedPlanPerforming.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
-- [ContinuousPerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ContinuousPerforming.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
-- [ComposablePerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.0.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ComposablePerforming.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
+- [NamedPlanPerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.NamedPlanPerforming.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
+- [ContinuousPerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ContinuousPerforming.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
+- [ComposablePerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ComposablePerforming.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
 
 See the associated links for more details on each performing type.
 

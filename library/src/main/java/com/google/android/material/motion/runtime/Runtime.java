@@ -16,7 +16,7 @@
 package com.google.android.material.motion.runtime;
 
 /**
- * @deprecated in #develop# use {@link MotionRuntime}.
+ * @deprecated in 5.1.0 use {@link MotionRuntime}.
  */
 @Deprecated
 public class Runtime extends MotionRuntime {
