@@ -15,8 +15,10 @@
  */
 package com.google.android.material.motion.runtime;
 
+import android.support.annotation.VisibleForTesting;
 import android.util.JsonReader;
 import android.util.JsonWriter;
+
 import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 
@@ -25,7 +27,9 @@ import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPer
  */
 public final class PlanFeatures {
 
-  private PlanFeatures() {
+  @VisibleForTesting
+  PlanFeatures() {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -44,12 +48,12 @@ public final class PlanFeatures {
 
   /**
    * Plans should implement this interface if it wants to support the named plan API.
-   *
-   * <p> A named plan is a {@link Plan} whose performer supports adding and remove the plan by name.
-   * Register a named plan by calling {@link Runtime#addNamedPlan(NamedPlan, String, Object)}, and
-   * remove it by calling {@link Runtime#removeNamedPlan(String, Object)}.
-   *
-   * <p> A named plan or family of named plans enables fine configuration of a performer's
+   * <p>
+   * A named plan is a {@link Plan} whose performer supports adding and remove the plan by
+   * name. Register a named plan by calling {@link Runtime#addNamedPlan(NamedPlan, String,
+   * Object)}, and remove it by calling {@link Runtime#removeNamedPlan(String, Object)}.
+   * <p>
+   * A named plan or family of named plans enables fine configuration of a performer's
    * behavior.
    *
    * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/named-plans.html">The
@@ -66,8 +70,8 @@ public final class PlanFeatures {
 
   /**
    * Plans should implement this interface if it wants to support the serialize API.
-   *
-   * <p> Serializable Plans can be sent over a wire or recorded to disk.
+   * <p>
+   * Serializable Plans can be sent over a wire or recorded to disk.
    */
   public interface SerializablePlan extends BasePlan {
 
