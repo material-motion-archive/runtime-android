@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/material-motion/runtime-android.svg?branch=develop)](https://travis-ci.org/material-motion/runtime-android)
 [![codecov](https://codecov.io/gh/material-motion/runtime-android/branch/develop/graph/badge.svg)](https://codecov.io/gh/material-motion/runtime-android)
+[![Release](https://img.shields.io/github/release/material-motion/runtime-android.svg)](https://github.com/material-motion/runtime-android/releases/latest)
+[![Docs](https://img.shields.io/badge/jitpack-docs-green.svg)](https://jitpack.io/com/github/material-motion/runtime-android/stable-SNAPSHOT/javadoc/)
 
 The Material Motion Runtime is a tool for describing motion declaratively.
 
