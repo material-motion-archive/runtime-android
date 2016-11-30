@@ -5,6 +5,7 @@
     "material-arc-tools/third_party/arc-proselint"
   ],
   "arcanist_configuration": "HookConphig",
+  "repository.callsign": "MDMRUNTIMEANDROID",
   "phabricator.uri": "http://codereview.cc/",
   "arc.land.onto.default": "develop",
   "arc.feature.start.default": "origin/develop"
