@@ -34,6 +34,7 @@ import com.google.android.material.motion.runtime.Runtime.State;
 import com.google.android.material.motion.runtime.Runtime.StateListener;
 import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;
+import com.google.android.material.motion.runtime.testing.StepChoreographer;
 
 import org.junit.Before;
 import org.junit.Test;

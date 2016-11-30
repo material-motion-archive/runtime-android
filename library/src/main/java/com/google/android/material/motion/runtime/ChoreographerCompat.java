@@ -27,7 +27,7 @@ import android.view.Choreographer;
  * A compatibility shim for {@link Choreographer} calls, since this class was not
  * available until API 16. For older versions of Android, a Handler will be used instead.
  */
-abstract class ChoreographerCompat {
+public abstract class ChoreographerCompat {
   private static final ThreadLocal<ChoreographerCompat> threadInstance =
       new ThreadLocal<ChoreographerCompat>() {
         @Override

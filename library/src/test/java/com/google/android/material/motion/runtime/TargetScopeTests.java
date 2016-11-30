@@ -29,6 +29,8 @@ import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPe
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
 import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.Runtime.State;
+import com.google.android.material.motion.runtime.testing.StepChoreographer;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
