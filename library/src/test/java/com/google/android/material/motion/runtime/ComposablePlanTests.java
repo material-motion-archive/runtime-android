@@ -81,7 +81,7 @@ public class ComposablePlanTests {
     }
   }
 
-  public static class LeafPerformer extends Performer {
+  public static class LeafPerformer extends Performer<TextView> {
 
     @Override
     public void addPlan(Plan plan) {

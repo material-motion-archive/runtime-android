@@ -49,23 +49,23 @@ public class RuntimeTests {
 
   @Test
   public void canCreateDeprecatedRuntime() {
-    Plan plan = new NoOpPlan();
+    Plan<Object> plan = new NoOpPlan();
     Object target = new Object();
 
     Runtime runtime = new Runtime();
     runtime.addPlan(plan, target);
   }
 
-  private static class NoOpPlan extends Plan {
+  private static class NoOpPlan extends Plan<Object> {
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends Performer<Object>> getPerformerClass() {
       return NoOpPerformer.class;
     }
   }
 
-  public static class NoOpPerformer extends Performer {
+  public static class NoOpPerformer extends Performer<Object> {
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(Plan<Object> plan) {
       // No-op.
     }
   }

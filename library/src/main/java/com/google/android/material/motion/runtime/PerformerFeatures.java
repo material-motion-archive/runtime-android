@@ -109,13 +109,16 @@ public final class PerformerFeatures {
     /**
      * A plan emitter allows an object to emit new plans to a backing runtime for the target to
      * which the performer is associated.
+     *
+     * @param <T> This emitter will only accept plans that can be applied to this type of
+     * target.
      */
-    interface PlanEmitter {
+    interface PlanEmitter<T> {
 
       /**
        * Emit a new plan. The plan will immediately be added to the backing runtime.
        */
-      void emit(Plan plan);
+      void emit(Plan<T> plan);
     }
   }
 }

@@ -41,10 +41,10 @@ import static com.google.android.material.motion.runtime.MotionRuntime.MANUAL_DE
  * Ensures only a single instance of Performer is created for each type of Performer required by a
  * target.
  */
-class TargetScope {
+class TargetScope<T> {
 
-  private final SimpleArrayMap<Class<? extends Performer>, Performer> cache = new SimpleArrayMap<>();
-  private final SimpleArrayMap<String, NamedPerformer> namedCache = new SimpleArrayMap<>();
+  private final SimpleArrayMap<Class<? extends Performer<T>>, Performer<T>> cache = new SimpleArrayMap<>();
+  private final SimpleArrayMap<String, NamedPerformer<T>> namedCache = new SimpleArrayMap<>();
 
   private final Set<ManualPerforming> activeManualPerformers = new HashSet<>();
 
@@ -57,8 +57,8 @@ class TargetScope {
     this.runtime = runtime;
   }
 
-  void commitPlan(Plan plan, Object target) {
-    Performer performer = commitPlanInternal(plan, target);
+  void commitPlan(Plan<T> plan, T target) {
+    Performer<T> performer = commitPlanInternal(plan, target);
     performer.addPlan(plan);
 
     // notify tracers
@@ -67,12 +67,12 @@ class TargetScope {
     }
   }
 
-  void commitAddNamedPlan(NamedPlan plan, String name, Object target) {
+  void commitAddNamedPlan(NamedPlan<T> plan, String name, T target) {
     // remove first
     commitRemoveNamedPlan(name, target);
 
     // then add
-    NamedPerformer performer = commitPlanInternal(plan, target);
+    NamedPerformer<T> performer = commitPlanInternal(plan, target);
     performer.addPlan(plan, name);
     namedCache.put(name, performer);
 
@@ -82,8 +82,8 @@ class TargetScope {
     }
   }
 
-  private <T extends Performer> T commitPlanInternal(Plan plan, Object target) {
-    Performer performer = getPerformer(plan, target);
+  private <P extends Performer<T>> P commitPlanInternal(Plan<T> plan, T target) {
+    Performer<T> performer = getPerformer(plan, target);
 
     if (performer instanceof ManualPerforming) {
       activeManualPerformers.add((ManualPerforming) performer);
@@ -91,11 +91,11 @@ class TargetScope {
     }
 
     //noinspection unchecked
-    return (T) performer;
+    return (P) performer;
   }
 
-  void commitRemoveNamedPlan(String name, Object target) {
-    NamedPerformer performer = namedCache.get(name);
+  void commitRemoveNamedPlan(String name, T target) {
+    NamedPerformer<T> performer = namedCache.get(name);
     if (performer != null) {
       performer.removePlan(name);
 
@@ -140,9 +140,9 @@ class TargetScope {
     return state;
   }
 
-  private Performer getPerformer(Plan plan, Object target) {
-    Class<? extends Performer> performerClass = plan.getPerformerClass();
-    Performer performer = cache.get(performerClass);
+  private Performer<T> getPerformer(Plan<T> plan, T target) {
+    Class<? extends Performer<T>> performerClass = plan.getPerformerClass();
+    Performer<T> performer = cache.get(performerClass);
 
     if (performer == null) {
       performer = createPerformer(plan, target);
@@ -152,12 +152,12 @@ class TargetScope {
     return performer;
   }
 
-  private Performer createPerformer(Plan plan, Object target) {
-    Class<? extends Performer> performerClass = plan.getPerformerClass();
+  private Performer<T> createPerformer(Plan<T> plan, T target) {
+    Class<? extends Performer<T>> performerClass = plan.getPerformerClass();
 
     //noinspection TryWithIdenticalCatches
     try {
-      Performer performer = performerClass.newInstance();
+      Performer<T> performer = performerClass.newInstance();
       performer.initialize(target);
 
       if (performer instanceof ContinuousPerforming) {
@@ -225,12 +225,12 @@ class TargetScope {
   }
 
   /**
-   * Creates a {@link PlanEmitter} to be assigned to the given {@link ComposablePerforming}.
+   * Creates a {@link PlanEmitter} to be assigned to the given performer.
    */
-  private PlanEmitter createPlanEmitter(final Performer performer) {
-    return new PlanEmitter() {
+  private PlanEmitter<T> createPlanEmitter(final Performer<T> performer) {
+    return new PlanEmitter<T>() {
       @Override
-      public void emit(Plan plan) {
+      public void emit(Plan<T> plan) {
         runtime.addPlan(plan, performer.getTarget());
       }
     };

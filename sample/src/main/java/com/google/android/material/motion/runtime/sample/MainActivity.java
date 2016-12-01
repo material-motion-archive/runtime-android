@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     runtime.addPlan(new DemoPlan2(.5f), text2);
   }
 
-  private static class DemoPlan1 extends NamedPlan {
+  private static class DemoPlan1 extends NamedPlan<TextView> {
 
     private final String text;
 
@@ -64,15 +64,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends NamedPerformer> getPerformerClass() {
+    public Class<? extends NamedPerformer<TextView>> getPerformerClass() {
       return DemoPerformer1.class;
     }
   }
 
-  public static class DemoPerformer1 extends NamedPerformer {
+  public static class DemoPerformer1 extends NamedPerformer<TextView> {
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(Plan<TextView> plan) {
       DemoPlan1 demoPlan = (DemoPlan1) plan;
       TextView target = getTarget();
 
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void addPlan(NamedPlan plan, String name) {
+    public void addPlan(NamedPlan<TextView> plan, String name) {
       addPlan(plan);
     }
 
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  private static class DemoPlan2 extends Plan {
+  private static class DemoPlan2 extends Plan<View> {
 
     private final float alpha;
 
@@ -98,12 +98,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends Performer<View>> getPerformerClass() {
       return DemoPerformer2.class;
     }
   }
 
-  public static class DemoPerformer2 extends Performer implements ContinuousPerforming {
+  public static class DemoPerformer2 extends Performer<View> implements ContinuousPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(Plan<View> plan) {
       DemoPlan2 demoPlan = (DemoPlan2) plan;
       View target = getTarget();
 

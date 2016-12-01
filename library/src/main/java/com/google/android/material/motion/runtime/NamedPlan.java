@@ -27,13 +27,13 @@ package com.google.android.material.motion.runtime;
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/named-plans.html">The
  * Named Plan specificiation</a> for more details.
  */
-public abstract class NamedPlan extends Plan {
+public abstract class NamedPlan<T> extends Plan<T> {
 
   @Override
-  public abstract Class<? extends NamedPerformer> getPerformerClass();
+  public abstract Class<? extends NamedPerformer<T>> getPerformerClass();
 
   @Override
-  public NamedPlan clone() {
-    return (NamedPlan) super.clone();
+  public NamedPlan<T> clone() {
+    return (NamedPlan<T>) super.clone();
   }
 }

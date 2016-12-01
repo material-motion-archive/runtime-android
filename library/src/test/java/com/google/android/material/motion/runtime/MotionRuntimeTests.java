@@ -520,31 +520,31 @@ public class MotionRuntimeTests {
     }
   }
 
-  private static class RegularPlanTargetAlteringPlan extends Plan {
+  private static class RegularPlanTargetAlteringPlan extends Plan<TextView> {
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends Performer<TextView>> getPerformerClass() {
       return GenericPlanPerformer.class;
     }
   }
 
-  private static class NamedCounterAlteringPlan extends NamedPlan {
+  private static class NamedCounterAlteringPlan extends NamedPlan<IncrementerTarget> {
 
     @Override
-    public Class<? extends NamedPerformer> getPerformerClass() {
+    public Class<? extends NamedPerformer<IncrementerTarget>> getPerformerClass() {
       return NamedCounterPlanPerformer.class;
     }
   }
 
-  private static class NamedTargetAlteringPlan extends NamedPlan {
+  private static class NamedTargetAlteringPlan extends NamedPlan<TextView> {
 
     @Override
-    public Class<? extends NamedPerformer> getPerformerClass() {
+    public Class<? extends NamedPerformer<TextView>> getPerformerClass() {
       return GenericPlanPerformer.class;
     }
   }
 
-  private static class ManualPlan extends NamedPlan {
+  private static class ManualPlan extends NamedPlan<View> {
 
     private final String text;
 
@@ -553,12 +553,12 @@ public class MotionRuntimeTests {
     }
 
     @Override
-    public Class<? extends NamedPerformer> getPerformerClass() {
+    public Class<? extends NamedPerformer<View>> getPerformerClass() {
       return ManualPerformer.class;
     }
   }
 
-  private static class NeverEndingContinuousPlan extends NamedPlan {
+  private static class NeverEndingContinuousPlan extends NamedPlan<Object> {
 
     private final String text;
 
@@ -567,12 +567,12 @@ public class MotionRuntimeTests {
     }
 
     @Override
-    public Class<? extends NamedPerformer> getPerformerClass() {
+    public Class<? extends NamedPerformer<Object>> getPerformerClass() {
       return NeverEndingContinuousPerformer.class;
     }
   }
 
-  private static class EndingContinuousPlan extends NamedPlan {
+  private static class EndingContinuousPlan extends NamedPlan<Object> {
 
     private final String text;
 
@@ -581,12 +581,12 @@ public class MotionRuntimeTests {
     }
 
     @Override
-    public Class<? extends NamedPerformer> getPerformerClass() {
+    public Class<? extends NamedPerformer<Object>> getPerformerClass() {
       return EndingContinuousPerformer.class;
     }
   }
 
-  public static class NamedCounterPlanPerformer extends NamedPerformer {
+  public static class NamedCounterPlanPerformer extends NamedPerformer<IncrementerTarget> {
 
     @Override
     public void addPlan(Plan plan) {
@@ -606,7 +606,7 @@ public class MotionRuntimeTests {
     }
   }
 
-  public static class TrackingPlanPerformer extends NamedPerformer {
+  public static class TrackingPlanPerformer extends NamedPerformer<TrackingTracing> {
 
     @Override
     public void addPlan(Plan plan) {
@@ -626,7 +626,7 @@ public class MotionRuntimeTests {
     }
   }
 
-  public static class StoragePlanPerformer extends NamedPerformer {
+  public static class StoragePlanPerformer extends NamedPerformer<List<String>> {
 
     @Override
     public void addPlan(Plan plan) {
@@ -646,7 +646,7 @@ public class MotionRuntimeTests {
     }
   }
 
-  public static class GenericPlanPerformer extends NamedPerformer {
+  public static class GenericPlanPerformer extends NamedPerformer<TextView> {
 
     @Override
     public void addPlan(Plan plan) {
@@ -667,7 +667,7 @@ public class MotionRuntimeTests {
     }
   }
 
-  public static class ManualPerformer extends NamedPerformer implements ManualPerforming {
+  public static class ManualPerformer extends NamedPerformer<View> implements ManualPerforming {
 
     @Override
     public int update(float deltaTimeMs) {
@@ -693,7 +693,7 @@ public class MotionRuntimeTests {
     }
   }
 
-  public static class NeverEndingContinuousPerformer extends NamedPerformer
+  public static class NeverEndingContinuousPerformer extends NamedPerformer<Object>
     implements ContinuousPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
@@ -719,7 +719,7 @@ public class MotionRuntimeTests {
     }
   }
 
-  public static class EndingContinuousPerformer extends NamedPerformer
+  public static class EndingContinuousPerformer extends NamedPerformer<Object>
     implements ContinuousPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;

@@ -35,7 +35,7 @@ public class TextViewAlteringNamedPlan extends NamedPlan {
     return TextViewAlteringPerformer.class;
   }
 
-  public static class TextViewAlteringPerformer extends NamedPerformer {
+  public static class TextViewAlteringPerformer extends NamedPerformer<TextView> {
 
     @Override
     public void addPlan(Plan plan) {

@@ -25,11 +25,12 @@ package com.google.android.material.motion.runtime;
  * <p>
  * The {@link PerformerFeatures} interfaces define optional APIs.
  *
+ * @param <T> The type of target this performer can act on.
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/performer.html">The
  * Performer specification</a>
  */
 
-public abstract class Performer {
+public abstract class Performer<T> {
 
   /**
    * Thrown when there is an instantiation failure. Make sure that your {@link Performer}'s class
@@ -48,26 +49,29 @@ public abstract class Performer {
     }
   }
 
-  private Object target;
+  private T target;
 
-  final void initialize(Object target) {
-    this.target = target;
-    onInitialize(target);
+  /**
+   * Performers are initialized with a target.
+   */
+  final void initialize(T target) {
+    //noinspection unchecked
+    this.target = (T) target;
+    onInitialize(this.target);
   }
 
   /**
    * Invoked immediately after this Performer has been initialized with a target.
    */
-  protected void onInitialize(Object target) {
+  protected void onInitialize(T target) {
   }
 
   /**
    * Provides a {@link Plan} to this Performer. The Performer is expected to execute this plan.
    */
-  protected abstract void addPlan(Plan plan);
+  protected abstract void addPlan(Plan<T> plan);
 
-  public final <T> T getTarget() {
-    //noinspection unchecked Cast expected to fail if target type is incorrect
-    return (T) target;
+  public final T getTarget() {
+    return target;
   }
 }

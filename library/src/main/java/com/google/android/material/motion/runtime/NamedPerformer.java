@@ -18,7 +18,7 @@ package com.google.android.material.motion.runtime;
 /**
  * A performer that supports the named plan API.
  */
-public abstract class NamedPerformer extends Performer {
+public abstract class NamedPerformer<T> extends Performer<T> {
 
   /**
    * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any plan
@@ -27,7 +27,7 @@ public abstract class NamedPerformer extends Performer {
    * @param plan the plan which was added to this performer.
    * @param name the name by which this plan can be identified.
    */
-  public abstract void addPlan(NamedPlan plan, String name);
+  public abstract void addPlan(NamedPlan<T> plan, String name);
 
   /**
    * Provides a {@link NamedPlan} to this Performer. The Performer is expected remove any plan

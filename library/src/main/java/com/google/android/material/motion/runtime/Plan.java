@@ -27,16 +27,17 @@ import android.support.annotation.VisibleForTesting;
  * <p>
  * The {@link PlanFeatures} interfaces define optional APIs.
  *
+ * @param <T> The type of target this plan can be applied to.
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/plan.html">The
  * Plan specificiation</a>
  * @see Object#clone()
  */
-public abstract class Plan implements Cloneable {
+public abstract class Plan<T> implements Cloneable {
 
   /**
    * @return The {@link Class} of the {@link Performer} that can fulfill this plan.
    */
-  protected abstract Class<? extends Performer> getPerformerClass();
+  protected abstract Class<? extends Performer<T>> getPerformerClass();
 
   /**
    * By default this implementation makes a shallow copy. If your Plan contains mutable Object
@@ -44,9 +45,10 @@ public abstract class Plan implements Cloneable {
    */
   @SuppressWarnings("CloneDoesntCallSuperClone")
   @Override
-  public Plan clone() {
+  public Plan<T> clone() {
     try {
-      return (Plan) superClone();
+      //noinspection unchecked
+      return (Plan<T>) superClone();
     } catch (CloneNotSupportedException e) {
       throw new AssertionError();
     }
