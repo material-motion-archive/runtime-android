@@ -16,38 +16,35 @@
 
 package com.google.android.material.motion.runtime;
 
-import static com.google.android.material.motion.runtime.MotionRuntime.CONTINUOUS_DETAILED_STATE_FLAG;
-import static com.google.android.material.motion.runtime.MotionRuntime.MANUAL_DETAILED_STATE_FLAG;
-
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.SimpleArrayMap;
+
+import com.google.android.material.motion.runtime.MotionRuntime.State;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming.PlanEmitter;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveToken;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveTokenGenerator;
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.MotionRuntime.State;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import static com.google.android.material.motion.runtime.MotionRuntime.CONTINUOUS_DETAILED_STATE_FLAG;
+import static com.google.android.material.motion.runtime.MotionRuntime.MANUAL_DETAILED_STATE_FLAG;
+
 /**
  * A helper class for {@link MotionRuntime} that scopes {@link Performer} instances by target.
- *
- * <p> Ensures only a single instance of Performer is created for each type of Performer required by
- * a target.
+ * <p>
+ * Ensures only a single instance of Performer is created for each type of Performer required by a
+ * target.
  */
 class TargetScope {
 
-  private final SimpleArrayMap<Class<? extends BasePerforming>, BasePerforming> cache =
-    new SimpleArrayMap<>();
-  private final SimpleArrayMap<String, NamedPlanPerforming> namedCache = new SimpleArrayMap<>();
+  private final SimpleArrayMap<Class<? extends Performer>, Performer> cache = new SimpleArrayMap<>();
+  private final SimpleArrayMap<String, NamedPerformer> namedCache = new SimpleArrayMap<>();
 
   private final Set<ManualPerforming> activeManualPerformers = new HashSet<>();
 
@@ -60,13 +57,13 @@ class TargetScope {
     this.runtime = runtime;
   }
 
-  void commitPlan(BasePlan plan, Object target) {
+  void commitPlan(Plan plan, Object target) {
     Performer performer = commitPlanInternal(plan, target);
     performer.addPlan(plan);
 
     // notify tracers
     for (Tracing tracer : runtime.getTracers()) {
-      tracer.onAddPlan((Plan) plan, target);
+      tracer.onAddPlan(plan, target);
     }
   }
 
@@ -75,7 +72,7 @@ class TargetScope {
     commitRemoveNamedPlan(name, target);
 
     // then add
-    NamedPlanPerforming performer = commitPlanInternal(plan, target);
+    NamedPerformer performer = commitPlanInternal(plan, target);
     performer.addPlan(plan, name);
     namedCache.put(name, performer);
 
@@ -85,8 +82,8 @@ class TargetScope {
     }
   }
 
-  private <T extends BasePerforming> T commitPlanInternal(BasePlan plan, Object target) {
-    BasePerforming performer = getPerformer(plan, target);
+  private <T extends Performer> T commitPlanInternal(Plan plan, Object target) {
+    Performer performer = getPerformer(plan, target);
 
     if (performer instanceof ManualPerforming) {
       activeManualPerformers.add((ManualPerforming) performer);
@@ -98,7 +95,7 @@ class TargetScope {
   }
 
   void commitRemoveNamedPlan(String name, Object target) {
-    NamedPlanPerforming performer = namedCache.get(name);
+    NamedPerformer performer = namedCache.get(name);
     if (performer != null) {
       performer.removePlan(name);
 
@@ -143,9 +140,9 @@ class TargetScope {
     return state;
   }
 
-  private BasePerforming getPerformer(BasePlan plan, Object target) {
-    Class<? extends BasePerforming> performerClass = plan.getPerformerClass();
-    BasePerforming performer = cache.get(performerClass);
+  private Performer getPerformer(Plan plan, Object target) {
+    Class<? extends Performer> performerClass = plan.getPerformerClass();
+    Performer performer = cache.get(performerClass);
 
     if (performer == null) {
       performer = createPerformer(plan, target);
@@ -155,11 +152,12 @@ class TargetScope {
     return performer;
   }
 
-  private BasePerforming createPerformer(BasePlan plan, Object target) {
-    Class<? extends BasePerforming> performerClass = plan.getPerformerClass();
+  private Performer createPerformer(Plan plan, Object target) {
+    Class<? extends Performer> performerClass = plan.getPerformerClass();
 
+    //noinspection TryWithIdenticalCatches
     try {
-      BasePerforming performer = performerClass.newInstance();
+      Performer performer = performerClass.newInstance();
       performer.initialize(target);
 
       if (performer instanceof ContinuousPerforming) {
@@ -174,7 +172,7 @@ class TargetScope {
       }
 
       for (Tracing tracing : runtime.getTracers()) {
-        tracing.onCreatePerformer((Performer) performer, target);
+        tracing.onCreatePerformer(performer, target);
       }
 
       return performer;

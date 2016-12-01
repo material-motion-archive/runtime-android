@@ -20,12 +20,12 @@ import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformi
 
 /**
  * A Performer is an object responsible for executing a {@link Plan}.
- *
- * <p> Plans define the {@link Class} of Performer that can fulfill it. Your Performer will be
+ * <p>
+ * Plans define the {@link Class} of Performer that can fulfill it. Your Performer will be
  * instantiated via reflection, so take care that a {@link PerformerInstantiationException} will not
  * be thrown.
- *
- * <p> The {@link PerformerFeatures} interfaces define optional APIs.
+ * <p>
+ * The {@link PerformerFeatures} interfaces define optional APIs.
  *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/performer.html">The
  * Performer specification</a>
@@ -40,7 +40,7 @@ public abstract class Performer implements BasePerforming {
   public static class PerformerInstantiationException extends RuntimeException {
 
     public PerformerInstantiationException(
-      Class<? extends BasePerforming> klass, Exception cause) {
+      Class<? extends Performer> klass, Exception cause) {
       super(
         "Unable to instantiate Performer "
           + klass.getName()

@@ -15,20 +15,16 @@
  */
 package com.google.android.material.motion.runtime;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.mock;
-
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
+
+import com.google.android.material.motion.runtime.MotionRuntime.State;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveToken;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveTokenGenerator;
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.MotionRuntime.State;
 import com.google.android.material.motion.runtime.testing.StepChoreographer;
 
 import org.junit.Before;
@@ -39,6 +35,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
@@ -132,7 +131,7 @@ public class TargetScopeTests {
     }
 
     @Override
-    public Class<? extends BasePerforming> getPerformerClass() {
+    public Class<? extends Performer> getPerformerClass() {
       return ManualPerformer.class;
     }
   }
@@ -148,7 +147,7 @@ public class TargetScopeTests {
     }
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       state = ((ManualPlan) plan).state;
     }
   }
@@ -156,7 +155,7 @@ public class TargetScopeTests {
   private static class PrivatePlan extends Plan {
 
     @Override
-    public Class<? extends BasePerforming> getPerformerClass() {
+    public Class<? extends Performer> getPerformerClass() {
       return PrivatePerformer.class;
     }
   }
@@ -164,14 +163,14 @@ public class TargetScopeTests {
   private static class PrivatePerformer extends Performer {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
     }
   }
 
   private static class OneArgConstructorPlan extends Plan {
 
     @Override
-    public Class<? extends BasePerforming> getPerformerClass() {
+    public Class<? extends Performer> getPerformerClass() {
       return OneArgConstructorPerformer.class;
     }
   }
@@ -182,7 +181,7 @@ public class TargetScopeTests {
     }
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
     }
   }
 }

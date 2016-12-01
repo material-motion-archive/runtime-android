@@ -18,13 +18,11 @@ package com.google.android.material.motion.runtime.plans;
 
 import android.widget.TextView;
 
-import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
+import com.google.android.material.motion.runtime.NamedPerformer;
+import com.google.android.material.motion.runtime.NamedPlan;
 import com.google.android.material.motion.runtime.Plan;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 
-public class TextViewAlteringNamedPlan extends Plan implements NamedPlan {
+public class TextViewAlteringNamedPlan extends NamedPlan {
 
   private final String text;
 
@@ -33,14 +31,14 @@ public class TextViewAlteringNamedPlan extends Plan implements NamedPlan {
   }
 
   @Override
-  public Class<? extends NamedPlanPerforming> getPerformerClass() {
+  public Class<? extends NamedPerformer> getPerformerClass() {
     return TextViewAlteringPerformer.class;
   }
 
-  public static class TextViewAlteringPerformer extends Performer implements NamedPlanPerforming {
+  public static class TextViewAlteringPerformer extends NamedPerformer {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       Object target = getTarget();
       TextViewAlteringNamedPlan textViewAlteringNamedPlan = (TextViewAlteringNamedPlan) plan;
       if (target instanceof TextView) {

@@ -19,9 +19,6 @@ import android.support.annotation.VisibleForTesting;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
-
 /**
  * Defines the APIs that a {@link Plan} can implement.
  */
@@ -41,31 +38,9 @@ public final class PlanFeatures {
     /**
      * @return The {@link Class} of the {@link Performer} that can fulfill this plan.
      */
-    Class<? extends BasePerforming> getPerformerClass();
+    Class<? extends Performer> getPerformerClass();
 
     BasePlan clone();
-  }
-
-  /**
-   * Plans should implement this interface if it wants to support the named plan API.
-   * <p>
-   * A named plan is a {@link Plan} whose performer supports adding and remove the plan by
-   * name. Register a named plan by calling {@link MotionRuntime#addNamedPlan(NamedPlan, String,
-   * Object)}, and remove it by calling {@link MotionRuntime#removeNamedPlan(String, Object)}.
-   * <p>
-   * A named plan or family of named plans enables fine configuration of a performer's
-   * behavior.
-   *
-   * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/named-plans.html">The
-   * Named Plan specificiation</a> for more details.
-   */
-  public interface NamedPlan extends BasePlan {
-
-    /**
-     * @return The {@link Class} of the {@link NamedPlanPerforming} that can fulfill this plan.
-     */
-    @Override
-    Class<? extends NamedPlanPerforming> getPerformerClass();
   }
 
   /**

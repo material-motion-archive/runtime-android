@@ -17,8 +17,6 @@ package com.google.android.material.motion.runtime;
 
 import android.support.annotation.VisibleForTesting;
 
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.MotionRuntime.State;
 
 /**
@@ -46,7 +44,7 @@ public final class PerformerFeatures {
      * Provides a {@link Plan} to this Performer. The Performer is expected to execute this
      * plan.
      */
-    void addPlan(BasePlan plan);
+    void addPlan(Plan plan);
 
     /**
      * Returns the target that this Performer is associated with.
@@ -56,30 +54,6 @@ public final class PerformerFeatures {
      * @return The target.
      */
     <T> T getTarget();
-  }
-
-  /**
-   * A Performer can implement this interface in order to support the add and remove for {@link
-   * NamedPlan}s APIs.
-   */
-  public interface NamedPlanPerforming extends BasePerforming {
-
-    /**
-     * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any
-     * plan added in this manner.
-     *
-     * @param plan the plan which was added to this performer.
-     * @param name the name by which this plan can be identified.
-     */
-    void addPlan(NamedPlan plan, String name);
-
-    /**
-     * Provides a {@link NamedPlan} to this Performer. The Performer is expected remove any plan
-     * presented in this manner.
-     *
-     * @param name the name by which this plan was identified.
-     */
-    void removePlan(String name);
   }
 
   /**
@@ -139,8 +113,8 @@ public final class PerformerFeatures {
      * Called by the {@link MotionRuntime} to notify the {@link Performer} of a new frame.
      *
      * @param deltaTimeMs The elapsed time in milliseconds since the last update.
-     * @return The {@link State} of this Performer after this update. {@link MotionRuntime#IDLE} means
-     * this Performer does not wish to get any more frame updates.
+     * @return The {@link State} of this Performer after this update. {@link MotionRuntime#IDLE}
+     * means this Performer does not wish to get any more frame updates.
      */
     @State
     int update(float deltaTimeMs);

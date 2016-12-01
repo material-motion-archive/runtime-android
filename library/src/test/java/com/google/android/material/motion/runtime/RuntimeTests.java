@@ -15,23 +15,15 @@
  */
 package com.google.android.material.motion.runtime;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.MotionRuntime.State;
 import com.google.android.material.motion.runtime.MotionRuntime.StateListener;
+import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
+import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
 import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 import com.google.android.material.motion.runtime.testing.StepChoreographer;
@@ -47,6 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
@@ -481,18 +476,18 @@ public class RuntimeTests {
     }
   }
 
-  private static class TrackingPlan extends Plan implements NamedPlan {
+  private static class TrackingPlan extends NamedPlan {
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return TrackingPlanPerformer.class;
     }
   }
 
   public static class StorageTracing implements Tracing {
 
-    List<BasePerforming> performers = new ArrayList<BasePerforming>();
-    List<BasePlan> addedRegularPlans = new ArrayList<>();
+    List<Performer> performers = new ArrayList<>();
+    List<Plan> addedRegularPlans = new ArrayList<>();
     List<String> addedNamePlans = new ArrayList<>();
     List<String> removedNamePlans = new ArrayList<>();
 
@@ -517,10 +512,10 @@ public class RuntimeTests {
     }
   }
 
-  private static class StorageNamedPlan extends Plan implements NamedPlan {
+  private static class StorageNamedPlan extends NamedPlan {
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return StoragePlanPerformer.class;
     }
   }
@@ -528,28 +523,28 @@ public class RuntimeTests {
   private static class RegularPlanTargetAlteringPlan extends Plan {
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends Performer> getPerformerClass() {
       return GenericPlanPerformer.class;
     }
   }
 
-  private static class NamedCounterAlteringPlan extends Plan implements NamedPlan {
+  private static class NamedCounterAlteringPlan extends NamedPlan {
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return NamedCounterPlanPerformer.class;
     }
   }
 
-  private static class NamedTargetAlteringPlan extends Plan implements NamedPlan {
+  private static class NamedTargetAlteringPlan extends NamedPlan {
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return GenericPlanPerformer.class;
     }
   }
 
-  private static class ManualPlan extends Plan implements NamedPlan {
+  private static class ManualPlan extends NamedPlan {
 
     private final String text;
 
@@ -558,12 +553,12 @@ public class RuntimeTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return ManualPerformer.class;
     }
   }
 
-  private static class NeverEndingContinuousPlan extends Plan implements NamedPlan {
+  private static class NeverEndingContinuousPlan extends NamedPlan {
 
     private final String text;
 
@@ -572,12 +567,12 @@ public class RuntimeTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return NeverEndingContinuousPerformer.class;
     }
   }
 
-  private static class EndingContinuousPlan extends Plan implements NamedPlan {
+  private static class EndingContinuousPlan extends NamedPlan {
 
     private final String text;
 
@@ -586,15 +581,15 @@ public class RuntimeTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return EndingContinuousPerformer.class;
     }
   }
 
-  public static class NamedCounterPlanPerformer extends Performer implements NamedPlanPerforming {
+  public static class NamedCounterPlanPerformer extends NamedPerformer {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       throw new UnsupportedOperationException();
     }
 
@@ -611,7 +606,12 @@ public class RuntimeTests {
     }
   }
 
-  public static class TrackingPlanPerformer extends StoragePlanPerformer {
+  public static class TrackingPlanPerformer extends NamedPerformer {
+
+    @Override
+    public void addPlan(Plan plan) {
+      throw new UnsupportedOperationException();
+    }
 
     @Override
     public void addPlan(NamedPlan plan, String name) {
@@ -626,10 +626,10 @@ public class RuntimeTests {
     }
   }
 
-  public static class StoragePlanPerformer extends Performer implements NamedPlanPerforming {
+  public static class StoragePlanPerformer extends NamedPerformer {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       throw new UnsupportedOperationException();
     }
 
@@ -646,10 +646,10 @@ public class RuntimeTests {
     }
   }
 
-  public static class GenericPlanPerformer extends Performer implements NamedPlanPerforming {
+  public static class GenericPlanPerformer extends NamedPerformer {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       TextView target = getTarget();
       target.setText(target.getText() + " regularAddPlanInvoked");
     }
@@ -667,8 +667,7 @@ public class RuntimeTests {
     }
   }
 
-  public static class ManualPerformer extends Performer implements ManualPerforming,
-    NamedPlanPerforming {
+  public static class ManualPerformer extends NamedPerformer implements ManualPerforming {
 
     @Override
     public int update(float deltaTimeMs) {
@@ -681,7 +680,7 @@ public class RuntimeTests {
     }
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
     }
 
     @Override
@@ -694,13 +693,13 @@ public class RuntimeTests {
     }
   }
 
-  public static class NeverEndingContinuousPerformer extends Performer implements
-    ContinuousPerforming, NamedPlanPerforming {
+  public static class NeverEndingContinuousPerformer extends NamedPerformer
+    implements ContinuousPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       // start the plan, but never finish it
       IsActiveToken token = isActiveTokenGenerator.generate();
     }
@@ -720,13 +719,13 @@ public class RuntimeTests {
     }
   }
 
-  public static class EndingContinuousPerformer extends Performer implements ContinuousPerforming,
-    NamedPlanPerforming {
+  public static class EndingContinuousPerformer extends NamedPerformer
+    implements ContinuousPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       throw new UnsupportedOperationException();
     }
 

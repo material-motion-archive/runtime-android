@@ -185,7 +185,7 @@ See the associated links for more details on each performing type.
 ```java
 public class MyPerformer extends Performer {
   @Override
-  public void addPlan(BasePlan plan) {
+  public void addPlan(Plan plan) {
   }
 }
 ```
@@ -200,7 +200,7 @@ Conforming to Plan requires:
 ```java
 public class MyPlan extends Plan {
   @Override
-  public Class<? extends BasePerforming> getPerformerClass() {
+  public Class<? extends Performer> getPerformerClass() {
     return MyPerformer.class;
   }
 
@@ -241,7 +241,7 @@ public class MyActivity extends Activity {
 }
 ```
 
-### Step 2: Associate plans with targets
+### Step 2: Associate named plans with targets
 
 ```java
 NamedPlan plan;
@@ -258,7 +258,7 @@ The `addPlan()` method will be invoked with plans that require use of this perfo
 ```java
 public class MyPerformer extends Performer {
   @Override
-  public void addPlan(BasePlan plan) {
+  public void addPlan(Plan plan) {
     MyPlan myPlan = (MyPlan) plan;
 
     // Do something with myPlan.
@@ -271,7 +271,7 @@ public class MyPerformer extends Performer {
 ```java
 public class MyPerformer extends Performer {
   @Override
-  public void addPlan(BasePlan plan) {
+  public void addPlan(Plan plan) {
     if (plan instanceof Plan1) {
       addPlan1((Plan1) plan);
     } else if (plan instanceof Plan2) {
@@ -286,7 +286,7 @@ public class MyPerformer extends Performer {
 ## How to configure performers with named plans
 
 ```java
-public class MyPerformer extends Performer {
+public class MyPerformer extends NamedPerformer {
   @Override
   public void addPlan(NamedPlan plan, String name) {
     MyPlan myPlan = (MyPlan) plan;

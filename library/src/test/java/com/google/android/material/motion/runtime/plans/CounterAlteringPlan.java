@@ -17,25 +17,23 @@
 package com.google.android.material.motion.runtime.plans;
 
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.PerformerFeatures;
 import com.google.android.material.motion.runtime.Plan;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 
 public class CounterAlteringPlan extends Plan {
 
   @Override
-  public Class<? extends PerformerFeatures.BasePerforming> getPerformerClass() {
+  public Class<? extends Performer> getPerformerClass() {
     return CounterAlteringPerformer.class;
   }
 
   public static class CounterAlteringPerformer extends Performer {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       Object target = getTarget();
       if (target instanceof IncrementerTarget) {
-        ((IncrementerTarget)target).addCounter += 1;
+        ((IncrementerTarget) target).addCounter += 1;
       }
     }
   }

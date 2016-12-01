@@ -19,7 +19,6 @@ package com.google.android.material.motion.runtime;
 import android.app.Activity;
 import android.widget.TextView;
 
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.plans.CounterAlteringPlan;
 import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;

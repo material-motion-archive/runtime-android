@@ -15,21 +15,20 @@
  */
 package com.google.android.material.motion.runtime;
 
-import static com.google.common.truth.Truth.assertThat;
-
 import android.app.Activity;
 import android.content.Context;
 import android.widget.TextView;
+
 import com.google.android.material.motion.runtime.PerformerFeatures.ComposablePerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
@@ -54,7 +53,7 @@ public class ComposablePlanTests {
     assertThat(textView.getText()).isEqualTo("leafPlan");
   }
 
-  private class RootPlan extends Plan implements NamedPlan {
+  private class RootPlan extends NamedPlan {
 
     private String text;
 
@@ -63,7 +62,7 @@ public class ComposablePlanTests {
     }
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return ComposablePerformer.class;
     }
   }
@@ -85,15 +84,15 @@ public class ComposablePlanTests {
   public static class LeafPerformer extends Performer {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       LeafPlan leafPlan = (LeafPlan) plan;
       TextView target = getTarget();
       target.setText(leafPlan.text);
     }
   }
 
-  public static class ComposablePerformer extends Performer implements
-    ComposablePerforming, NamedPlanPerforming {
+  public static class ComposablePerformer extends NamedPerformer
+    implements ComposablePerforming {
 
     private PlanEmitter planEmitter;
 
@@ -102,7 +101,7 @@ public class ComposablePlanTests {
     }
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       // immediately delegate the actual work of changing the text view to the leaf plan
       planEmitter.emit(new LeafPlan("leafPlan"));
     }

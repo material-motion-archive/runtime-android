@@ -23,13 +23,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.motion.runtime.MotionRuntime;
+import com.google.android.material.motion.runtime.NamedPerformer;
+import com.google.android.material.motion.runtime.NamedPlan;
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.Plan;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 
 /**
  * Material Motion Android Runtime sample Activity.
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     runtime.addPlan(new DemoPlan2(.5f), text2);
   }
 
-  private static class DemoPlan1 extends Plan implements NamedPlan {
+  private static class DemoPlan1 extends NamedPlan {
 
     private final String text;
 
@@ -66,15 +64,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer> getPerformerClass() {
       return DemoPerformer1.class;
     }
   }
 
-  public static class DemoPerformer1 extends Performer implements NamedPlanPerforming {
+  public static class DemoPerformer1 extends NamedPerformer {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       DemoPlan1 demoPlan = (DemoPlan1) plan;
       TextView target = getTarget();
 
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends BasePerforming> getPerformerClass() {
+    public Class<? extends Performer> getPerformerClass() {
       return DemoPerformer2.class;
     }
   }
@@ -115,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan plan) {
       DemoPlan2 demoPlan = (DemoPlan2) plan;
       View target = getTarget();
 

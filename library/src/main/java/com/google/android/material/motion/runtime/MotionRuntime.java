@@ -24,7 +24,6 @@ import android.util.Log;
 import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -173,7 +172,7 @@ public class MotionRuntime {
     if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException("A NamedPlan must have a non-empty name.");
     }
-    getTargetScope(target).commitAddNamedPlan((NamedPlan) plan.clone(), name, target);
+    getTargetScope(target).commitAddNamedPlan(plan.clone(), name, target);
   }
 
   /**

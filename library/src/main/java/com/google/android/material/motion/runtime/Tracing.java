@@ -16,11 +16,9 @@
 
 package com.google.android.material.motion.runtime;
 
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-
 /**
- * A tracer object may implement a variety of hooks for the purposes of observing changes to the internal workings of a runtime.
+ * A tracer object may implement a variety of hooks for the purposes of observing changes to the
+ * internal workings of a runtime.
  *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/runtime_tracing.html">The
  * Tracing specificiation</a>
