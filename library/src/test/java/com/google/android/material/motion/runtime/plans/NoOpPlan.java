@@ -13,31 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.android.material.motion.runtime;
+package com.google.android.material.motion.runtime.plans;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
+import com.google.android.material.motion.runtime.NamedPerformer;
+import com.google.android.material.motion.runtime.NamedPlan;
+import com.google.android.material.motion.runtime.Plan;
 
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21)
-public class RuntimeTests {
-
-  @Test
-  public void canCreateDeprecatedRuntime() {
-    Plan<Object> plan = new NoOpPlan();
-    Object target = new Object();
-
-    Runtime runtime = new Runtime();
-    runtime.addPlan(plan, target);
-  }
-
-  public static class NoOpPlan extends NamedPlan<Object> {
-    @Override
-    public Class<? extends NamedPerformer<Object>> getPerformerClass() {
-      return NoOpPerformer.class;
-    }
+/**
+ * A plan that takes any target and does nothing.
+ */
+public class NoOpPlan extends NamedPlan<Object> {
+  @Override
+  public Class<? extends NamedPerformer<Object>> getPerformerClass() {
+    return NoOpPerformer.class;
   }
 
   public static class NoOpPerformer extends NamedPerformer<Object> {

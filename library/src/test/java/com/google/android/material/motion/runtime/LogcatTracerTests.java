@@ -19,7 +19,7 @@ package com.google.android.material.motion.runtime;
 import android.app.Activity;
 import android.widget.TextView;
 
-import com.google.android.material.motion.runtime.RuntimeTests.NoOpPlan;
+import com.google.android.material.motion.runtime.plans.NoOpPlan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 
 import org.junit.Before;

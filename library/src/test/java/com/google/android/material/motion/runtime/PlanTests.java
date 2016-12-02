@@ -15,7 +15,7 @@
  */
 package com.google.android.material.motion.runtime;
 
-import com.google.android.material.motion.runtime.RuntimeTests.NoOpPlan;
+import com.google.android.material.motion.runtime.plans.NoOpPlan;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
