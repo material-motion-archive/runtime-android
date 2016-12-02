@@ -16,6 +16,8 @@
 
 package com.google.android.material.motion.runtime;
 
+import android.support.annotation.VisibleForTesting;
+
 /**
  * A Performer is an object responsible for executing a {@link Plan}.
  * <p>
@@ -54,7 +56,8 @@ public abstract class Performer<T> {
   /**
    * Performers are initialized with a target.
    */
-  final void initialize(T target) {
+  @VisibleForTesting
+  public final void initialize(T target) {
     //noinspection unchecked
     this.target = (T) target;
     onInitialize(this.target);
