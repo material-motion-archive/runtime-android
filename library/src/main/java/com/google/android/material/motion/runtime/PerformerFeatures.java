@@ -30,33 +30,6 @@ public final class PerformerFeatures {
   }
 
   /**
-   * Defines the base functionality for {@link Performer}s. You should not have to implement this
-   * interface yourself.
-   */
-  public interface BasePerforming {
-
-    /**
-     * Performers are initialized with a target.
-     */
-    void initialize(Object target);
-
-    /**
-     * Provides a {@link Plan} to this Performer. The Performer is expected to execute this
-     * plan.
-     */
-    void addPlan(Plan plan);
-
-    /**
-     * Returns the target that this Performer is associated with.
-     *
-     * @param <T> Convenience to avoid casting, for when the caller knows the type of the
-     * target.
-     * @return The target.
-     */
-    <T> T getTarget();
-  }
-
-  /**
    * A Performer implements this interface in order to request and release is-active tokens. The
    * runtime uses these tokens to inform its active state. If any performer owns an is-active
    * token then the runtime is active. Otherwise, the runtime is idle.
@@ -66,7 +39,7 @@ public final class PerformerFeatures {
    * IsActiveTokenGenerator#generate() starts} and release the token when the continuous
    * performance {@link IsActiveToken#terminate() ends}.
    */
-  public interface ContinuousPerforming extends BasePerforming {
+  public interface ContinuousPerforming {
 
     /**
      * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link
@@ -107,7 +80,7 @@ public final class PerformerFeatures {
    * <p>
    * The Performer is expected to calculate and set its target's next state on each update.
    */
-  public interface ManualPerforming extends BasePerforming {
+  public interface ManualPerforming {
 
     /**
      * Called by the {@link MotionRuntime} to notify the {@link Performer} of a new frame.
@@ -125,7 +98,7 @@ public final class PerformerFeatures {
    * <p>
    * The Performer should call {@link PlanEmitter#emit(Plan)} to add new plans.
    */
-  public interface ComposablePerforming extends BasePerforming {
+  public interface ComposablePerforming {
 
     /**
      * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link

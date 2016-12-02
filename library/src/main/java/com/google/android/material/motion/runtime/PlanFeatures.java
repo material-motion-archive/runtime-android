@@ -30,25 +30,11 @@ public final class PlanFeatures {
   }
 
   /**
-   * Defines the base functionality for {@link Plan}s. You should not have to implement this
-   * interface yourself.
-   */
-  public interface BasePlan extends Cloneable {
-
-    /**
-     * @return The {@link Class} of the {@link Performer} that can fulfill this plan.
-     */
-    Class<? extends Performer> getPerformerClass();
-
-    BasePlan clone();
-  }
-
-  /**
    * Plans should implement this interface if it wants to support the serialize API.
    * <p>
    * Serializable Plans can be sent over a wire or recorded to disk.
    */
-  public interface SerializablePlan extends BasePlan {
+  public interface SerializablePlan {
 
     /**
      * Serializes the Plan into JSON.

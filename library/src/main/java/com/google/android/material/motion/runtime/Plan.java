@@ -18,14 +18,12 @@ package com.google.android.material.motion.runtime;
 
 import android.support.annotation.VisibleForTesting;
 
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-
 /**
  * A Plan is an object representing what you want something to do. A Plan uses a {@link Performer}
  * to fulfill itself.
  * <p>
- * Plans must be {@link Cloneable}, and by default {@link #clone()} makes a shallow copy. If your
- * Plan contains mutable Object references, override {@link #clone()} to make a deep copy.
+ * Plans are {@link Cloneable}, and by default {@link #clone()} makes a shallow copy. If your Plan
+ * contains mutable Object references, override {@link #clone()} to make a deep copy.
  * <p>
  * The {@link PlanFeatures} interfaces define optional APIs.
  *
@@ -33,12 +31,18 @@ import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
  * Plan specificiation</a>
  * @see Object#clone()
  */
-public abstract class Plan implements BasePlan {
+public abstract class Plan implements Cloneable {
+
+  /**
+   * @return The {@link Class} of the {@link Performer} that can fulfill this plan.
+   */
+  protected abstract Class<? extends Performer> getPerformerClass();
 
   /**
    * By default this implementation makes a shallow copy. If your Plan contains mutable Object
    * references, override this method to make a deep copy.
    */
+  @SuppressWarnings("CloneDoesntCallSuperClone")
   @Override
   public Plan clone() {
     try {

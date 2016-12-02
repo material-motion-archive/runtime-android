@@ -16,8 +16,6 @@
 
 package com.google.android.material.motion.runtime;
 
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
-
 /**
  * A Performer is an object responsible for executing a {@link Plan}.
  * <p>
@@ -31,7 +29,7 @@ import com.google.android.material.motion.runtime.PerformerFeatures.BasePerformi
  * Performer specification</a>
  */
 
-public abstract class Performer implements BasePerforming {
+public abstract class Performer {
 
   /**
    * Thrown when there is an instantiation failure. Make sure that your {@link Performer}'s class
@@ -52,8 +50,7 @@ public abstract class Performer implements BasePerforming {
 
   private Object target;
 
-  @Override
-  public final void initialize(Object target) {
+  final void initialize(Object target) {
     this.target = target;
     onInitialize(target);
   }
@@ -64,7 +61,11 @@ public abstract class Performer implements BasePerforming {
   protected void onInitialize(Object target) {
   }
 
-  @Override
+  /**
+   * Provides a {@link Plan} to this Performer. The Performer is expected to execute this plan.
+   */
+  protected abstract void addPlan(Plan plan);
+
   public final <T> T getTarget() {
     //noinspection unchecked Cast expected to fail if target type is incorrect
     return (T) target;

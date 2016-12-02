@@ -168,7 +168,7 @@ class TargetScope {
 
       if (performer instanceof ComposablePerforming) {
         ComposablePerforming composablePerformer = (ComposablePerforming) performer;
-        composablePerformer.setPlanEmitter(createPlanEmitter(composablePerformer));
+        composablePerformer.setPlanEmitter(createPlanEmitter(performer));
       }
 
       for (Tracing tracing : runtime.getTracers()) {
@@ -227,7 +227,7 @@ class TargetScope {
   /**
    * Creates a {@link PlanEmitter} to be assigned to the given {@link ComposablePerforming}.
    */
-  private PlanEmitter createPlanEmitter(final ComposablePerforming performer) {
+  private PlanEmitter createPlanEmitter(final Performer performer) {
     return new PlanEmitter() {
       @Override
       public void emit(Plan plan) {
