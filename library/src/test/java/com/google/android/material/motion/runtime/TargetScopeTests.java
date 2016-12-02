@@ -15,20 +15,16 @@
  */
 package com.google.android.material.motion.runtime;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.mock;
-
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
+
+import com.google.android.material.motion.runtime.MotionRuntime.State;
 import com.google.android.material.motion.runtime.Performer.PerformerInstantiationException;
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveToken;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming.IsActiveTokenGenerator;
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.MotionRuntime.State;
 import com.google.android.material.motion.runtime.testing.StepChoreographer;
 
 import org.junit.Before;
@@ -39,6 +35,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
@@ -122,7 +121,7 @@ public class TargetScopeTests {
     token.terminate();
   }
 
-  private static class ManualPlan extends Plan {
+  private static class ManualPlan extends Plan<Object> {
 
     @State
     private int state;
@@ -132,12 +131,12 @@ public class TargetScopeTests {
     }
 
     @Override
-    public Class<? extends BasePerforming> getPerformerClass() {
+    public Class<? extends Performer<Object>> getPerformerClass() {
       return ManualPerformer.class;
     }
   }
 
-  public static class ManualPerformer extends Performer implements ManualPerforming {
+  public static class ManualPerformer extends Performer<Object> implements ManualPerforming {
 
     @State
     int state;
@@ -148,41 +147,41 @@ public class TargetScopeTests {
     }
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan<Object> plan) {
       state = ((ManualPlan) plan).state;
     }
   }
 
-  private static class PrivatePlan extends Plan {
+  private static class PrivatePlan extends Plan<Object> {
 
     @Override
-    public Class<? extends BasePerforming> getPerformerClass() {
+    public Class<? extends Performer<Object>> getPerformerClass() {
       return PrivatePerformer.class;
     }
   }
 
-  private static class PrivatePerformer extends Performer {
+  private static class PrivatePerformer extends Performer<Object> {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan<Object> plan) {
     }
   }
 
-  private static class OneArgConstructorPlan extends Plan {
+  private static class OneArgConstructorPlan extends Plan<Object> {
 
     @Override
-    public Class<? extends BasePerforming> getPerformerClass() {
+    public Class<? extends Performer<Object>> getPerformerClass() {
       return OneArgConstructorPerformer.class;
     }
   }
 
-  public static class OneArgConstructorPerformer extends Performer {
+  public static class OneArgConstructorPerformer extends Performer<Object> {
 
     public OneArgConstructorPerformer(Object param) {
     }
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan<Object> plan) {
     }
   }
 }

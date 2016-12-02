@@ -17,8 +17,6 @@ package com.google.android.material.motion.runtime;
 
 import android.support.annotation.VisibleForTesting;
 
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 import com.google.android.material.motion.runtime.MotionRuntime.State;
 
 /**
@@ -32,57 +30,6 @@ public final class PerformerFeatures {
   }
 
   /**
-   * Defines the base functionality for {@link Performer}s. You should not have to implement this
-   * interface yourself.
-   */
-  public interface BasePerforming {
-
-    /**
-     * Performers are initialized with a target.
-     */
-    void initialize(Object target);
-
-    /**
-     * Provides a {@link Plan} to this Performer. The Performer is expected to execute this
-     * plan.
-     */
-    void addPlan(BasePlan plan);
-
-    /**
-     * Returns the target that this Performer is associated with.
-     *
-     * @param <T> Convenience to avoid casting, for when the caller knows the type of the
-     * target.
-     * @return The target.
-     */
-    <T> T getTarget();
-  }
-
-  /**
-   * A Performer can implement this interface in order to support the add and remove for {@link
-   * NamedPlan}s APIs.
-   */
-  public interface NamedPlanPerforming extends BasePerforming {
-
-    /**
-     * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any
-     * plan added in this manner.
-     *
-     * @param plan the plan which was added to this performer.
-     * @param name the name by which this plan can be identified.
-     */
-    void addPlan(NamedPlan plan, String name);
-
-    /**
-     * Provides a {@link NamedPlan} to this Performer. The Performer is expected remove any plan
-     * presented in this manner.
-     *
-     * @param name the name by which this plan was identified.
-     */
-    void removePlan(String name);
-  }
-
-  /**
    * A Performer implements this interface in order to request and release is-active tokens. The
    * runtime uses these tokens to inform its active state. If any performer owns an is-active
    * token then the runtime is active. Otherwise, the runtime is idle.
@@ -92,7 +39,7 @@ public final class PerformerFeatures {
    * IsActiveTokenGenerator#generate() starts} and release the token when the continuous
    * performance {@link IsActiveToken#terminate() ends}.
    */
-  public interface ContinuousPerforming extends BasePerforming {
+  public interface ContinuousPerforming {
 
     /**
      * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link
@@ -133,14 +80,14 @@ public final class PerformerFeatures {
    * <p>
    * The Performer is expected to calculate and set its target's next state on each update.
    */
-  public interface ManualPerforming extends BasePerforming {
+  public interface ManualPerforming {
 
     /**
      * Called by the {@link MotionRuntime} to notify the {@link Performer} of a new frame.
      *
      * @param deltaTimeMs The elapsed time in milliseconds since the last update.
-     * @return The {@link State} of this Performer after this update. {@link MotionRuntime#IDLE} means
-     * this Performer does not wish to get any more frame updates.
+     * @return The {@link State} of this Performer after this update. {@link MotionRuntime#IDLE}
+     * means this Performer does not wish to get any more frame updates.
      */
     @State
     int update(float deltaTimeMs);
@@ -151,24 +98,27 @@ public final class PerformerFeatures {
    * <p>
    * The Performer should call {@link PlanEmitter#emit(Plan)} to add new plans.
    */
-  public interface ComposablePerforming extends BasePerforming {
+  public interface ComposablePerforming<T> {
 
     /**
      * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link
      * PlanEmitter}.
      */
-    void setPlanEmitter(PlanEmitter planEmitter);
+    void setPlanEmitter(PlanEmitter<T> planEmitter);
 
     /**
      * A plan emitter allows an object to emit new plans to a backing runtime for the target to
      * which the performer is associated.
+     *
+     * @param <T> This emitter will only accept plans that can be applied to this type of
+     * target.
      */
-    interface PlanEmitter {
+    interface PlanEmitter<T> {
 
       /**
        * Emit a new plan. The plan will immediately be added to the backing runtime.
        */
-      void emit(Plan plan);
+      void emit(Plan<T> plan);
     }
   }
 }

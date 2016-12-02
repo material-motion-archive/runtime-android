@@ -16,22 +16,21 @@
 
 package com.google.android.material.motion.runtime;
 
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
-
 /**
  * A Performer is an object responsible for executing a {@link Plan}.
- *
- * <p> Plans define the {@link Class} of Performer that can fulfill it. Your Performer will be
+ * <p>
+ * Plans define the {@link Class} of Performer that can fulfill it. Your Performer will be
  * instantiated via reflection, so take care that a {@link PerformerInstantiationException} will not
  * be thrown.
+ * <p>
+ * The {@link PerformerFeatures} interfaces define optional APIs.
  *
- * <p> The {@link PerformerFeatures} interfaces define optional APIs.
- *
+ * @param <T> The type of target this performer can act on.
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/performer.html">The
  * Performer specification</a>
  */
 
-public abstract class Performer implements BasePerforming {
+public abstract class Performer<T> {
 
   /**
    * Thrown when there is an instantiation failure. Make sure that your {@link Performer}'s class
@@ -40,7 +39,7 @@ public abstract class Performer implements BasePerforming {
   public static class PerformerInstantiationException extends RuntimeException {
 
     public PerformerInstantiationException(
-      Class<? extends BasePerforming> klass, Exception cause) {
+      Class<? extends Performer> klass, Exception cause) {
       super(
         "Unable to instantiate Performer "
           + klass.getName()
@@ -50,23 +49,37 @@ public abstract class Performer implements BasePerforming {
     }
   }
 
-  private Object target;
+  private T target;
 
-  @Override
-  public final void initialize(Object target) {
-    this.target = target;
-    onInitialize(target);
+  /**
+   * Performers are initialized with a target.
+   */
+  final void initialize(T target) {
+    //noinspection unchecked
+    this.target = (T) target;
+    onInitialize(this.target);
   }
 
   /**
    * Invoked immediately after this Performer has been initialized with a target.
    */
-  protected void onInitialize(Object target) {
+  protected void onInitialize(T target) {
   }
 
-  @Override
-  public final <T> T getTarget() {
-    //noinspection unchecked Cast expected to fail if target type is incorrect
-    return (T) target;
+  /**
+   * Provides a {@link Plan} to this Performer. The Performer is expected to execute this plan.
+   */
+  protected abstract void addPlan(Plan<T> plan);
+
+  /**
+   * ​Returns the target that this Performer is associated with. ​
+   *
+   * @param <Type> Convenience to avoid casting, for when the caller knows the type of the
+   * target.
+   * @return The target. ​
+   */
+  public final <Type extends T> Type getTarget() {
+    //noinspection unchecked
+    return (Type) target;
   }
 }

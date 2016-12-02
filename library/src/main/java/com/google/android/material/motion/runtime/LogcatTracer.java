@@ -18,8 +18,6 @@ package com.google.android.material.motion.runtime;
 
 import android.util.Log;
 
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-
 /**
  * An implementation of {@link Tracing} which logs directly to logcat.
  */

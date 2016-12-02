@@ -18,31 +18,37 @@ package com.google.android.material.motion.runtime;
 
 import android.support.annotation.VisibleForTesting;
 
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-
 /**
  * A Plan is an object representing what you want something to do. A Plan uses a {@link Performer}
  * to fulfill itself.
  * <p>
- * Plans must be {@link Cloneable}, and by default {@link #clone()} makes a shallow copy. If your
- * Plan contains mutable Object references, override {@link #clone()} to make a deep copy.
+ * Plans are {@link Cloneable}, and by default {@link #clone()} makes a shallow copy. If your Plan
+ * contains mutable Object references, override {@link #clone()} to make a deep copy.
  * <p>
  * The {@link PlanFeatures} interfaces define optional APIs.
  *
+ * @param <T> The type of target this plan can be applied to.
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/plan.html">The
  * Plan specificiation</a>
  * @see Object#clone()
  */
-public abstract class Plan implements BasePlan {
+public abstract class Plan<T> implements Cloneable {
+
+  /**
+   * @return The {@link Class} of the {@link Performer} that can fulfill this plan.
+   */
+  protected abstract Class<? extends Performer<T>> getPerformerClass();
 
   /**
    * By default this implementation makes a shallow copy. If your Plan contains mutable Object
    * references, override this method to make a deep copy.
    */
+  @SuppressWarnings("CloneDoesntCallSuperClone")
   @Override
-  public Plan clone() {
+  public Plan<T> clone() {
     try {
-      return (Plan) superClone();
+      //noinspection unchecked
+      return (Plan<T>) superClone();
     } catch (CloneNotSupportedException e) {
       throw new AssertionError();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present The Material Motion Authors. All Rights Reserved.
+ * Copyright 2016-present The Material Motion Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,40 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.google.android.material.motion.runtime.plans;
 
 import com.google.android.material.motion.runtime.NamedPerformer;
 import com.google.android.material.motion.runtime.NamedPlan;
-import com.google.android.material.motion.runtime.Performer;
 import com.google.android.material.motion.runtime.Plan;
-import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 
-public class CounterAlteringPlan extends NamedPlan<IncrementerTarget> {
-
+/**
+ * A plan that takes any target and does nothing.
+ */
+public class NoOpPlan extends NamedPlan<Object> {
   @Override
-  public Class<? extends NamedPerformer<IncrementerTarget>> getPerformerClass() {
-    return CounterAlteringPerformer.class;
+  public Class<? extends NamedPerformer<Object>> getPerformerClass() {
+    return NoOpPerformer.class;
   }
 
-  public static class CounterAlteringPerformer extends NamedPerformer<IncrementerTarget> {
-
+  public static class NoOpPerformer extends NamedPerformer<Object> {
     @Override
-    public void addPlan(Plan<IncrementerTarget> plan) {
-      IncrementerTarget target = getTarget();
-      target.addCounter += 1;
+    public void addPlan(Plan<Object> plan) {
+      // No-op.
     }
 
     @Override
-    public void addPlan(NamedPlan<IncrementerTarget> plan, String name) {
-      IncrementerTarget target = getTarget();
-      target.addCounter += 1;
+    public void addPlan(NamedPlan<Object> plan, String name) {
+      // No-op.
     }
 
     @Override
     public void removePlan(String name) {
-      IncrementerTarget target = getTarget();
-      target.removeCounter += 1;
+      // No-op.
     }
   }
 }

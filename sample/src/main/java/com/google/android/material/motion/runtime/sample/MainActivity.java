@@ -23,13 +23,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.material.motion.runtime.MotionRuntime;
+import com.google.android.material.motion.runtime.NamedPerformer;
+import com.google.android.material.motion.runtime.NamedPlan;
 import com.google.android.material.motion.runtime.Performer;
-import com.google.android.material.motion.runtime.PerformerFeatures.BasePerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.NamedPlanPerforming;
 import com.google.android.material.motion.runtime.Plan;
-import com.google.android.material.motion.runtime.PlanFeatures.BasePlan;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 
 /**
  * Material Motion Android Runtime sample Activity.
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     runtime.addPlan(new DemoPlan2(.5f), text2);
   }
 
-  private static class DemoPlan1 extends Plan implements NamedPlan {
+  private static class DemoPlan1 extends NamedPlan<TextView> {
 
     private final String text;
 
@@ -66,15 +64,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends NamedPlanPerforming> getPerformerClass() {
+    public Class<? extends NamedPerformer<TextView>> getPerformerClass() {
       return DemoPerformer1.class;
     }
   }
 
-  public static class DemoPerformer1 extends Performer implements NamedPlanPerforming {
+  public static class DemoPerformer1 extends NamedPerformer<TextView> {
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan<TextView> plan) {
       DemoPlan1 demoPlan = (DemoPlan1) plan;
       TextView target = getTarget();
 
@@ -82,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void addPlan(NamedPlan plan, String name) {
+    public void addPlan(NamedPlan<TextView> plan, String name) {
       addPlan(plan);
     }
 
@@ -91,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
-  private static class DemoPlan2 extends Plan {
+  private static class DemoPlan2 extends Plan<View> {
 
     private final float alpha;
 
@@ -100,12 +98,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public Class<? extends BasePerforming> getPerformerClass() {
+    public Class<? extends Performer<View>> getPerformerClass() {
       return DemoPerformer2.class;
     }
   }
 
-  public static class DemoPerformer2 extends Performer implements ContinuousPerforming {
+  public static class DemoPerformer2 extends Performer<View> implements ContinuousPerforming {
 
     private IsActiveTokenGenerator isActiveTokenGenerator;
 
@@ -115,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void addPlan(BasePlan plan) {
+    public void addPlan(Plan<View> plan) {
       DemoPlan2 demoPlan = (DemoPlan2) plan;
       View target = getTarget();
 

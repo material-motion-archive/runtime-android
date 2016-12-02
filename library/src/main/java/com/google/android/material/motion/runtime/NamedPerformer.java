@@ -16,8 +16,24 @@
 package com.google.android.material.motion.runtime;
 
 /**
- * @deprecated in 5.1.0 use {@link MotionRuntime}.
+ * A performer that supports the named plan API.
  */
-@Deprecated
-public class Runtime extends MotionRuntime {
+public abstract class NamedPerformer<T> extends Performer<T> {
+
+  /**
+   * Provides a {@link NamedPlan} to this Performer. The Performer is expected to execute any plan
+   * added in this manner.
+   *
+   * @param plan the plan which was added to this performer.
+   * @param name the name by which this plan can be identified.
+   */
+  public abstract void addPlan(NamedPlan<T> plan, String name);
+
+  /**
+   * Provides a {@link NamedPlan} to this Performer. The Performer is expected remove any plan
+   * presented in this manner.
+   *
+   * @param name the name by which this plan was identified.
+   */
+  public abstract void removePlan(String name);
 }

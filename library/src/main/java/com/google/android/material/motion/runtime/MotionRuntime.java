@@ -24,7 +24,6 @@ import android.util.Log;
 import com.google.android.material.motion.runtime.ChoreographerCompat.FrameCallback;
 import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
 import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -38,17 +37,17 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * The Material Motion runtime accepts {@link Plan Plans} and creates {@link Performer Performers}.
  * The runtime generates relevant events for Performers and {@link StateListener listeners} and
  * monitors {@link State}.
- *
- * <p> Commit Plans to the runtime by calling {@link #addPlan(Plan, Object)}. A runtime ensures that
+ * <p>
+ * Commit Plans to the runtime by calling {@link #addPlan(Plan, Object)}. A runtime ensures that
  * only one {@link Performer} instance is created for each type of Performer required by a target.
  * This allows multiple {@link Plan Plans} to affect a single Performer instance. The Performers can
  * then maintain state across multiple Plans.
- *
- * <p> Query the State of the runtime by calling {@link #getState()}. The runtime is active if any
+ * <p>
+ * Query the State of the runtime by calling {@link #getState()}. The runtime is active if any
  * of its Performers are active. To listen for state changes, attach listeners via {@link
  * #addStateListener(StateListener)}.
- *
- * <p> The runtime correctly handles all the interfaces defined in {@link PlanFeatures} and {@link
+ * <p>
+ * The runtime correctly handles all the interfaces defined in {@link PlanFeatures} and {@link
  * PerformerFeatures}.
  *
  * @see <a href="https://material-motion.gitbooks.io/material-motion-starmap/content/specifications/runtime/runtime.html">The
@@ -156,24 +155,27 @@ public class MotionRuntime {
    *
    * @param plan the {@link Plan} to add to the runtime.
    * @param target the target on which the plan will operate.
+   * @param <T> The type of target this plan can be applied to.
    */
-  public void addPlan(Plan plan, Object target) {
+  public <T> void addPlan(Plan<T> plan, T target) {
     getTargetScope(target).commitPlan(plan.clone(), target);
   }
 
   /**
-   * Adds a {@link NamedPlan} to the runtime. When this method is invoked, a {@link NamedPlan} with
-   * the same name and target is removed from the runtime before the plan is eventually added.
+   * Adds a {@link NamedPlan} to the runtime. When this method is invoked, a {@link NamedPlan}
+   * with the same name and target is removed from the runtime before the plan is eventually
+   * added.
    *
    * @param plan the {@link NamedPlan} to add to the runtime.
    * @param name the name by which this plan can be identified.
    * @param target the target on which the plan will operate.
+   * @param <T> The type of target this plan can be applied to.
    */
-  public void addNamedPlan(NamedPlan plan, String name, Object target) {
+  public <T> void addNamedPlan(NamedPlan<T> plan, String name, T target) {
     if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException("A NamedPlan must have a non-empty name.");
     }
-    getTargetScope(target).commitAddNamedPlan((NamedPlan) plan.clone(), name, target);
+    getTargetScope(target).commitAddNamedPlan(plan.clone(), name, target);
   }
 
   /**
@@ -181,8 +183,9 @@ public class MotionRuntime {
    *
    * @param name the name by which the named plan can be identified.
    * @param target the target on which the named plan was added.
+   * @param <T> The type of target this plan can be applied to.
    */
-  public void removeNamedPlan(String name, Object target) {
+  public <T> void removeNamedPlan(String name, T target) {
     if (name == null || name.isEmpty()) {
       throw new IllegalArgumentException("A NamedPlan must have a non-empty name.");
     }
@@ -218,11 +221,12 @@ public class MotionRuntime {
     return tracers;
   }
 
-  private TargetScope getTargetScope(Object target) {
-    TargetScope targetScope = targets.get(target);
+  private <T> TargetScope<T> getTargetScope(T target) {
+    //noinspection unchecked
+    TargetScope<T> targetScope = targets.get(target);
 
     if (targetScope == null) {
-      targetScope = new TargetScope(this);
+      targetScope = new TargetScope<>(this);
       targets.put(target, targetScope);
     }
 
@@ -230,7 +234,8 @@ public class MotionRuntime {
   }
 
   /**
-   * Notifies the runtime that a {@link TargetScope}'s detailed state may or may not have changed.
+   * Notifies the runtime that a {@link TargetScope}'s detailed state may or may not have
+   * changed.
    */
   void setTargetState(TargetScope target, int targetDetailedState) {
     int oldDetailedState = getDetailedState();

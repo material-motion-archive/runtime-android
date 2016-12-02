@@ -35,4 +35,6 @@ public class LegacyChoreographerCompatTests extends ChoreographerCompatTests {
   public void nullLooperThrows() {
     new ChoreographerCompat.LegacyHandlerWrapper(null);
   }
+
+  // Super-class runs all tests.
 }

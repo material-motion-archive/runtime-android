@@ -19,9 +19,7 @@ package com.google.android.material.motion.runtime;
 import android.app.Activity;
 import android.widget.TextView;
 
-import com.google.android.material.motion.runtime.PlanFeatures.NamedPlan;
-import com.google.android.material.motion.runtime.plans.CounterAlteringPlan;
-import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
+import com.google.android.material.motion.runtime.plans.NoOpPlan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 
 import org.junit.Before;
@@ -51,8 +49,8 @@ public class LogcatTracerTests {
 
   @Test
   public void testAddingAndRemovingPlansToAndFromDifferentTargets() {
-    Plan regularPlan = new CounterAlteringPlan();
-    NamedPlan namedPlan = new TextViewAlteringNamedPlan("standard");
+    Plan regularPlan = new NoOpPlan();
+    NamedPlan namedPlan = new NoOpPlan();
 
     List<Object> targets = new ArrayList<>();
     targets.add(new TextView(Robolectric.setupActivity(Activity.class)));
