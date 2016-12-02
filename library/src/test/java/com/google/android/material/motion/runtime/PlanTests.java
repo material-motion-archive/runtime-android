@@ -15,6 +15,8 @@
  */
 package com.google.android.material.motion.runtime;
 
+import com.google.android.material.motion.runtime.RuntimeTests.NoOpPlan;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -29,12 +31,7 @@ public class PlanTests {
 
   @Test(expected = AssertionError.class)
   public void cloneExceptionThrowsAssertionError() throws CloneNotSupportedException {
-    Plan plan = spy(new Plan() {
-      @Override
-      public Class<? extends Performer> getPerformerClass() {
-        return null;
-      }
-    });
+    Plan plan = spy(new NoOpPlan());
 
     doThrow(new CloneNotSupportedException()).when(plan).superClone();
 

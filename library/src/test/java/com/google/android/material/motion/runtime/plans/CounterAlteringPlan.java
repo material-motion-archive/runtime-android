@@ -16,25 +16,37 @@
 
 package com.google.android.material.motion.runtime.plans;
 
+import com.google.android.material.motion.runtime.NamedPerformer;
+import com.google.android.material.motion.runtime.NamedPlan;
 import com.google.android.material.motion.runtime.Performer;
 import com.google.android.material.motion.runtime.Plan;
 import com.google.android.material.motion.runtime.targets.IncrementerTarget;
 
-public class CounterAlteringPlan extends Plan {
+public class CounterAlteringPlan extends NamedPlan<IncrementerTarget> {
 
   @Override
-  public Class<? extends Performer> getPerformerClass() {
+  public Class<? extends NamedPerformer<IncrementerTarget>> getPerformerClass() {
     return CounterAlteringPerformer.class;
   }
 
-  public static class CounterAlteringPerformer extends Performer {
+  public static class CounterAlteringPerformer extends NamedPerformer<IncrementerTarget> {
 
     @Override
-    public void addPlan(Plan plan) {
-      Object target = getTarget();
-      if (target instanceof IncrementerTarget) {
-        ((IncrementerTarget) target).addCounter += 1;
-      }
+    public void addPlan(Plan<IncrementerTarget> plan) {
+      IncrementerTarget target = getTarget();
+      target.addCounter += 1;
+    }
+
+    @Override
+    public void addPlan(NamedPlan<IncrementerTarget> plan, String name) {
+      IncrementerTarget target = getTarget();
+      target.addCounter += 1;
+    }
+
+    @Override
+    public void removePlan(String name) {
+      IncrementerTarget target = getTarget();
+      target.removeCounter += 1;
     }
   }
 }

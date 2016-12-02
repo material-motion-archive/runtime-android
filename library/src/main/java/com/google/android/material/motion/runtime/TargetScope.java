@@ -167,7 +167,8 @@ class TargetScope<T> {
       }
 
       if (performer instanceof ComposablePerforming) {
-        ComposablePerforming composablePerformer = (ComposablePerforming) performer;
+        //noinspection unchecked
+        ComposablePerforming<T> composablePerformer = (ComposablePerforming<T>) performer;
         composablePerformer.setPlanEmitter(createPlanEmitter(performer));
       }
 

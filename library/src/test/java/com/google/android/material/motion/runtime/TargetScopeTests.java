@@ -121,7 +121,7 @@ public class TargetScopeTests {
     token.terminate();
   }
 
-  private static class ManualPlan extends Plan {
+  private static class ManualPlan extends Plan<Object> {
 
     @State
     private int state;
@@ -131,12 +131,12 @@ public class TargetScopeTests {
     }
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends Performer<Object>> getPerformerClass() {
       return ManualPerformer.class;
     }
   }
 
-  public static class ManualPerformer extends Performer implements ManualPerforming {
+  public static class ManualPerformer extends Performer<Object> implements ManualPerforming {
 
     @State
     int state;
@@ -147,41 +147,41 @@ public class TargetScopeTests {
     }
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(Plan<Object> plan) {
       state = ((ManualPlan) plan).state;
     }
   }
 
-  private static class PrivatePlan extends Plan {
+  private static class PrivatePlan extends Plan<Object> {
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends Performer<Object>> getPerformerClass() {
       return PrivatePerformer.class;
     }
   }
 
-  private static class PrivatePerformer extends Performer {
+  private static class PrivatePerformer extends Performer<Object> {
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(Plan<Object> plan) {
     }
   }
 
-  private static class OneArgConstructorPlan extends Plan {
+  private static class OneArgConstructorPlan extends Plan<Object> {
 
     @Override
-    public Class<? extends Performer> getPerformerClass() {
+    public Class<? extends Performer<Object>> getPerformerClass() {
       return OneArgConstructorPerformer.class;
     }
   }
 
-  public static class OneArgConstructorPerformer extends Performer {
+  public static class OneArgConstructorPerformer extends Performer<Object> {
 
     public OneArgConstructorPerformer(Object param) {
     }
 
     @Override
-    public void addPlan(Plan plan) {
+    public void addPlan(Plan<Object> plan) {
     }
   }
 }

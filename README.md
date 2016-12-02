@@ -172,7 +172,7 @@ public class MyPlan {
 
 Performers are responsible for fulfilling plans. Fulfillment is possible in a variety of ways:
 
-- [NamedPlanPerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.NamedPlanPerforming.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
+- [NamedPerformer](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/NamedPerformer.html): [How to configure performers with named plans](#how-to-configure-performers-with-named-plans)
 - [ContinuousPerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ContinuousPerforming.html): [How to indicate continuous performance](#how-to-indicate-continuous-performance)
 - [ComposablePerforming](https://jitpack.io/com/github/material-motion/runtime-android/5.1.0/javadoc/index.html?com/google/android/material/motion/runtime/PerformerFeatures.ComposablePerforming.html): [How to use composition to fulfill plans](#how-to-use-composition-to-fulfill-plans)
 
@@ -183,10 +183,7 @@ See the associated links for more details on each performing type.
 > [How to configure performers with plans](#how-to-configure-performers-with-plans) for more details.
 
 ```java
-public class MyPerformer extends Performer {
-  @Override
-  public void addPlan(Plan plan) {
-  }
+public class MyPerformer {
 }
 ```
 
@@ -194,13 +191,14 @@ public class MyPerformer extends Performer {
 
 Conforming to Plan requires:
 
+1. that you choose the type of target your plan applies to,
 1. that you define the type of performer your plan requires, and
-2. that your plan be Cloneable.
+1. that your plan be Cloneable.
 
 ```java
-public class MyPlan extends Plan {
+public class MyPlan extends Plan<View> {
   @Override
-  public Class<? extends Performer> getPerformerClass() {
+  public Class<? extends Performer<View>> getPerformerClass() {
     return MyPerformer.class;
   }
 
@@ -208,6 +206,22 @@ public class MyPlan extends Plan {
   public Plan clone() {
     // Only override this method if you need to deep clone reference-typed fields.
     return super.clone();
+  }
+}
+```
+
+### Step 4: Make the performer type a formal Performer
+
+Conforming to Performer requires:
+
+1. that the type of target your performer can act on agrees with the plan, and
+1. that you fulfill all plans passed to `addPlan()`.
+
+```java
+public class MyPerformer extends Performer<View> {
+  @Override
+  public void addPlan(Plan<View> plan) {
+    View target = getTarget();
   }
 }
 ```
@@ -225,7 +239,7 @@ public class MyActivity extends Activity {
 ### Step 2: Associate plans with targets
 
 ```java
-Plan plan;
+Plan<View> plan;
 View target;
 
 runtime.addPlan(plan, target);
@@ -244,7 +258,7 @@ public class MyActivity extends Activity {
 ### Step 2: Associate named plans with targets
 
 ```java
-NamedPlan plan;
+NamedPlan<View> plan;
 String name;
 View target;
 
@@ -256,9 +270,9 @@ runtime.addNamedPlan(plan, name, target);
 The `addPlan()` method will be invoked with plans that require use of this performer.
 
 ```java
-public class MyPerformer extends Performer {
+public class MyPerformer extends Performer<View> {
   @Override
-  public void addPlan(Plan plan) {
+  public void addPlan(Plan<View> plan) {
     MyPlan myPlan = (MyPlan) plan;
 
     // Do something with myPlan.
@@ -269,9 +283,9 @@ public class MyPerformer extends Performer {
 ***Handling multiple plan types***
 
 ```java
-public class MyPerformer extends Performer {
+public class MyPerformer extends Performer<View> {
   @Override
-  public void addPlan(Plan plan) {
+  public void addPlan(Plan<View> plan) {
     if (plan instanceof Plan1) {
       addPlan1((Plan1) plan);
     } else if (plan instanceof Plan2) {
@@ -286,9 +300,9 @@ public class MyPerformer extends Performer {
 ## How to configure performers with named plans
 
 ```java
-public class MyPerformer extends NamedPerformer {
+public class MyPerformer extends NamedPerformer<View> {
   @Override
-  public void addPlan(NamedPlan plan, String name) {
+  public void addPlan(NamedPlan<View> plan, String name) {
     MyPlan myPlan = (MyPlan) plan;
 
     // Do something with myPlan.
@@ -309,12 +323,12 @@ reuse of plans and the creation of higher-order abstractions.
 ### Step 1: Conform to ComposablePerforming and store the plan emitter
 
 ```java
-public class MyPerformer extends Performer implements ComposablePerforming {
+public class MyPerformer extends Performer<View> implements ComposablePerforming<View> {
   // Store the emitter in your class' definition.
-  private PlanEmitter emitter;
+  private PlanEmitter<View> emitter;
 
   @Override
-  public void setPlanEmitter(PlanEmitter planEmitter) {
+  public void setPlanEmitter(PlanEmitter<View> planEmitter) {
     this.emitter = planEmitter;
   }
 }
@@ -325,7 +339,8 @@ public class MyPerformer extends Performer implements ComposablePerforming {
 Performers are only able to emit plans for their associated target.
 
 ```java
-Plan plan;
+PlanEmitter<View> emitter;
+Plan<View> plan;
 
 emitter.emit(plan);
 ```
@@ -346,7 +361,7 @@ animation starts. When the animation completes the token would be terminated.
 ### Step 1: Conform to ContinuousPerforming and store the token generator
 
 ```java
-public class MyPerformer extends Performer implements ComposablePerforming {
+public class MyPerformer extends Performer<View> implements ContinuousPerforming {
   // Store the emitter in your class' definition.
   private IsActiveTokenGenerator tokenGenerator;
 
@@ -408,7 +423,7 @@ The documentation for the Tracing interface enumerates the available methods.
 ```java
 public class CustomTracer implements Tracing {
   @Override
-  public void onAddPlan(Plan plan, Object target) {
+  public <T> void onAddPlan(Plan<T> plan, T target) {
 
   }
 }

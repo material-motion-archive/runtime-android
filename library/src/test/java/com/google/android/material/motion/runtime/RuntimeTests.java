@@ -15,33 +15,10 @@
  */
 package com.google.android.material.motion.runtime;
 
-import android.app.Activity;
-import android.content.Context;
-import android.view.View;
-import android.widget.TextView;
-
-import com.google.android.material.motion.runtime.MotionRuntime.State;
-import com.google.android.material.motion.runtime.MotionRuntime.StateListener;
-import com.google.android.material.motion.runtime.PerformerFeatures.ContinuousPerforming;
-import com.google.android.material.motion.runtime.PerformerFeatures.ManualPerforming;
-import com.google.android.material.motion.runtime.plans.TextViewAlteringNamedPlan;
-import com.google.android.material.motion.runtime.targets.IncrementerTarget;
-import com.google.android.material.motion.runtime.testing.StepChoreographer;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.google.common.truth.Truth.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
@@ -56,16 +33,26 @@ public class RuntimeTests {
     runtime.addPlan(plan, target);
   }
 
-  private static class NoOpPlan extends Plan<Object> {
+  public static class NoOpPlan extends NamedPlan<Object> {
     @Override
-    public Class<? extends Performer<Object>> getPerformerClass() {
+    public Class<? extends NamedPerformer<Object>> getPerformerClass() {
       return NoOpPerformer.class;
     }
   }
 
-  public static class NoOpPerformer extends Performer<Object> {
+  public static class NoOpPerformer extends NamedPerformer<Object> {
     @Override
     public void addPlan(Plan<Object> plan) {
+      // No-op.
+    }
+
+    @Override
+    public void addPlan(NamedPlan<Object> plan, String name) {
+      // No-op.
+    }
+
+    @Override
+    public void removePlan(String name) {
       // No-op.
     }
   }

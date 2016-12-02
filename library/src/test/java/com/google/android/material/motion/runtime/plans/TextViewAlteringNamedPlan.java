@@ -22,7 +22,7 @@ import com.google.android.material.motion.runtime.NamedPerformer;
 import com.google.android.material.motion.runtime.NamedPlan;
 import com.google.android.material.motion.runtime.Plan;
 
-public class TextViewAlteringNamedPlan extends NamedPlan {
+public class TextViewAlteringNamedPlan extends NamedPlan<TextView> {
 
   private final String text;
 
@@ -31,24 +31,21 @@ public class TextViewAlteringNamedPlan extends NamedPlan {
   }
 
   @Override
-  public Class<? extends NamedPerformer> getPerformerClass() {
+  public Class<? extends NamedPerformer<TextView>> getPerformerClass() {
     return TextViewAlteringPerformer.class;
   }
 
   public static class TextViewAlteringPerformer extends NamedPerformer<TextView> {
 
     @Override
-    public void addPlan(Plan plan) {
-      Object target = getTarget();
+    public void addPlan(Plan<TextView> plan) {
+      TextView target = getTarget();
       TextViewAlteringNamedPlan textViewAlteringNamedPlan = (TextViewAlteringNamedPlan) plan;
-      if (target instanceof TextView) {
-        TextView textView = getTarget();
-        textView.setText(textView.getText() + " " + textViewAlteringNamedPlan.text);
-      }
+      target.setText(target.getText() + " " + textViewAlteringNamedPlan.text);
     }
 
     @Override
-    public void addPlan(NamedPlan plan, String name) {
+    public void addPlan(NamedPlan<TextView> plan, String name) {
       addPlan(plan);
     }
 

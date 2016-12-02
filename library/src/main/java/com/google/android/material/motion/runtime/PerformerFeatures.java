@@ -98,13 +98,13 @@ public final class PerformerFeatures {
    * <p>
    * The Performer should call {@link PlanEmitter#emit(Plan)} to add new plans.
    */
-  public interface ComposablePerforming {
+  public interface ComposablePerforming<T> {
 
     /**
      * Called by the {@link MotionRuntime} to supply the {@link Performer} with a {@link
      * PlanEmitter}.
      */
-    void setPlanEmitter(PlanEmitter planEmitter);
+    void setPlanEmitter(PlanEmitter<T> planEmitter);
 
     /**
      * A plan emitter allows an object to emit new plans to a backing runtime for the target to

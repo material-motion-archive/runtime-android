@@ -71,7 +71,15 @@ public abstract class Performer<T> {
    */
   protected abstract void addPlan(Plan<T> plan);
 
-  public final T getTarget() {
-    return target;
+  /**
+   * ​Returns the target that this Performer is associated with. ​
+   *
+   * @param <Type> Convenience to avoid casting, for when the caller knows the type of the
+   * target.
+   * @return The target. ​
+   */
+  public final <Type extends T> Type getTarget() {
+    //noinspection unchecked
+    return (Type) target;
   }
 }

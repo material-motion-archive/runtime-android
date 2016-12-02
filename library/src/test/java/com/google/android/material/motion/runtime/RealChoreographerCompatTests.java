@@ -29,4 +29,6 @@ public class RealChoreographerCompatTests extends ChoreographerCompatTests {
     ChoreographerCompat.forceLegacy = false;
     ChoreographerCompat.threadInstance = ChoreographerCompat.createThreadInstance();
   }
+
+  // Super-class runs all tests.
 }
