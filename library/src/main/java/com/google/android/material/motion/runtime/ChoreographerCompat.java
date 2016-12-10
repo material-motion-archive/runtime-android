@@ -17,7 +17,6 @@
 package com.google.android.material.motion.runtime;
 
 import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Handler;
@@ -31,8 +30,9 @@ import android.view.Choreographer;
  * available until API 16. For older versions of Android, a Handler will be used instead.
  */
 public abstract class ChoreographerCompat {
+
   @VisibleForTesting
-  static boolean forceLegacy = false;
+  static int sdkInt = VERSION.SDK_INT;
 
   @VisibleForTesting
   static ThreadLocal<ChoreographerCompat> threadInstance = createThreadInstance();
@@ -43,7 +43,7 @@ public abstract class ChoreographerCompat {
     return new ThreadLocal<ChoreographerCompat>() {
       @Override
       protected ChoreographerCompat initialValue() {
-        if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN && !forceLegacy) {
+        if (sdkInt >= VERSION_CODES.JELLY_BEAN) {
           return new RealChoreographer();
         } else {
           return new LegacyHandlerWrapper(Looper.myLooper());

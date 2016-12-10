@@ -26,7 +26,6 @@ public class RealChoreographerCompatTests extends ChoreographerCompatTests {
 
   @BeforeClass
   public static void oneTimeSetUp() {
-    ChoreographerCompat.forceLegacy = false;
     ChoreographerCompat.threadInstance = ChoreographerCompat.createThreadInstance();
   }
 

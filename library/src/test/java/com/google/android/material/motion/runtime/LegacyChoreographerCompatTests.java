@@ -27,7 +27,7 @@ public class LegacyChoreographerCompatTests extends ChoreographerCompatTests {
 
   @BeforeClass
   public static void oneTimeSetUp() {
-    ChoreographerCompat.forceLegacy = true;
+    ChoreographerCompat.sdkInt = 15;
     ChoreographerCompat.threadInstance = ChoreographerCompat.createThreadInstance();
   }
 
